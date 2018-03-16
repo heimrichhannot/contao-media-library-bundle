@@ -1,0 +1,35 @@
+services:
+  huh.media_library.backend.product:
+    class: HeimrichHannot\MediaLibraryBundle\Backend\Product
+    arguments:
+      - "@contao.framework"
+      - "@huh.media_library.product_archive_registry"
+      - "@huh.media_library.product_registry"
+      - "@huh.media_library.download_registry"
+      - "@huh.utils.model"
+      - "@huh.utils.dca"
+  huh.media_library.backend.product_archive:
+      class: HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive
+      arguments:
+        - "@contao.framework"
+        - "@huh.media_library.product_archive_registry"
+        - "@huh.utils.model"
+        - "@huh.utils.dca"
+  huh.media_library.product_archive_registry:
+    class: HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry
+    arguments:
+      - "@contao.framework"
+      - "@huh.utils.model"
+      - "@huh.utils.dca"
+  huh.media_library.product_registry:
+    class: HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry
+    arguments:
+      - "@contao.framework"
+      - "@huh.utils.model"
+      - "@huh.utils.dca"
+  huh.media_library.download_registry:
+      class: HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry
+      arguments:
+        - "@contao.framework"
+        - "@huh.utils.model"
+        - "@huh.utils.dca"
