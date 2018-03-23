@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.build/
+.buildpath
+.idea/
+.project
+.settings/
+
+# Composer
+vendor
+composer.lock

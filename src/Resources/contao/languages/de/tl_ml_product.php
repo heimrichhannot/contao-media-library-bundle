@@ -18,6 +18,13 @@ $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'
 ];
+$lang['licence'] = [
+    'Lizenz',
+    'Geben Sie hier die Lizenz für dieses Produkt an.',
+    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE => 'frei',
+    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED => 'gesperrt'
+];
+
 
 /**
  * Legends

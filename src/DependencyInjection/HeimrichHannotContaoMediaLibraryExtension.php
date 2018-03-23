@@ -2,7 +2,6 @@
 
 /*
  * Copyright (c) 2018 Heimrich & Hannot GmbH
- *
  * @license LGPL-3.0-or-later
  */
 
@@ -15,9 +14,12 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class HeimrichHannotContaoMediaLibraryExtension extends Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function load(array $mergedConfig, ContainerBuilder $container)
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }
 }

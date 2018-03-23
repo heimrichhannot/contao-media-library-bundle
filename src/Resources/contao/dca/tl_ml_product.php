@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ],
     'palettes'    => [
         '__selector__' => ['published'],
-        'default'      => '{general_legend},title;{product_legend},category,uploadedFiles,doNotCreateDownloadItems,text,tag,overrideImageSize;{publish_legend},published;'
+        'default'      => '{general_legend},title;{product_legend},category,uploadedFiles,doNotCreateDownloadItems,text,licence,tag,overrideImageSize;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -124,13 +124,15 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType'        => 'select',
             'foreignKey'       => 'tl_category.title',
             'options_callback' => function () {
-                return \Contao\System::getContainer()->get('huh.utils.choice.model_instance')->getCachedChoices(
-                    [
-                        'dataContainer' => 'tl_category',
-                        'columns'       => [],
-                        'values'        => [],
-                    ]
-                );
+                $categories = \Contao\System::getContainer()->get('huh.categories.manager')->findAll();
+                
+                $options = [];
+                while($categories->next())
+                {
+                    $options[$categories->id] = $categories->title;
+                }
+                
+                return $options;
             },
             'eval'             => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr w50'],
             'sql'              => "varchar(255) NOT NULL default ''"
@@ -189,6 +191,22 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             ],
             'attributes' => ['legend' => 'general_legend', 'multilingual' => true, 'fixed' => true, 'fe_sorting' => true, 'fe_search' => true],
             'sql'        => "blob NULL",
+        ],
+        'licence' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
+            'inputType' => 'select',
+            'exclude'    => true,
+            'default' => 'free',
+            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
+            'options' => [
+                \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE,
+                \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED
+            ],
+            'eval' => [
+                'mandatory' => true,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(16) NOT NULL default ''"
         ],
         'published'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],

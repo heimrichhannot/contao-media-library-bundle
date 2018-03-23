@@ -1,36 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mkunitzsch
- * Date: 14.03.18
- * Time: 16:36
+
+/*
+ * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\MediaLibraryBundle\Registry;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class ProductArchiveRegistry
 {
     /** @var ContaoFrameworkInterface */
     protected $framework;
-    
+
     /** @var ModelUtil */
     protected $modelUtil;
-    
-    /** @var DcaUtil */
-    protected $dcaUtil;
-    
-    public function __construct(ContaoFrameworkInterface $framework, ModelUtil $modelUtil, DcaUtil $dcaUtil)
+
+    public function __construct(ContaoFrameworkInterface $framework, ModelUtil $modelUtil)
     {
         $this->framework = $framework;
         $this->modelUtil = $modelUtil;
-        $this->dcaUtil   = $dcaUtil;
     }
-    
+
     /**
      * Adapter function for the model's findBy method.
      *
@@ -49,7 +43,7 @@ class ProductArchiveRegistry
             $options
         );
     }
-    
+
     /**
      * Adapter function for the model's findOneBy method.
      *
@@ -68,7 +62,7 @@ class ProductArchiveRegistry
             $options
         );
     }
-    
+
     /**
      * Adapter function for the model's findByPk method.
      *

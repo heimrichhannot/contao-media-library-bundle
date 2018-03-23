@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mkunitzsch
- * Date: 13.03.18
- * Time: 15:18
+
+/*
+ * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\MediaLibraryBundle\ContaoManager;
-
 
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
@@ -20,7 +18,7 @@ class Plugin implements BundlePluginInterface
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter([ContaoCoreBundle::class, 'bootstrapper']),
+            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter([ContaoCoreBundle::class]),
         ];
     }
 }
