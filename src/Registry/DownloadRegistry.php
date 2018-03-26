@@ -84,6 +84,24 @@ class DownloadRegistry
     /**
      * Adapter function for the model's findByPk method.
      *
+     * @param int   $pid
+     * @param array $options
+     *
+     * @return \Contao\Model\Collection|DownloadModel|null
+     */
+    public function findByPid(int $pid, array $options = [])
+    {
+        return $this->modelUtil->findModelInstancesBy(
+            'tl_ml_download',
+            ['tl_ml_download.pid=?'],
+            [$pid],
+            $options
+        );
+    }
+
+    /**
+     * Adapter function for the model's findByPk method.
+     *
      * @param mixed $pid
      * @param array $options
      *

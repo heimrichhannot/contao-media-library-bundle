@@ -230,12 +230,19 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'text',
             'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql'       => "varchar(10) NOT NULL default ''"
+        ],
+        'imageSize' => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => ['tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''"
         ]
     ]
 ];
 
 $containerUtil = \Contao\System::getContainer()->get('huh.utils.dca');
-$containerUtil->addOverridableFields(['imageSize'], 'tl_ml_product_archive', 'tl_ml_product');
+//$containerUtil->addOverridableFields(['imageSize'], 'tl_ml_product_archive', 'tl_ml_product');
 
 
 class tl_ml_product extends \Contao\Backend

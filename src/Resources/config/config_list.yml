@@ -1,0 +1,7 @@
+huh:
+    list:
+        items:
+          - { name: media-library-default, class: HeimrichHannot\MediaLibraryBundle\Item\MediaLibraryListItem }
+        templates:
+            item:
+                - { name: media-library-list-item, template: "@HeimrichHannotContaoWatchlist/list_item_media_library.html.twig" }
