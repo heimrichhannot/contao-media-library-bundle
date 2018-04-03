@@ -16,8 +16,27 @@ array_insert($GLOBALS['BE_MOD']['content'], count($GLOBALS['BE_MOD']['content'])
 ]);
 
 /**
+ * JavaScipt
+ */
+
+if(\Contao\System::getContainer()->get('huh.utils.container')->isFrontend())
+{
+    $GLOBALS['TL_JAVASCRIPT']['contao-media-library-bundle'] = 'bundles/heimrichhannotcontaomedialibrary/js/jquery.media-library.min.js|static';
+}
+
+
+/**
  * Models
  */
 $GLOBALS['TL_MODELS']['tl_ml_product_archive'] = 'HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel';
 $GLOBALS['TL_MODELS']['tl_ml_product']         = 'HeimrichHannot\MediaLibraryBundle\Model\ProductModel';
 $GLOBALS['TL_MODELS']['tl_ml_download']        = 'HeimrichHannot\MediaLibraryBundle\Model\DownloadModel';
+
+$GLOBALS['AJAX'][\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_XHR_GROUP] = [
+    \HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS => [
+        'arguments' => [
+            \HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_ARGUMENTS_OPTIONS
+        ],
+        'optional' => []
+    ]
+];

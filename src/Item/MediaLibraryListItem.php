@@ -7,7 +7,6 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
-use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
 use Contao\StringUtil;
@@ -75,40 +74,50 @@ class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
             return;
         }
 
-        $downloads = $this->getDownloadItems();
+        list($downloads, $hasOptions) = $this->getDownloadItems();
 
-        if (null === ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
-            $downloads = deserialize($this->_raw['uploadedFiles']);
-        }
-
-        if (null === $downloads) {
+        if (empty($downloads)) {
             return;
         }
 
+        System::loadLanguageFile('tl_ml_product');
+
         $template = new FrontendTemplate('download_action');
 
-        $template->link = $GLOBALS['TL_LANG']['media_library']['downloadLink'];
-        $template->title = sprintf($GLOBALS['TL_LANG']['media_library']['downloadLink'], $this->_raw['title']);
+        $template->link = $GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'];
+        $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->_raw['title']);
 
-        if (1 === count($downloads)) {
-            $template->file = Environment::get('base').'?file='.System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloadItems[0]['uuid']);
+        if (!$hasOptions) {
+            $template->file = '?file='.$downloads;
 
             return $template->parse();
         }
+
+        $template->options = $downloads;
+        $template->action = System::getContainer()->get('huh.ajax.action')->generateUrl(\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_XHR_GROUP, \HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS);
+
+        return $template->parse();
     }
 
     protected function getDownloadItems()
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
             if (1 === count($downloads)) {
-                return $downloads->downloadFile;
+                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads->downloadFile), false];
             }
 
-            return $this->getOptions($downloads);
+            return [$this->getOptions($downloads), true];
         }
 
         if (empty($downloads = StringUtil::deserialize($this->_raw['uploadedFiles'], true))) {
+            return [];
         }
+
+        if (1 === count($downloads)) {
+            return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($this->_raw['uploadedFiles']), false];
+        }
+
+        return [$this->getOptionsFromArray($downloads), true];
     }
 
     protected function getOptions($downloadItems)

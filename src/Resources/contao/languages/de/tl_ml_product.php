@@ -43,3 +43,6 @@ $lang['delete']        = ['Produkt löschen', 'Produkt ID %s löschen'];
 $lang['toggle']        = ['Produkt veröffentlichen', 'Produkt ID %s veröffentlichen/verstecken'];
 $lang['show']          = ['Produkt Details', 'Produkt-Details ID %s anzeigen'];
 $lang['editDownloads'] = ['Download-Items anzeigen', 'Download-Items vom Produkt %s anzeigen'];
+
+$lang['downloadLink']  = 'herunterladen';
+$lang['downloadTitle'] = '% herunterladen';
