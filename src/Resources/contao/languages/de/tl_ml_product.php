@@ -18,10 +18,10 @@ $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'
 ];
-$lang['licence'] = [
+$lang['licence']                  = [
     'Lizenz',
     'Geben Sie hier die Lizenz für dieses Produkt an.',
-    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE => 'frei',
+    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE   => 'frei',
     \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED => 'gesperrt'
 ];
 
@@ -36,13 +36,13 @@ $lang['product_legend'] = 'Produkt-Einstellungen';
 /**
  * Buttons
  */
-$lang['new']           = ['Neues Produkt', 'Produkt erstellen'];
-$lang['edit']          = ['Produkt bearbeiten', 'Produkt ID %s bearbeiten'];
-$lang['copy']          = ['Produkt duplizieren', 'Produkt ID %s duplizieren'];
-$lang['delete']        = ['Produkt löschen', 'Produkt ID %s löschen'];
-$lang['toggle']        = ['Produkt veröffentlichen', 'Produkt ID %s veröffentlichen/verstecken'];
-$lang['show']          = ['Produkt Details', 'Produkt-Details ID %s anzeigen'];
-$lang['editDownloads'] = ['Download-Items anzeigen', 'Download-Items vom Produkt %s anzeigen'];
+$lang['new']       = ['Neues Produkt', 'Produkt erstellen'];
+$lang['edit']      = ['Produkt bearbeiten', 'Produkt ID %s bearbeiten'];
+$lang['copy']      = ['Produkt duplizieren', 'Produkt ID %s duplizieren'];
+$lang['delete']    = ['Produkt löschen', 'Produkt ID %s löschen'];
+$lang['toggle']    = ['Produkt veröffentlichen', 'Produkt ID %s veröffentlichen/verstecken'];
+$lang['show']      = ['Produkt Details', 'Produkt-Details ID %s anzeigen'];
+$lang['downloads'] = ['Downloads anzeigen', 'Downloads von Produkt ID %s anzeigen'];
 
 $lang['downloadLink']  = 'herunterladen';
 $lang['downloadTitle'] = '% herunterladen';

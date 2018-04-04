@@ -1,24 +1,25 @@
 <?php
 
 $date = date('Y');
+
 $header = <<<EOF
 Copyright (c) $date Heimrich & Hannot GmbH
+
 @license LGPL-3.0-or-later
 EOF;
+
 $finder = PhpCsFixer\Finder::create()
     ->exclude('Resources')
     ->exclude('Fixtures')
     ->in([__DIR__.'/src', __DIR__.'/tests'])
-    ->exclude('vendor')
-    ->exclude('components')
-    ->in(__DIR__)
 ;
+
 return PhpCsFixer\Config::create()
     ->setRules([
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'psr0' => false,
-        'strict_comparison' => true,
+        'strict_comparison' => false,
         'strict_param' => true,
         'array_syntax' => ['syntax' => 'short'],
         'heredoc_to_nowdoc' => true,
@@ -39,4 +40,4 @@ return PhpCsFixer\Config::create()
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setUsingCache(false)
-    ;
+;

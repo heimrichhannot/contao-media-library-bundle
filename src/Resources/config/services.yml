@@ -1,4 +1,8 @@
 services:
+  huh.media_library.backend.download:
+    class: HeimrichHannot\MediaLibraryBundle\Backend\Download
+    arguments:
+      - "@contao.framework"
   huh.media_library.backend.product:
     class: HeimrichHannot\MediaLibraryBundle\Backend\Product
     arguments:

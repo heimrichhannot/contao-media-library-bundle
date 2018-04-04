@@ -40,3 +40,9 @@ $GLOBALS['AJAX'][\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_L
         'optional' => []
     ]
 ];
+
+/**
+ * Permissions
+ */
+$GLOBALS['TL_PERMISSIONS'][] = 'contao_media_library_bundles';
+$GLOBALS['TL_PERMISSIONS'][] = 'contao_media_library_bundlep';
