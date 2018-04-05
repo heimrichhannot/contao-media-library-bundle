@@ -27,3 +27,7 @@ services:
     arguments:
       - "@contao.framework"
       - "@huh.utils.model"
+  huh.media_library.ajax_manager:
+    class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
+    arguments:
+      - "@contao.framework"

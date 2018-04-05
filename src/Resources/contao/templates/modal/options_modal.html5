@@ -1,7 +1,7 @@
 <?php if (!empty($this->options)): ?>
     <div class="form-group <?= $this->class?>" >
         <label for="mediaLibrary-select"><?= $this->label ?></label>
-        <select id="mediaLibrary-select" <?php if($this->action):?>data-action="<?= $this->action; ?>"<?php endif; ?>>
+        <select id="mediaLibrary-select">
             <option value="" selected>-</option>
             <?php foreach ($this->options as $key => $value): ?>
                 <?php if(is_array($value)): ?>
@@ -11,6 +11,6 @@
                 <?php endif; ?>
             <?php endforeach; ?>
         </select>
-        <button class="media-library-download-selected" data-action="<?= $data->action ?>" title="<?= $this->link ?>"><?= $this->link ?></button>
+        <button class="media-library-download-selected" title="<?= $this->link ?>"><?= $this->link ?></button>
     </div>
 <?php endif; ?>

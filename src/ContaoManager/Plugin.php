@@ -14,6 +14,7 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ContainerBuilder;
 use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
 use HeimrichHannot\AjaxBundle\HeimrichHannotContaoAjaxBundle;
+use HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle;
 use HeimrichHannot\MediaLibraryBundle\HeimrichHannotContaoMediaLibraryBundle;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 
@@ -22,7 +23,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter([ContaoCoreBundle::class, HeimrichHannotContaoAjaxBundle::class]),
+            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter([ContaoCoreBundle::class, HeimrichHannotContaoAjaxBundle::class, HeimrichHannotContaoFilterBundle::class]),
         ];
     }
 
