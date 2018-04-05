@@ -33,6 +33,8 @@ if(\Contao\System::getContainer()->get('huh.utils.container')->isFrontend())
 $GLOBALS['TL_MODELS']['tl_ml_product_archive'] = 'HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel';
 $GLOBALS['TL_MODELS']['tl_ml_product']         = 'HeimrichHannot\MediaLibraryBundle\Model\ProductModel';
 $GLOBALS['TL_MODELS']['tl_ml_download']        = 'HeimrichHannot\MediaLibraryBundle\Model\DownloadModel';
+<<<<<<< HEAD
+=======
 
 $GLOBALS['AJAX'][\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_XHR_GROUP] = [
     \HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS => [
@@ -48,3 +50,4 @@ $GLOBALS['AJAX'][\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_L
  */
 $GLOBALS['TL_PERMISSIONS'][] = 'contao_media_library_bundles';
 $GLOBALS['TL_PERMISSIONS'][] = 'contao_media_library_bundlep';
+>>>>>>> 67a7198b161b5e57e76639562ef202655ddb67c1

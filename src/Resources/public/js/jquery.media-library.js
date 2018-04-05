@@ -1,5 +1,4 @@
 (function ($) {
-
     var MediaLibrary = {
         init: function() {
             MediaLibrary.registerEvents();
@@ -36,6 +35,4 @@
     $(document).ready(function () {
         MediaLibrary.init();
     });
-
-
 })(jQuery);

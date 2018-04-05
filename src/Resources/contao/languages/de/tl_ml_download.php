@@ -8,8 +8,8 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_download'];
 $lang['tstamp']       = ['Änderungsdatum', ''];
 $lang['title']        = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['published']    = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
-$lang['start']        = ['Anzeigen ab', 'Download-Item erst ab diesem Tag auf der Webseite anzeigen.'];
-$lang['stop']         = ['Anzeigen bis', 'Download-Item nur bis zu diesem Tag auf der Webseite anzeigen.'];
+$lang['start']        = ['Anzeigen ab', 'Download erst ab diesem Tag auf der Webseite anzeigen.'];
+$lang['stop']         = ['Anzeigen bis', 'Download nur bis zu diesem Tag auf der Webseite anzeigen.'];
 $lang['downloadFile'] = ['Datei', 'Laden Sie hier die Download-Datei hoch.'];
 
 /**
@@ -21,9 +21,9 @@ $lang['publish_legend'] = 'Veröffentlichung';
 /**
  * Buttons
  */
-$lang['new']    = ['Neues Download-Item', 'Download-Item erstellen'];
-$lang['edit']   = ['Download-Item bearbeiten', 'Download-Item ID %s bearbeiten'];
-$lang['copy']   = ['Download-Item duplizieren', 'Download-Item ID %s duplizieren'];
-$lang['delete'] = ['Download-Item löschen', 'Download-Item ID %s löschen'];
-$lang['toggle'] = ['Download-Item veröffentlichen', 'Download-Item ID %s veröffentlichen/verstecken'];
-$lang['show']   = ['Download-Item Details', 'Download-Item-Details ID %s anzeigen'];
+$lang['new']    = ['Neuer Download', 'Download erstellen'];
+$lang['edit']   = ['Download bearbeiten', 'Download ID %s bearbeiten'];
+$lang['copy']   = ['Download duplizieren', 'Download ID %s duplizieren'];
+$lang['delete'] = ['Download löschen', 'Download ID %s löschen'];
+$lang['toggle'] = ['Download veröffentlichen', 'Download ID %s veröffentlichen/verstecken'];
+$lang['show']   = ['Download Details', 'Download-Details ID %s anzeigen'];

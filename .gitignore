@@ -1,14 +1,7 @@
-# OS
-.DS_Store
+.idea
 Thumbs.db
-
-# IDEs
-.build/
-.buildpath
-.idea/
-.project
-.settings/
-
-# Composer
+.DS_Store
+.sass-cache
 vendor
+component
 composer.lock

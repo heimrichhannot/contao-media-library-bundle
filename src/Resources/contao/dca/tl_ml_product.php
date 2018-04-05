@@ -34,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ],
         'sorting'           => [
             'mode'        => 2,
-            'fields'      => ['category'],
+            'fields'      => ['title'],
             'panelLayout' => 'filter;sort,search,limit',
         ],
         'global_operations' => [
@@ -51,10 +51,10 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg'
             ],
-            'editDownloads' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['editDownloads'],
+            'downloads' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['downloads'],
                 'href'  => 'table=tl_ml_download',
-                'icon'  => 'down.svg'
+                'icon'  => 'bundles/heimrichhannotcontaomedialibrary/img/icon-download.png'
             ],
             'copy'          => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['copy'],
@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'label'           => &$GLOBALS['TL_LANG']['tl_ml_product']['toggle'],
                 'icon'            => 'visible.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['tl_ml_product', 'toggleIcon']
+                'button_callback' => ['huh.media_library.backend.product', 'toggleIcon']
             ],
             'show'          => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['show'],
@@ -134,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight'     => \Config::get('gdMaxImgHeight'),
                 'skipPrepareForSave' => true,
-                'uploadFolder'       => ['huh.media_library.backend.product', 'getUploadFolder'],
+                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolder'],
                 'addRemoveLinks'     => true,
                 'maxFiles'           => 15,
                 'multipleFiles'      => true,
@@ -142,7 +142,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'mandatory'          => true
             ],
             'attributes' => ['legend' => 'media_legend'],
-            
+
             'sql' => "blob NULL",
         ],
         'doNotCreateDownloadItems' => [
@@ -225,118 +225,3 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ]
     ]
 ];
-
-$containerUtil = \Contao\System::getContainer()->get('huh.utils.dca');
-//$containerUtil->addOverridableFields(['imageSize'], 'tl_ml_product_archive', 'tl_ml_product');
-
-
-class tl_ml_product extends \Contao\Backend
-{
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $user = \Contao\BackendUser::getInstance();
-        
-        if (strlen(\Contao\Input::get('tid'))) {
-            $this->toggleVisibility(\Contao\Input::get('tid'), (\Contao\Input::get('state') === '1'), (@func_get_arg(12) ?: null));
-            $this->redirect($this->getReferer());
-        }
-        
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$user->hasAccess('tl_ml_product::published', 'alexf')) {
-            return '';
-        }
-        
-        $href .= '&amp;tid=' . $row['id'] . '&amp;state=' . ($row['published'] ? '' : 1);
-        
-        if (!$row['published']) {
-            $icon = 'invisible.svg';
-        }
-        
-        return '<a href="' . $this->addToUrl($href) . '" title="' . \StringUtil::specialchars($title) . '"' . $attributes . '>'
-               . \Image::getHtml($icon, $label, 'data-state="' . ($row['published'] ? 1 : 0) . '"') . '</a> ';
-    }
-    
-    public function toggleVisibility($intId, $blnVisible, \DataContainer $dc = null)
-    {
-        $user     = \Contao\BackendUser::getInstance();
-        $database = \Contao\Database::getInstance();
-        
-        // Set the ID and action
-        \Contao\Input::setGet('id', $intId);
-        \Contao\Input::setGet('act', 'toggle');
-        
-        if ($dc) {
-            $dc->id = $intId; // see #8043
-        }
-        
-        // Trigger the onload_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
-                    $callback($dc);
-                }
-            }
-        }
-        
-        // Check the field access
-        if (!$user->hasAccess('tl_ml_product::published', 'alexf')) {
-            throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to publish/unpublish tl_ml_product item ID ' . $intId
-                                                                         . '.');
-        }
-        
-        // Set the current record
-        if ($dc) {
-            $objRow = $database->prepare("SELECT * FROM tl_ml_product WHERE id=?")
-                ->limit(1)
-                ->execute($intId);
-            
-            if ($objRow->numRows) {
-                $dc->activeRecord = $objRow;
-            }
-        }
-        
-        $objVersions = new \Versions('tl_ml_product', $intId);
-        $objVersions->initialize();
-        
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, $dc);
-                } elseif (is_callable($callback)) {
-                    $blnVisible = $callback($blnVisible, $dc);
-                }
-            }
-        }
-        
-        $time = time();
-        
-        // Update the database
-        $database->prepare("UPDATE tl_ml_product SET tstamp=$time, published=" . ($blnVisible ? '1' : '') . " WHERE id=?")
-            ->execute($intId);
-        
-        if ($dc) {
-            $dc->activeRecord->tstamp    = $time;
-            $dc->activeRecord->published = ($blnVisible ? '1' : '');
-        }
-        
-        // Trigger the onsubmit_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
-                    $callback($dc);
-                }
-            }
-        }
-        
-        $objVersions->create();
-    }
-    
-}
