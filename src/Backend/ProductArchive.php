@@ -12,11 +12,18 @@ use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
-use Contao\StringUtil;
 use Contao\System;
 
 class ProductArchive
 {
+    const UPLOAD_FOLDER_MODE_STATIC = 'static';
+    const UPLOAD_FOLDER_MODE_MEMBER_HOME_DIR = 'member_home_dir';
+
+    const UPLOAD_FOLDER_MODES = [
+        self::UPLOAD_FOLDER_MODE_STATIC,
+        self::UPLOAD_FOLDER_MODE_MEMBER_HOME_DIR,
+    ];
+
     /**
      * @var ContaoFrameworkInterface
      */
@@ -25,21 +32,6 @@ class ProductArchive
     public function __construct(ContaoFrameworkInterface $framework)
     {
         $this->framework = $framework;
-    }
-
-    /**
-     * get fields from tl_ml_product.
-     *
-     * @return mixed
-     */
-    public function getPaletteFields()
-    {
-        return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
-            [
-                'dataContainer' => 'tl_ml_product',
-                'inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'],
-            ]
-        );
     }
 
     /**
@@ -62,26 +54,14 @@ class ProductArchive
      *
      * @return mixed
      */
-    public function getFieldsForTag(DataContainer $dc)
+    public function getFieldsForTags(DataContainer $dc)
     {
-        if (null === ($productArchive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $dc->id))) {
-            return [];
-        }
-
-        $fields = [];
-
-        System::loadLanguageFile('tl_ml_product');
-        Controller::loadDataContainer('tl_ml_product');
-
-        foreach (StringUtil::deserialize($productArchive->palette, true) as $field) {
-            $fields[$field] =
-                $GLOBALS['TL_DCA']['tl_ml_product']['fields'][$field]['label'][0].' <span style="display: inline; color:#999; padding-left:3px">['
-                .$field.']</span>' ?: $field;
-        }
-
-        asort($fields);
-
-        return $fields;
+        return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
+            [
+                'dataContainer' => 'tl_ml_product',
+                'inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'],
+            ]
+        );
     }
 
     public function checkPermission()

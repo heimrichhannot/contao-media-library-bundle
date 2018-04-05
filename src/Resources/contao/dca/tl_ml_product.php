@@ -7,7 +7,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'ctable'            => 'tl_ml_download',
         'enableVersioning'  => true,
         'onload_callback'   => [
-            ['huh.media_library.backend.product', 'modifyPalette']
+            ['huh.media_library.backend.product', 'setType']
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
@@ -82,8 +82,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['published'],
-        'default'      => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tag,overrideImageSizes;{publish_legend},published;'
+        '__selector__' => ['type', 'published'],
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -93,11 +94,11 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'                      => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['pid'],
+            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['pid'],
             'foreignKey' => 'tl_ml_product_archive.id',
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+            'exclude'    => true,
+            'search'     => true,
+            'sorting'    => true,
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager']
         ],
@@ -111,6 +112,16 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'flag'    => 6,
             'eval'    => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql'     => "int(10) unsigned NOT NULL default '0'"
+        ],
+        'type'                     => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['type'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'select',
+            'options'   => \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPES,
+            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
+            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
+            'sql'       => "varchar(64) NOT NULL default ''"
         ],
         'title'                    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['title'],
@@ -130,19 +141,15 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'tl_class'           => 'clr',
                 'extensions'         => \Config::get('validImageTypes'),
                 'filesOnly'          => true,
-                'fieldType'          => 'checkbox',
+                'fieldType'          => 'radio',
                 'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight'     => \Config::get('gdMaxImgHeight'),
-                'skipPrepareForSave' => true,
                 'uploadFolder'       => ['huh.media_library.backend.product', 'getUploadFolder'],
                 'addRemoveLinks'     => true,
-                'maxFiles'           => 15,
-                'multipleFiles'      => true,
+                'maxFiles'           => 1,
                 'maxUploadSize'      => \Config::get('maxFileSize'),
                 'mandatory'          => true
             ],
-            'attributes' => ['legend' => 'media_legend'],
-
             'sql' => "blob NULL",
         ],
         'doNotCreateDownloadItems' => [
@@ -160,8 +167,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'eval'      => ['tl_class' => 'clr', 'rte' => 'tinyMCE'],
             'sql'       => "text NULL",
         ],
-        'tag'                      => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['tag'],
+        'tags'                      => [
+            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['tags'],
             'exclude'    => true,
             'search'     => true,
             'sorting'    => true,

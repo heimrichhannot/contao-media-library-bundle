@@ -9,6 +9,10 @@ $lang['tstamp']               = ['Änderungsdatum', ''];
 $lang['title']                = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['palette']              = ['Produktfelder', 'Wählen Sie hier die Felder für die Produkte dieser Kategorie aus.'];
 $lang['imageSizes']           = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
+$lang['uploadFolderMode']         = [
+    'Uploadverzeichnis-Modus',
+    'Wählen Sie hier aus, wo Dateien abgelegt werden, die '
+];
 $lang['uploadFolder']         = [
     'Uploadverzeichnis',
     'Wählen Sie hier den Ordner, der als Basisordner für die hochgeladenen Dateien genutzt werden soll. (In diesem Ordner werden Unterverzeichnisse anhand des Produktnamens angelegt. In diesem werden dann wiederum die Dateien abgelegt.)'

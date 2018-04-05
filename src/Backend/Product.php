@@ -11,6 +11,7 @@ namespace HeimrichHannot\MediaLibraryBundle\Backend;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Database;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
@@ -28,6 +29,14 @@ use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class Product
 {
+    const TYPE_FILE = 'file';
+    const TYPE_IMAGE = 'image';
+
+    const TYPES = [
+        self::TYPE_FILE,
+        self::TYPE_IMAGE,
+    ];
+
     /**
      * @var ContaoFrameworkInterface
      */
@@ -64,21 +73,11 @@ class Product
         $this->dcaUtil = $dcaUtil;
     }
 
-    public function modifyPalette(DataContainer $dc)
+    public function setType(DataContainer $dc)
     {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
-            return;
+        if (null !== ($productArchive = $this->getProductArchive($dc->id))) {
+            Database::getInstance()->prepare('UPDATE tl_ml_product SET type=? WHERE id=?')->execute($productArchive->type, $dc->id);
         }
-
-        $paletteConfig = StringUtil::deserialize($productArchive->palette, true);
-
-        if (empty($paletteConfig)) {
-            return;
-        }
-
-        $dca = &$GLOBALS['TL_DCA']['tl_ml_product'];
-
-        $dca['palettes']['default'] = implode(',', $paletteConfig);
     }
 
     /**
@@ -115,7 +114,7 @@ class Product
      *
      * @return bool
      */
-    public function generateTags(DataContainer &$dc)
+    public function generateTags(DataContainer $dc)
     {
         if (null === ($productArchive = $this->getProductArchive($dc->id))) {
             return false;
@@ -138,14 +137,14 @@ class Product
         $tags = [];
 
         foreach ($fieldsForTags as $field) {
-            $this->addToTag($dc, $field, $tags);
+            $this->addToTags($product, $field, $tags, $dc);
         }
 
-        if (isset($dc->activeRecord->tag) && !in_array('tag', $fieldsForTags, true)) {
-            $tags = array_unique(array_merge($tags, StringUtil::deserialize($dc->activeRecord->tag, true)));
+        if (isset($product->tags) && !in_array('tags', $fieldsForTags, true)) {
+            $tags = array_unique(array_merge($tags, StringUtil::deserialize($product->tags, true)));
         }
 
-        $product->tag = serialize($tags);
+        $product->tags = serialize($tags);
         $product->save();
     }
 
@@ -181,15 +180,19 @@ class Product
             return Config::get('uploadPath');
         }
 
+        if (null === ($product = $this->productRegistry->findByPk($dc->id))) {
+            return Config::get('uploadPath');
+        }
+
         if (null === ($uploadFolder = System::getContainer()->get('huh.utils.file')->getPathFromUuid($productArchive->uploadFolder))) {
             return Config::get('uploadPath');
         }
 
-        if (!isset($dc->activeRecord->title)) {
+        if (!isset($product->title)) {
             return $uploadFolder;
         }
 
-        return $uploadFolder.DIRECTORY_SEPARATOR.$dc->activeRecord->title;
+        return $uploadFolder.DIRECTORY_SEPARATOR.$product->title;
     }
 
     public function checkPermission()
@@ -391,12 +394,12 @@ class Product
      * @param string        $field
      * @param array         $tags
      */
-    protected function addToTag(DataContainer $dc, string $field, array &$tags)
+    protected function addToTags(ProductModel $product, string $field, array &$tags, DataContainer $dc)
     {
-        $fieldValue = $dc->activeRecord->{$field};
+        $fieldValue = $product->{$field};
 
         if (!is_array(StringUtil::deserialize($fieldValue))) {
-            $tags[] = System::getContainer()->get('huh.utils.form')->prepareSpecialValueForOutput($field, $dc->activeRecord->{$field}, $dc);
+            $tags[] = System::getContainer()->get('huh.utils.form')->prepareSpecialValueForOutput($field, $product->{$field}, $dc);
 
             return;
         }

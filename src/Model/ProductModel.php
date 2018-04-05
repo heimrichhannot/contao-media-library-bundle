@@ -14,8 +14,8 @@ use Contao\Model;
  * @property string $title
  * @property string $category
  * @property string $uploadedFiles
- * @property text   $text
- * @property string $tag
+ * @property string $text
+ * @property string $tags
  */
 class ProductModel extends Model
 {

@@ -5,7 +5,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'dataContainer'     => 'Table',
         'ctable'            => 'tl_ml_product',
         'enableVersioning'  => true,
-        'onload_callback' => [
+        'onload_callback'   => [
             ['huh.media_library.backend.product_archive', 'checkPermission'],
         ],
         'onsubmit_callback' => [
@@ -41,9 +41,9 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
         'operations'        => [
             'edit'       => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['edit'],
-                'href'            => 'table=tl_ml_product',
-                'icon'            => 'edit.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['edit'],
+                'href'  => 'table=tl_ml_product',
+                'icon'  => 'edit.svg',
             ],
             'editheader' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['editheader'],
@@ -60,7 +60,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'label'      => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
+                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm']
+                                . '\'))return false;Backend.getScrollOffset()"',
             ],
             'show'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['show'],
@@ -70,10 +71,11 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['createTagsFromValues'],
-        'default'      => '{general_legend},title;{config_legend},palette,imageSizes,createTagsFromValues,uploadFolder;'
+        '__selector__' => ['type', 'createTagsFromValues'],
+        'default'      => '{general_legend},title;{config_legend},type,palette,uploadFolder,createTagsFromValues;'
     ],
     'subpalettes' => [
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'imageSizes',
         'createTagsFromValues' => 'fieldsForTags'
     ],
     'fields'      => [
@@ -91,6 +93,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'    => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
+        // general
         'title'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['title'],
             'exclude'   => true,
@@ -101,29 +104,42 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'palette'              => [
-            'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['palette'],
-            'exclude'          => true,
-            'flag'             => 1,
-            'inputType'        => 'checkboxWizard',
-            'options_callback' => ['huh.media_library.backend.product_archive', 'getPaletteFields'],
-            'eval'             => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
-            'sql'              => "blob NULL"
+        'type'                     => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['type'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'select',
+            'options'   => \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPES,
+            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
+            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
+            'sql'       => "varchar(64) NOT NULL default ''"
         ],
-        'imageSizes'            => [
+        // image
+        'imageSizes'           => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSizes'],
             'exclude'          => true,
             'flag'             => 1,
             'inputType'        => 'checkboxWizard',
             'options_callback' => ['huh.media_library.backend.product_archive', 'getImageSizes'],
-            'eval'             => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'clr'],
+            'eval'             => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'w50 autoheight'],
             'sql'              => "blob NULL"
+        ],
+        // config
+        'uploadFolderMode'     => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderMode'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'select',
+            'options'   => \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODES,
+            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['reference'],
+            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
+            'sql'       => "varchar(64) NOT NULL default ''"
         ],
         'uploadFolder'         => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolder'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['fieldType' => 'radio', 'tl_class' => 'clr'],
+            'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight'],
             'sql'       => "binary(16) NULL",
         ],
         'createTagsFromValues' => [
@@ -131,15 +147,15 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
+            'eval'      => ['submitOnChange' => true, 'tl_class' => 'w50 clr'],
             'sql'       => "char(1) NOT NULL default ''"
         ],
         'fieldsForTags'        => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['fieldsForTags'],
             'exclude'          => true,
             'inputType'        => 'checkboxWizard',
-            'options_callback' => ['huh.media_library.backend.product_archive', 'getFieldsForTag'],
-            'eval'             => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
+            'options_callback' => ['huh.media_library.backend.product_archive', 'getFieldsForTags'],
+            'eval'             => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'w50 autoheight'],
             'sql'              => "blob NULL"
         ],
     ]

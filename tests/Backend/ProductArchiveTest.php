@@ -66,14 +66,14 @@ class ProductArchiveTest extends ContaoTestCase
 //        $this->assertEquals(['option1','option2','option3'],$options);
 //    }
 
-    public function testGetFieldsForTag()
+    public function testGetFieldsForTags()
     {
         $dc = $this->mockClassWithProperties(DataContainer::class, ['activeRecord' => new \stdClass()]);
         $dc->activeRecord->palette = serialize(['field1', 'field2', 'field3']);
 
         $productArchive = new ProductArchive($this->framework);
 
-        $paletteFields = $productArchive->getFieldsForTag($dc);
+        $paletteFields = $productArchive->getFieldsForTags($dc);
 
         $this->assertNotEmpty($paletteFields);
         $this->assertCount(3, $paletteFields);
