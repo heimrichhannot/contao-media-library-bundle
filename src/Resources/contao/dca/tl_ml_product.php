@@ -93,7 +93,11 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'                      => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['pid'],
             'foreignKey' => 'tl_ml_product_archive.id',
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager']
         ],

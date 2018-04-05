@@ -14,6 +14,13 @@ let jQuery = require('jquery');
             $(document).on('click', '.media-library-download-selected', function(){
                 MediaLibrary.downloadSelectedItem();
             });
+
+            $(document).on('hide.bs.modal','#watchlistModal', function(){
+                console.log('modal hide');
+                setTimeout(function(){
+                    $(document).find('#watchlistModal').remove();
+                },500);
+            });
         },
         showOptionsModal: function(elem) {
             let url = elem.data('action'),
@@ -24,15 +31,19 @@ let jQuery = require('jquery');
             MediaLibrary.doAjax(url,data);
         },
         downloadSelectedItem: function(){
-            let file = $(document).find('#mediaLibrary-select option:selected');
+            let file = $(document).find('#mediaLibrary-select option:selected').val();
 
+            console.log(file);
             if('' == file) {
                 alert('Keine Option ausgewählt');
             }
+            else {
+                import(/* webpackChunkName: "contao-utils-bundle" */ 'contao-utils-bundle').then((utilsBundle) => {
+                    window.location.href = utilsBundle.url.addParameterToUri(window.location.href, 'file', file);
+                });
 
-            import(/* webpackChunkName: "contao-utils-bundle" */ 'contao-utils-bundle').then((utilsBundle) => {
-                window.location.href = utilsBundle.url.addParameterToUri(window.location.href, 'file', file);
-            });
+                $('#mediaLibraryModal').modal('toggle');
+            }
         },
         doAjax: function(url, data) {
             $.ajax({
@@ -43,10 +54,16 @@ let jQuery = require('jquery');
                 success: function(data) {
                     if(undefined !== data.result.data.modal) {
                         $('body').append(data.result.data.modal);
-                        $('.modal').toggle();
+                        $('#mediaLibraryModal').modal('toggle');
                     }
+
+                    MediaLibrary.ajaxCompleteCallback();
                 }
             });
+        },
+        ajaxCompleteCallback: function () {
+            // remove the loading animation
+            $('.loader').remove();
         }
     };
 

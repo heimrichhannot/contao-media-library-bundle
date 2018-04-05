@@ -7,10 +7,10 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_product'];
  */
 $lang['tstamp']                   = ['Änderungsdatum', ''];
 $lang['title']                    = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
+$lang['pid']                      = ['Kategorie', 'Wählen Sie hier die Kategorie aus.'];
 $lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['category']                 = ['Kategorie', 'Wählen Sie hier die Kategorie'];
 $lang['uploadedFiles']            = ['Dateien', 'Laden Sie hier die zum Produkt gehörigen Dateien hoch.'];
 $lang['text']                     = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
 $lang['tag']                      = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
@@ -46,3 +46,4 @@ $lang['downloads'] = ['Downloads anzeigen', 'Downloads von Produkt ID %s anzeige
 
 $lang['downloadLink']  = 'herunterladen';
 $lang['downloadTitle'] = '% herunterladen';
+$lang['downloadItem']  = 'Option herunterladen';
