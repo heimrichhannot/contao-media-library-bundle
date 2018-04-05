@@ -19,6 +19,7 @@ use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
@@ -89,19 +90,22 @@ class Product
      */
     public function generateDownloadItems(DataContainer $dc)
     {
-        if ($dc->activeRecord->doNotCreateDownloadItems) {
+        if (null === ($product = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $dc->id))) {
             return;
         }
 
-        $files = StringUtil::deserialize($dc->activeRecord->uploadedFiles, true);
+        if ($product->doNotCreateDownloadItems) {
+            return;
+        }
+
+        $files = StringUtil::deserialize($product->uploadedFiles, true);
 
         if (empty($files)) {
             return;
         }
 
-        $this->cleanGeneratedDownloadItems($dc, true);
-
-        $this->createDownloadItems($dc);
+        $this->cleanGeneratedDownloadItems($product, true);
+        $this->createDownloadItems($product);
     }
 
     /**
@@ -151,10 +155,9 @@ class Product
      * @param DataContainer $dc
      * @param bool          $deleteOnlyGenerated
      */
-    public function cleanGeneratedDownloadItems(DataContainer $dc, $deleteOnlyGenerated = false)
+    public function cleanGeneratedDownloadItems(ProductModel $product, $deleteOnlyGenerated = false)
     {
-        $downloads = $deleteOnlyGenerated
-            ? $this->downloadRegistry->findGeneratedImages($dc->activeRecord->id) : $this->downloadRegistry->findBy('pid', $dc->activeRecord->pid);
+        $downloads = $deleteOnlyGenerated ? $this->downloadRegistry->findGeneratedImages($product->id) : $this->downloadRegistry->findBy('pid', $product->pid);
 
         if (null === $downloads) {
             return;
@@ -413,22 +416,22 @@ class Product
      *
      * @throws \Exception
      */
-    protected function createDownloadItems(DataContainer $dc)
+    protected function createDownloadItems(ProductModel $product)
     {
-        foreach (StringUtil::deserialize($dc->activeRecord->uploadedFiles, true) as $file) {
-            $path = TL_ROOT.DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->getPathFromUuid($file);
+        foreach (StringUtil::deserialize($product->uploadedFiles, true) as $file) {
+            $path = System::getContainer()->getParameter('kernel.project_dir').DIRECTORY_SEPARATOR.
+                    System::getContainer()->get('huh.utils.file')->getPathFromUuid($file);
+
             $extension = System::getContainer()->get('huh.utils.file')->getFileExtension($path);
 
             if (in_array($extension, explode(',', Config::get('validImageTypes')), true)) {
-                $this->createImageDownloadItems($path, $extension, $dc);
+                $this->createImageDownloadItems($path, $extension, $product);
             }
-
-            $this->createDownloadItem($path, $dc);
         }
     }
 
     /**
-     * create image dowload items that will be resized.
+     * Create image download items that will be resized.
      *
      * @param string        $path
      * @param string        $extension
@@ -438,14 +441,16 @@ class Product
      *
      * @return bool
      */
-    protected function createImageDownloadItems(string $path, string $extension, DataContainer $dc)
+    protected function createImageDownloadItems(string $path, string $extension, ProductModel $product)
     {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
+        if (null === ($productArchive = $this->getProductArchive($product->id))) {
             return false;
         }
 
-        $sizes =
-            $dc->activeRecord->overrideImageSize ? StringUtil::deserialize($dc->activeRecord->imageSize, true) : StringUtil::deserialize($productArchive->imageSize, true);
+        $sizes = StringUtil::deserialize(System::getContainer()->get('huh.utils.dca')->getOverridableProperty('imageSizes', [
+            $productArchive, $product,
+        ]), true);
+
         $extension = '.'.$extension;
 
         foreach ($sizes as $size) {
@@ -460,7 +465,7 @@ class Product
             $targetFile = str_replace($extension, '_'.$sizeModel->name.$extension, $path);
             $resizeImage = System::getContainer()->get('contao.image.image_factory')->create($path, $size, $targetFile);
 
-            $this->createDownloadItem($resizeImage->getPath(), $dc, $sizeModel);
+            $this->createDownloadItem($resizeImage->getPath(), $product, $sizeModel);
         }
     }
 
@@ -492,12 +497,12 @@ class Product
      *
      * @throws \Exception
      */
-    protected function createDownloadItem(string $path, DataContainer $dc, ImageSizeModel $size = null)
+    protected function createDownloadItem(string $path, ProductModel $product, ImageSizeModel $size = null)
     {
         $downloadItem = new DownloadModel();
-        $title = $dc->activeRecord->title;
+        $title = $product->title;
 
-        $path = str_replace(TL_ROOT.DIRECTORY_SEPARATOR, '', $path);
+        $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR, '', $path);
 
         if (null === ($downloadFile = FilesModel::findByPath($path))) {
             $downloadFile = Dbafs::addResource(urldecode($path));
@@ -507,11 +512,10 @@ class Product
             $title .= '_'.$size->name;
         }
 
-        $downloadItem->tstamp = time();
-        $downloadItem->dateAdded = time();
+        $downloadItem->tstamp = $downloadItem->dateAdded = time();
 
         $downloadItem->title = $title;
-        $downloadItem->pid = $dc->activeRecord->id;
+        $downloadItem->pid = $product->id;
         $downloadItem->downloadFile = $downloadFile->uuid;
 
         $downloadItem->published = true;

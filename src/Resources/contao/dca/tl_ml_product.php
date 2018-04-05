@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             ],
         ],
         'operations'        => [
-            'edit'          => [
+            'edit'      => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg'
@@ -56,25 +56,25 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'href'  => 'table=tl_ml_download',
                 'icon'  => 'bundles/heimrichhannotcontaomedialibrary/img/icon-download.png'
             ],
-            'copy'          => [
+            'copy'      => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.svg'
             ],
-            'delete'        => [
+            'delete'    => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm']
                                 . '\'))return false;Backend.getScrollOffset()"'
             ],
-            'toggle'        => [
+            'toggle'    => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_ml_product']['toggle'],
                 'icon'            => 'visible.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
                 'button_callback' => ['huh.media_library.backend.product', 'toggleIcon']
             ],
-            'show'          => [
+            'show'      => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.svg'
@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ],
     'palettes'    => [
         '__selector__' => ['published'],
-        'default'      => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tag,overrideImageSize;{publish_legend},published;'
+        'default'      => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tag,overrideImageSizes;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight'     => \Config::get('gdMaxImgHeight'),
                 'skipPrepareForSave' => true,
-                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolder'],
+                'uploadFolder'       => ['huh.media_library.backend.product', 'getUploadFolder'],
                 'addRemoveLinks'     => true,
                 'maxFiles'           => 15,
                 'multipleFiles'      => true,
@@ -173,21 +173,21 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'attributes' => ['legend' => 'general_legend', 'multilingual' => true, 'fixed' => true, 'fe_sorting' => true, 'fe_search' => true],
             'sql'        => "blob NULL",
         ],
-        'licence' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
+        'licence'                  => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
             'inputType' => 'select',
-            'exclude'    => true,
-            'default' => 'free',
+            'exclude'   => true,
+            'default'   => 'free',
             'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
-            'options' => [
+            'options'   => [
                 \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE,
                 \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED
             ],
-            'eval' => [
+            'eval'      => [
                 'mandatory' => true,
-                'tl_class' => 'w50',
+                'tl_class'  => 'w50',
             ],
-            'sql' => "varchar(16) NOT NULL default ''"
+            'sql'       => "varchar(16) NOT NULL default ''"
         ],
         'published'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],
@@ -211,13 +211,12 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'text',
             'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql'       => "varchar(10) NOT NULL default ''"
-        ],
-        'imageSize' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],
-            'exclude'   => true,
-            'inputType' => 'text',
-            'eval'      => ['tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
         ]
     ]
 ];
+
+System::getContainer()->get('huh.utils.dca')->addOverridableFields(
+    ['imageSizes'],
+    'tl_ml_product_archive',
+    'tl_ml_product'
+);

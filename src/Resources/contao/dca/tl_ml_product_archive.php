@@ -1,7 +1,5 @@
 <?php
 
-\Contao\Controller::loadDataContainer('tl_ml_product');
-
 $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     'config'      => [
         'dataContainer'     => 'Table',
@@ -73,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes'    => [
         '__selector__' => ['createTagsFromValues'],
-        'default'      => '{general_legend},title,palette,imageSize,createTagsFromValues,uploadFolder;'
+        'default'      => '{general_legend},title;{config_legend},palette,imageSizes,createTagsFromValues,uploadFolder;'
     ],
     'subpalettes' => [
         'createTagsFromValues' => 'fieldsForTags'
@@ -112,8 +110,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'             => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
             'sql'              => "blob NULL"
         ],
-        'imageSize'            => [
-            'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSize'],
+        'imageSizes'            => [
+            'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSizes'],
             'exclude'          => true,
             'flag'             => 1,
             'inputType'        => 'checkboxWizard',

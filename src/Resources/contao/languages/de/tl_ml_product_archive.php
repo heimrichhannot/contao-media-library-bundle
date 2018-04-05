@@ -7,13 +7,10 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_product_archive'];
  */
 $lang['tstamp']               = ['Änderungsdatum', ''];
 $lang['title']                = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
-$lang['published']            = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
-$lang['start']                = ['Anzeigen ab', 'Produkt-Archiv erst ab diesem Tag auf der Webseite anzeigen.'];
-$lang['stop']                 = ['Anzeigen bis', 'Produkt-Archiv nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['palette']              = ['Felder für Produkt', 'Wählen Sie hier die Felder für die Produkte dieser Kategorie aus.'];
-$lang['imageSize']            = ['Bildgrößen', 'Wählen Sie die Bildgrößen aus, aus denen Download-Items für das Produkt erstellt werden'];
+$lang['palette']              = ['Produktfelder', 'Wählen Sie hier die Felder für die Produkte dieser Kategorie aus.'];
+$lang['imageSizes']           = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
 $lang['uploadFolder']         = [
-    'Dateiordner',
+    'Uploadverzeichnis',
     'Wählen Sie hier den Ordner, der als Basisordner für die hochgeladenen Dateien genutzt werden soll. (In diesem Ordner werden Unterverzeichnisse anhand des Produktnamens angelegt. In diesem werden dann wiederum die Dateien abgelegt.)'
 ];
 $lang['createTagsFromValues'] = ['Schlagworte aus Feldern generieren', 'Wählen Sie diese Option, wenn aus den Produktfeldern Schlagworte generiert werden sollen.'];

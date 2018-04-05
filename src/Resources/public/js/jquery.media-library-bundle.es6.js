@@ -30,7 +30,9 @@ let jQuery = require('jquery');
                 alert('Keine Option ausgewählt');
             }
 
-            window.location.href = window.location.href + '?file=' + file;
+            import(/* webpackChunkName: "contao-utils-bundle" */ 'contao-utils-bundle').then((utilsBundle) => {
+                window.location.href = utilsBundle.url.addParameterToUri(window.location.href, 'file', file);
+            });
         },
         doAjax: function(url, data) {
             $.ajax({
@@ -49,7 +51,7 @@ let jQuery = require('jquery');
     };
 
 
-    module.exports = mediaLibraryBundle;
+    module.exports = MediaLibrary;
 
     $(document).ready(function () {
         MediaLibrary.init();
