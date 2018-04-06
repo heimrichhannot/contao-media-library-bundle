@@ -109,24 +109,21 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'downloadFile' => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_ml_download']['downloadFile'],
-            'exclude'    => true,
-            'inputType'  => 'multifileupload',
-            'eval'       => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['downloadFile'],
+            'exclude'   => true,
+            'inputType' => 'multifileupload',
+            'eval'      => [
                 'tl_class'           => 'clr',
                 'filesOnly'          => true,
-                'fieldType'          => 'checkbox',
+                'fieldType'          => 'radio',
                 'skipPrepareForSave' => true,
-                'uploadFolder'       => ['tl_ml_download', 'getUploadFolder'],
+                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolderByDownload'],
                 'addRemoveLinks'     => true,
                 'maxFiles'           => 1,
-                'multipleFiles'      => true,
                 'maxUploadSize'      => \Config::get('maxFileSize'),
                 'mandatory'          => true
             ],
-            'attributes' => ['legend' => 'media_legend'],
-
-            'sql' => "blob NULL",
+            'sql'       => "blob NULL",
         ],
         'imageSize'    => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],

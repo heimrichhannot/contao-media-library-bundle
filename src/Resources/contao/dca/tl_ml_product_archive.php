@@ -71,22 +71,25 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'createTagsFromValues'],
-        'default'      => '{general_legend},title;{config_legend},type,palette,uploadFolder,createTagsFromValues;'
+        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'createTagsFromValues'],
+        'default'      => '{general_legend},title;{config_legend},type,palette,uploadFolderMode,createTagsFromValues;'
     ],
     'subpalettes' => [
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'imageSizes',
-        'createTagsFromValues' => 'fieldsForTags'
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                                          => 'imageSizes',
+        'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
+        'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
+        'addProductPatternToUploadFolder' => 'uploadFolderProductPattern',
+        'createTagsFromValues'                                                                                            => 'fieldsForTags'
     ],
     'fields'      => [
-        'id'                   => [
+        'id'                      => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'               => [
+        'tstamp'                  => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['tstamp'],
             'sql'   => "int(10) unsigned NOT NULL default '0'"
         ],
-        'dateAdded'            => [
+        'dateAdded'               => [
             'label'   => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
             'sorting' => true,
             'flag'    => 6,
@@ -94,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
         // general
-        'title'                => [
+        'title'                   => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['title'],
             'exclude'   => true,
             'search'    => true,
@@ -104,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'type'                     => [
+        'type'                    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['type'],
             'exclude'   => true,
             'filter'    => true,
@@ -115,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'       => "varchar(64) NOT NULL default ''"
         ],
         // image
-        'imageSizes'           => [
+        'imageSizes'              => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSizes'],
             'exclude'          => true,
             'flag'             => 1,
@@ -125,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'              => "blob NULL"
         ],
         // config
-        'uploadFolderMode'     => [
+        'uploadFolderMode'        => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderMode'],
             'exclude'   => true,
             'filter'    => true,
@@ -135,14 +138,37 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql'       => "varchar(64) NOT NULL default ''"
         ],
-        'uploadFolder'         => [
+        'uploadFolder'            => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolder'],
             'exclude'   => true,
             'inputType' => 'fileTree',
             'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight'],
             'sql'       => "binary(16) NULL",
         ],
-        'createTagsFromValues' => [
+        'uploadFolderUserPattern' => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderUserPattern'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50', 'mandatory' => true],
+            'sql'       => "varchar(255) NOT NULL default ''"
+        ],
+        'addProductPatternToUploadFolder' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['addProductPatternToUploadFolder'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => ['tl_class' => 'w50', 'submitOnChange' => true],
+            'sql'                     => "char(1) NOT NULL default ''"
+        ],
+        'uploadFolderProductPattern' => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderProductPattern'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50 clr', 'mandatory' => true],
+            'sql'       => "varchar(255) NOT NULL default ''"
+        ],
+        'createTagsFromValues'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['createTagsFromValues'],
             'exclude'   => true,
             'filter'    => true,
@@ -150,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['submitOnChange' => true, 'tl_class' => 'w50 clr'],
             'sql'       => "char(1) NOT NULL default ''"
         ],
-        'fieldsForTags'        => [
+        'fieldsForTags'           => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['fieldsForTags'],
             'exclude'          => true,
             'inputType'        => 'checkboxWizard',

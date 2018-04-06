@@ -83,8 +83,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ],
     'palettes'    => [
         '__selector__' => ['type', 'published'],
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title;{product_legend},uploadedFiles,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title;{product_legend},file,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title;{product_legend},file,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -133,8 +133,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'uploadedFiles'            => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['uploadedFiles'],
+        'file'            => [
+            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['file'],
             'exclude'    => true,
             'inputType'  => 'multifileupload',
             'eval'       => [
@@ -144,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'fieldType'          => 'radio',
                 'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight'     => \Config::get('gdMaxImgHeight'),
-                'uploadFolder'       => ['huh.media_library.backend.product', 'getUploadFolder'],
+                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
                 'addRemoveLinks'     => true,
                 'maxFiles'           => 1,
                 'maxUploadSize'      => \Config::get('maxFileSize'),

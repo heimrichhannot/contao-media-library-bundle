@@ -25,11 +25,6 @@ class Download
         $this->framework = $framework;
     }
 
-    public function getUploadFolder()
-    {
-        return 'files/media/mediathek/test';
-    }
-
     public function listChildren($arrRow)
     {
         return '<div class="tl_content_left">'.($arrRow['title'] ?: $arrRow['id']).' <span style="color:#b3b3b3; padding-left:3px">['.

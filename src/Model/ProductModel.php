@@ -10,13 +10,6 @@ namespace HeimrichHannot\MediaLibraryBundle\Model;
 
 use Contao\Model;
 
-/**
- * @property string $title
- * @property string $category
- * @property string $uploadedFiles
- * @property string $text
- * @property string $tags
- */
 class ProductModel extends Model
 {
     const ITEM_LICENCE_TYPE_FREE = 'free';

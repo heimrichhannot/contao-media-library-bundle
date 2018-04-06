@@ -93,13 +93,7 @@ class Product
             return;
         }
 
-        if ($product->doNotCreateDownloadItems) {
-            return;
-        }
-
-        $files = StringUtil::deserialize($product->uploadedFiles, true);
-
-        if (empty($files)) {
+        if ($product->doNotCreateDownloadItems || !$product->file) {
             return;
         }
 
@@ -165,34 +159,6 @@ class Product
         while ($downloads->next()) {
             $downloads->delete();
         }
-    }
-
-    /**
-     * get the upload folder.
-     *
-     * @param DataContainer $dc
-     *
-     * @return string
-     */
-    public function getUploadFolder(DataContainer $dc)
-    {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
-            return Config::get('uploadPath');
-        }
-
-        if (null === ($product = $this->productRegistry->findByPk($dc->id))) {
-            return Config::get('uploadPath');
-        }
-
-        if (null === ($uploadFolder = System::getContainer()->get('huh.utils.file')->getPathFromUuid($productArchive->uploadFolder))) {
-            return Config::get('uploadPath');
-        }
-
-        if (!isset($product->title)) {
-            return $uploadFolder;
-        }
-
-        return $uploadFolder.DIRECTORY_SEPARATOR.$product->title;
     }
 
     public function checkPermission()
@@ -421,15 +387,15 @@ class Product
      */
     protected function createDownloadItems(ProductModel $product)
     {
-        foreach (StringUtil::deserialize($product->uploadedFiles, true) as $file) {
-            $path = System::getContainer()->getParameter('kernel.project_dir').DIRECTORY_SEPARATOR.
-                    System::getContainer()->get('huh.utils.file')->getPathFromUuid($file);
+        $file = StringUtil::deserialize($product->file, true)[0];
 
-            $extension = System::getContainer()->get('huh.utils.file')->getFileExtension($path);
+        $path = System::getContainer()->getParameter('kernel.project_dir').DIRECTORY_SEPARATOR.
+                System::getContainer()->get('huh.utils.file')->getPathFromUuid($file);
 
-            if (in_array($extension, explode(',', Config::get('validImageTypes')), true)) {
-                $this->createImageDownloadItems($path, $extension, $product);
-            }
+        $extension = System::getContainer()->get('huh.utils.file')->getFileExtension($path);
+
+        if (in_array($extension, explode(',', Config::get('validImageTypes')), true)) {
+            $this->createImageDownloadItems($path, $extension, $product);
         }
     }
 

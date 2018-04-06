@@ -11,9 +11,9 @@ $lang['pid']                      = ['Kategorie', 'Wählen Sie hier die Kategori
 $lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['uploadedFiles']            = ['Dateien', 'Laden Sie hier die zum Produkt gehörigen Dateien hoch.'];
+$lang['file']                     = ['Datei', 'Laden Sie hier die zum Produkt gehörige Datei hoch.'];
 $lang['text']                     = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
-$lang['tags']                      = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
+$lang['tags']                     = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
 $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'

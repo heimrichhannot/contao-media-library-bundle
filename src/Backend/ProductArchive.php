@@ -9,6 +9,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\Backend;
 
 use Contao\BackendUser;
+use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
@@ -17,11 +18,11 @@ use Contao\System;
 class ProductArchive
 {
     const UPLOAD_FOLDER_MODE_STATIC = 'static';
-    const UPLOAD_FOLDER_MODE_MEMBER_HOME_DIR = 'member_home_dir';
+    const UPLOAD_FOLDER_MODE_USER_HOME_DIR = 'user_home_dir';
 
     const UPLOAD_FOLDER_MODES = [
         self::UPLOAD_FOLDER_MODE_STATIC,
-        self::UPLOAD_FOLDER_MODE_MEMBER_HOME_DIR,
+        self::UPLOAD_FOLDER_MODE_USER_HOME_DIR,
     ];
 
     /**
@@ -62,6 +63,77 @@ class ProductArchive
                 'inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'],
             ]
         );
+    }
+
+    public function getUploadFolderByProduct(DataContainer $dc)
+    {
+        return $this->doGetUploadFolder($dc->id);
+    }
+
+    public function getUploadFolderByDownload(DataContainer $dc)
+    {
+        if (null === ($download = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_download', $dc->id))) {
+            return \Contao\Config::get('uploadPath');
+        }
+
+        return $this->doGetUploadFolder($download->pid);
+    }
+
+    /**
+     * get the upload folder.
+     *
+     * @param int $product
+     *
+     * @return string
+     */
+    public function doGetUploadFolder(int $product)
+    {
+        if (null === ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $product))) {
+            return Config::get('uploadPath');
+        }
+
+        if (null === ($productArchive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+            return Config::get('uploadPath');
+        }
+
+        if (null === ($uploadFolder = System::getContainer()->get('huh.utils.file')->getPathFromUuid($productArchive->uploadFolder))) {
+            return Config::get('uploadPath');
+        }
+
+        $modelUtil = System::getContainer()->get('huh.utils.model');
+
+        switch ($productArchive->uploadFolderMode) {
+            case static::UPLOAD_FOLDER_MODE_USER_HOME_DIR:
+                if ($productArchive->uploadFolderUserPattern) {
+                    $backendUser = $this->framework->createInstance(BackendUser::class);
+
+                    if (null !== ($user = $modelUtil->findModelInstanceByPk('tl_user', $backendUser->id))) {
+                        $userPattern = $modelUtil->computeStringPattern(
+                            $productArchive->uploadFolderUserPattern,
+                            $user,
+                            'tl_user'
+                        );
+
+                        if ($userPattern) {
+                            $uploadFolder .= DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($userPattern);
+                        }
+                    }
+                }
+
+                break;
+        }
+
+        if ($productArchive->addProductPatternToUploadFolder && $productArchive->uploadFolderProductPattern) {
+            $productPattern = $modelUtil->computeStringPattern(
+                $productArchive->uploadFolderProductPattern,
+                $product,
+                'tl_ml_product'
+            );
+
+            $uploadFolder .= DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($productPattern);
+        }
+
+        return $uploadFolder;
     }
 
     public function checkPermission()
@@ -108,7 +180,15 @@ class ProductArchive
                     if (is_array($arrNew['tl_ml_product_archive']) && in_array(\Contao\Input::get('id'), $arrNew['tl_ml_product_archive'], true)) {
                         // Add the permissions on group level
                         if ('custom' != $user->inherit) {
-                            $objGroup = $database->execute('SELECT id, contao_media_library_bundles, contao_media_library_bundlep FROM tl_user_group WHERE id IN('.implode(',', array_map('intval', $user->groups)).')');
+                            $objGroup = $database->execute(
+                                'SELECT id, contao_media_library_bundles, contao_media_library_bundlep FROM tl_user_group WHERE id IN('.implode(
+                                    ',',
+                                    array_map(
+                                        'intval',
+                                        $user->groups
+                                    )
+                                ).')'
+                            );
 
                             while ($objGroup->next()) {
                                 $arrModulep = \StringUtil::deserialize($objGroup->contao_media_library_bundlep);
@@ -117,7 +197,10 @@ class ProductArchive
                                     $arrModules = \StringUtil::deserialize($objGroup->contao_media_library_bundles, true);
                                     $arrModules[] = \Contao\Input::get('id');
 
-                                    $database->prepare('UPDATE tl_user_group SET contao_media_library_bundles=? WHERE id=?')->execute(serialize($arrModules), $objGroup->id);
+                                    $database->prepare('UPDATE tl_user_group SET contao_media_library_bundles=? WHERE id=?')->execute(
+                                        serialize($arrModules),
+                                        $objGroup->id
+                                    );
                                 }
                             }
                         }
@@ -134,8 +217,10 @@ class ProductArchive
                                 $arrModules = \StringUtil::deserialize($user->contao_media_library_bundles, true);
                                 $arrModules[] = \Contao\Input::get('id');
 
-                                $database->prepare('UPDATE tl_user SET contao_media_library_bundles=? WHERE id=?')
-                                    ->execute(serialize($arrModules), $user->id);
+                                $database->prepare('UPDATE tl_user SET contao_media_library_bundles=? WHERE id=?')->execute(
+                                        serialize($arrModules),
+                                        $user->id
+                                    );
                             }
                         }
 
@@ -149,8 +234,16 @@ class ProductArchive
             case 'copy':
             case 'delete':
             case 'show':
-                if (!in_array(\Contao\Input::get('id'), $root, true) || ('delete' == \Contao\Input::get('act') && !$user->hasAccess('delete', 'contao_media_library_bundlep'))) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.');
+                if (!in_array(\Contao\Input::get('id'), $root, true)
+                    || ('delete' == \Contao\Input::get('act')
+                        && !$user->hasAccess(
+                            'delete',
+                            'contao_media_library_bundlep'
+                        ))
+                ) {
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
+                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.'
+                    );
                 }
                 break;
 
@@ -168,7 +261,9 @@ class ProductArchive
 
             default:
                 if (strlen(\Contao\Input::get('act'))) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.');
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
+                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.'
+                    );
                 }
                 break;
         }
@@ -176,16 +271,31 @@ class ProductArchive
 
     public function editHeader($row, $href, $label, $title, $icon, $attributes)
     {
-        return \Contao\BackendUser::getInstance()->canEditFieldsOf('tl_ml_product_archive') ? '<a href="'.Controller::addToUrl($href.'&amp;id='.$row['id']).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        return \Contao\BackendUser::getInstance()->canEditFieldsOf('tl_ml_product_archive') ? '<a href="'.Controller::addToUrl(
+                $href.'&amp;id='.$row['id']
+            ).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml(
+                $icon,
+                $label
+            ).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 
     public function copyArchive($row, $href, $label, $title, $icon, $attributes)
     {
-        return \Contao\BackendUser::getInstance()->hasAccess('create', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl($href.'&amp;id='.$row['id']).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        return \Contao\BackendUser::getInstance()->hasAccess('create', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
+                $href.'&amp;id='.$row['id']
+            ).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml(
+                $icon,
+                $label
+            ).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 
     public function deleteArchive($row, $href, $label, $title, $icon, $attributes)
     {
-        return \Contao\BackendUser::getInstance()->hasAccess('delete', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl($href.'&amp;id='.$row['id']).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        return \Contao\BackendUser::getInstance()->hasAccess('delete', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
+                $href.'&amp;id='.$row['id']
+            ).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml(
+                $icon,
+                $label
+            ).'</a> ' : \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 }
