@@ -50,7 +50,7 @@ class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
         if (null !== $downloadFiles && 1 === count($downloadFiles)) {
             $template->uuid = json_encode([
                 'title' => $downloadFiles->title,
-                'uuid' => StringUtil::binToUuid($downloadFiles->downloadFile),
+                'uuid' => StringUtil::binToUuid($downloadFiles->file),
             ]);
         }
 
@@ -104,7 +104,7 @@ class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
             if (1 === count($downloads)) {
-                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads->downloadFile), false];
+                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads->file), false];
             }
 
             return [$this->getOptions($downloads), true];
@@ -129,7 +129,7 @@ class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
         foreach ($downloadItems as $downloadItem) {
             $options[] = [
                 'title' => $downloadItem->title,
-                'uuid' => StringUtil::binToUuid($downloadItem->downloadFile),
+                'uuid' => StringUtil::binToUuid($downloadItem->file),
             ];
         }
 

@@ -67,7 +67,7 @@ class ProductArchive
 
     public function getUploadFolderByProduct(DataContainer $dc)
     {
-        return $this->doGetUploadFolder($dc->id);
+        return $this->doGetUploadFolder($dc->activeRecord);
     }
 
     public function getUploadFolderByDownload(DataContainer $dc)
@@ -76,23 +76,24 @@ class ProductArchive
             return \Contao\Config::get('uploadPath');
         }
 
-        return $this->doGetUploadFolder($download->pid);
+        if (null === ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $download->pid))) {
+            return \Contao\Config::get('uploadPath');
+        }
+
+        return $this->doGetUploadFolder($product);
     }
 
     /**
      * get the upload folder.
      *
-     * @param int $product
+     * @param object $product
      *
      * @return string
      */
-    public function doGetUploadFolder(int $product)
+    public function doGetUploadFolder($product)
     {
-        if (null === ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $product))) {
-            return Config::get('uploadPath');
-        }
-
-        if (null === ($productArchive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+        if (null === ($productArchive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive',
+                                                                                                              $product->pid))) {
             return Config::get('uploadPath');
         }
 

@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
     ],
     'palettes'    => [
         '__selector__' => ['published'],
-        'default'      => '{general_legend},title,imageSize,downloadFile;{publish_legend},published;'
+        'default'      => '{general_legend},title,imageSize,file;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -108,8 +108,8 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'downloadFile' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['downloadFile'],
+        'file' => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['file'],
             'exclude'   => true,
             'inputType' => 'multifileupload',
             'eval'      => [
