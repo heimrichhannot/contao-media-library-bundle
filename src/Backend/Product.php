@@ -153,7 +153,7 @@ class Product
                 $dc->activeRecord->pid
             );
 
-        if (null === $downloads) {
+        if (null === $downloads || (null === ($productArchive = $this->getProductArchive($dc->id)))) {
             return;
         }
 
@@ -183,7 +183,9 @@ class Product
             $download->delete();
         }
 
-        if (null !== $folder) {
+        $canDeleteFolder = null !== $folder && ($productArchive->uploadFolderUserPattern || $productArchive->addProductPatternToUploadFolder && $productArchive->uploadFolderProductPattern);
+
+        if ($canDeleteFolder) {
             if (null !== ($folder = new Folder($folder))) {
                 $folder->delete();
             }
