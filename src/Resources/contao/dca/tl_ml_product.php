@@ -12,7 +12,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
             ['huh.media_library.backend.product', 'generateDownloadItems'],
-            ['huh.media_library.backend.product', 'generateTags']
+            ['huh.media_library.backend.product', 'generateTags'],
+            ['huh.media_library.backend.product', 'generateAlias'],
         ],
         'oncopy_callback'   => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
@@ -83,8 +84,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ],
     'palettes'    => [
         '__selector__' => ['type', 'published'],
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title;{product_legend},file,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title;{product_legend},file,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -105,6 +106,12 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'tstamp'                   => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['tstamp'],
             'sql'   => "int(10) unsigned NOT NULL default '0'"
+        ],
+        'alias' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['alias'],
+            'inputType' => 'text',
+            'eval'      => ['tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
         'dateAdded'                => [
             'label'   => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],

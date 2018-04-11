@@ -393,6 +393,16 @@ class Product
         $objVersions->create();
     }
 
+    public function generateAlias(DataContainer $dc)
+    {
+        if (null === ($product = System::getContainer()->get('huh.media_library.product_registry')->findByPk($dc->activeRecord->id))) {
+            return null;
+        }
+
+        $product->alias = System::getContainer()->get('huh.utils.dca')->generateAlias($dc->activeRecord->alias, $dc->activeRecord->id, 'tl_ml_product', $dc->activeRecord->title);
+        $product->save();
+    }
+
     /**
      * add values to tags.
      *
@@ -490,7 +500,7 @@ class Product
             // compose path
             $targetFile = $containerUtil->getProjectDir().DIRECTORY_SEPARATOR.dirname($file->path).DIRECTORY_SEPARATOR.$targetFilename;
 
-            $resizeImage = $imageFactory->create($file->path, $size, $targetFile);
+            $resizeImage = $imageFactory->create($containerUtil->getProjectDir().DIRECTORY_SEPARATOR.$file->path, $size, $targetFile);
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $sizeModel);
         }

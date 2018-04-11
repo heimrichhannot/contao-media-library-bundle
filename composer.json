@@ -9,7 +9,7 @@
     "symfony/framework-bundle": "^3.4",
     "heimrichhannot/contao-categories-bundle": "^1.0",
     "heimrichhannot/contao-multifileupload-bundle": "^1.0",
-    "heimrichhannot/contao-utils-bundle": "^2.0"
+    "heimrichhannot/contao-utils-bundle": "^2.5"
   },
   "require-dev": {
     "contao/test-case": "^1.1",
