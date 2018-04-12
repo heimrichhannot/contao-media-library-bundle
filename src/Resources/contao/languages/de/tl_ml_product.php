@@ -18,20 +18,22 @@ $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'
 ];
-$lang['licence']                  = [
-    'Lizenz',
-    'Geben Sie hier die Lizenz für dieses Produkt an.',
-    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE   => 'frei',
-    \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED => 'gesperrt'
-];
-
 
 /**
  * Legends
  */
 $lang['general_legend'] = 'Allgemeine Einstellungen';
-$lang['publish_legend'] = 'Veröffentlichung';
 $lang['product_legend'] = 'Produkt-Einstellungen';
+$lang['additional_fields_legend'] = 'Zusätzliche Einstellungen';
+$lang['publish_legend'] = 'Veröffentlichung';
+
+/**
+ * Reference
+ */
+$lang['reference'] = [
+    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'Bild',
+    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => 'Datei',
+];
 
 /**
  * Buttons

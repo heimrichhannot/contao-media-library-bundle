@@ -20,6 +20,7 @@ use Contao\Folder;
 use Contao\ImageSizeModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Versions;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
@@ -74,15 +75,93 @@ class Product
         $this->dcaUtil = $dcaUtil;
     }
 
+    public function listChildren($row)
+    {
+        return '<div class="tl_content_left">'.($row['title'] ?: $row['id']).'</div>';
+    }
+
     public function setType(DataContainer $dc)
     {
-        if (null !== ($productArchive = $this->getProductArchive($dc->id))) {
+        if ($dc->id && null !== ($productArchive = $this->getProductArchive($dc->id))) {
             Database::getInstance()->prepare('UPDATE tl_ml_product SET type=? WHERE id=?')->execute($productArchive->type, $dc->id);
         }
     }
 
+    public function addAdditionalFields(DataContainer $dc)
+    {
+        if (null === ($product = $this->productRegistry->findByPk($dc->id))) {
+            return;
+        }
+
+        if (null === ($productArchive = $this->productArchiveRegistry->findByPk($product->pid))) {
+            return;
+        }
+
+        $dca = &$GLOBALS['TL_DCA']['tl_ml_product'];
+
+        $additionalFields = StringUtil::deserialize($productArchive->additionalFields, true);
+
+        if (!empty($additionalFields)) {
+            $dca['palettes'][$product->type] = str_replace(
+                '{additional_fields_legend}',
+                '{additional_fields_legend},'.implode(',', $additionalFields),
+                $dca['palettes'][$product->type]
+            );
+        }
+    }
+
+    public function setCopyright($varValue, DataContainer $dc)
+    {
+        if (!$dc->activeRecord || !$dc->activeRecord->file) {
+            return '';
+        }
+
+        $file = StringUtil::deserialize($dc->activeRecord->file, true);
+
+        if (empty($file)) {
+            return '';
+        }
+
+        $model = FilesModel::findByUuid($file[0]);
+
+        if (null === $model) {
+            return '';
+        }
+
+        $versions = new Versions('tl_files', $model->id);
+        $versions->initialize();
+
+        $model->copyright = $varValue;
+        $model->save();
+
+        $versions->create();
+
+        return '';
+    }
+
+    public function getCopyright($value, DataContainer $dc)
+    {
+        if (!$dc->activeRecord || !$dc->activeRecord->file) {
+            return '';
+        }
+
+        $file = StringUtil::deserialize($dc->activeRecord->file, true);
+
+        if (empty($file)) {
+            return '';
+        }
+
+        $model = FilesModel::findByUuid($file[0]);
+
+        if (null === $model) {
+            return '';
+        }
+
+        return $model->copyright;
+    }
+
     /**
-     * delete old download items before progressing.
+     * Generate download.
      *
      * @param DataContainer $dc
      *
@@ -94,7 +173,7 @@ class Product
             return;
         }
 
-        $this->cleanGeneratedDownloadItems($dc, true);
+        $this->cleanGeneratedDownloadItems($dc, true, true);
         $this->createDownloadItems($dc);
     }
 
@@ -107,7 +186,7 @@ class Product
      */
     public function generateTags(DataContainer $dc)
     {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
+        if (null === ($productArchive = $this->getProductArchive($dc->id)) || !$productArchive->createTagsFromValues) {
             return false;
         }
 
@@ -120,9 +199,9 @@ class Product
         // use all fields if none is defined
         if (empty($fieldsForTags)) {
             $fieldsForTags = System::getContainer()->get('huh.utils.dca')->getFields(
-                    'tl_ml_product',
-                    ['inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'], 'localizeLabels' => false]
-                );
+                'tl_ml_product',
+                ['inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'], 'localizeLabels' => false]
+            );
         }
 
         $tags = [];
@@ -145,10 +224,11 @@ class Product
      * @param DataContainer $dc
      * @param bool          $deleteOnlyGenerated
      */
-    public function cleanGeneratedDownloadItems(DataContainer $dc, $deleteOnlyGenerated = false)
+    public function cleanGeneratedDownloadItems(DataContainer $dc, $deleteOnlyGenerated = false, $keepFolder = false)
     {
         $downloads = $deleteOnlyGenerated
-            ? $this->downloadRegistry->findGeneratedImages($dc->id) : $this->downloadRegistry->findBy(
+            ? $this->downloadRegistry->findGeneratedImages($dc->id)
+            : $this->downloadRegistry->findBy(
                 'pid',
                 $dc->activeRecord->pid
             );
@@ -163,7 +243,7 @@ class Product
             // delete (skip the original file)
             $files = StringUtil::deserialize($download->file, true);
 
-            if (count($files) < 1) {
+            if (count($files) < 1 || !$download->imageSize) {
                 continue;
             }
 
@@ -183,7 +263,10 @@ class Product
             $download->delete();
         }
 
-        $canDeleteFolder = null !== $folder && ($productArchive->uploadFolderUserPattern || $productArchive->addProductPatternToUploadFolder && $productArchive->uploadFolderProductPattern);
+        $canDeleteFolder = !$keepFolder && null !== $folder
+                           && ($productArchive->uploadFolderUserPattern
+                               || $productArchive->addProductPatternToUploadFolder
+                                  && $productArchive->uploadFolderProductPattern);
 
         if ($canDeleteFolder) {
             if (null !== ($folder = new Folder($folder))) {
@@ -399,7 +482,12 @@ class Product
             return null;
         }
 
-        $product->alias = System::getContainer()->get('huh.utils.dca')->generateAlias($dc->activeRecord->alias, $dc->activeRecord->id, 'tl_ml_product', $dc->activeRecord->title);
+        $product->alias = System::getContainer()->get('huh.utils.dca')->generateAlias(
+            $dc->activeRecord->alias,
+            $dc->activeRecord->id,
+            'tl_ml_product',
+            $dc->activeRecord->title
+        );
         $product->save();
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+\Contao\System::loadLanguageFile('tl_ml_product');
+
 $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     'config'      => [
         'dataContainer'     => 'Table',
@@ -72,10 +74,11 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes'    => [
         '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'createTagsFromValues'],
-        'default'      => '{general_legend},title;{config_legend},type,palette,uploadFolderMode,createTagsFromValues;'
+        'default'      => '{general_legend},title;{config_legend},type,additionalFields,createTagsFromValues;'
     ],
     'subpalettes' => [
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                                          => 'imageSizes',
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                                          => 'uploadFolderMode,imageSizes',
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                                           => 'uploadFolderMode',
         'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
         'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
         'addProductPatternToUploadFolder' => 'uploadFolderProductPattern',
@@ -108,7 +111,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'type'                    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['type'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['type'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'select',
@@ -116,6 +119,24 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
             'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql'       => "varchar(64) NOT NULL default ''"
+        ],
+        'additionalFields' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['additionalFields'],
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkboxWizard',
+            'options_callback' => function(\Contao\DataContainer $dc) {
+                return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
+                    [
+                        'dataContainer' => 'tl_ml_product',
+                        'evalConditions' => [
+                            'isAdditionalField' => true
+                        ]
+                    ]
+                );
+            },
+            'eval'                    => ['tl_class' => 'w50 autoheight', 'multiple' => true],
+            'sql'                     => "blob NULL"
         ],
         // image
         'imageSizes'              => [
@@ -142,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolder'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight'],
+            'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight', 'mandatory' => true],
             'sql'       => "binary(16) NULL",
         ],
         'uploadFolderUserPattern' => [

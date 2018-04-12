@@ -24,7 +24,14 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter([ContaoCoreBundle::class, HeimrichHannotContaoAjaxBundle::class, HeimrichHannotContaoFilterBundle::class]),
+            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter(
+                [
+                    ContaoCoreBundle::class,
+                    HeimrichHannotContaoAjaxBundle::class,
+                    HeimrichHannotContaoFilterBundle::class,
+                    'filecredits',
+                ]
+            ),
         ];
     }
 
@@ -41,7 +48,8 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
             'huh_encore',
             $extensionName,
             $extensionConfigs,
-            $container->getParameter('kernel.project_dir').'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_encore.yml'
+            $container->getParameter('kernel.project_dir')
+            .'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_encore.yml'
         );
     }
 }

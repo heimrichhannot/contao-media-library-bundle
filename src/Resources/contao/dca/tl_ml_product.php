@@ -7,7 +7,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'ctable'            => 'tl_ml_download',
         'enableVersioning'  => true,
         'onload_callback'   => [
-            ['huh.media_library.backend.product', 'setType']
+            ['huh.media_library.backend.product', 'setType'],
+            ['huh.media_library.backend.product', 'addAdditionalFields'],
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
@@ -34,9 +35,11 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'format' => '%s'
         ],
         'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['title'],
-            'panelLayout' => 'filter;sort,search,limit',
+            'mode'                  => 4,
+            'fields'                => ['title'],
+            'headerFields'          => ['title', 'tstamp'],
+            'panelLayout'           => 'filter;sort,search,limit',
+            'child_record_callback' => ['huh.media_library.backend.product', 'listChildren']
         ],
         'global_operations' => [
             'all' => [
@@ -83,9 +86,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'published'],
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,doNotCreateDownloadItems,text,licence,tags;{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,doNotCreateDownloadItems,text,licence,tags,overrideImageSizes;{publish_legend},published;'
+        '__selector__'                                                 => ['type', 'published'],
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE  => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags,overrideImageSizes;{additional_fields_legend};{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -107,11 +110,11 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['tstamp'],
             'sql'   => "int(10) unsigned NOT NULL default '0'"
         ],
-        'alias' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['alias'],
+        'alias'                    => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['alias'],
             'inputType' => 'text',
             'eval'      => ['tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'dateAdded'                => [
             'label'   => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
@@ -140,24 +143,24 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'file'            => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['file'],
-            'exclude'    => true,
-            'inputType'  => 'multifileupload',
-            'eval'       => [
-                'tl_class'           => 'clr',
-                'extensions'         => \Config::get('validImageTypes'),
-                'filesOnly'          => true,
-                'fieldType'          => 'radio',
-                'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
-                'maxImageHeight'     => \Config::get('gdMaxImgHeight'),
-                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
-                'addRemoveLinks'     => true,
-                'maxFiles'           => 1,
-                'maxUploadSize'      => \Config::get('maxFileSize'),
-                'mandatory'          => true
+        'file'                     => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['file'],
+            'exclude'   => true,
+            'inputType' => 'multifileupload',
+            'eval'      => [
+                'tl_class'       => 'clr',
+                'extensions'     => \Config::get('validImageTypes'),
+                'filesOnly'      => true,
+                'fieldType'      => 'radio',
+                'maxImageWidth'  => \Config::get('gdMaxImgWidth'),
+                'maxImageHeight' => \Config::get('gdMaxImgHeight'),
+                'uploadFolder'   => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
+                'addRemoveLinks' => true,
+                'maxFiles'       => 1,
+                'maxUploadSize'  => \Config::get('maxFileSize'),
+                'mandatory'      => true
             ],
-            'sql' => "blob NULL",
+            'sql'       => "blob NULL",
         ],
         'doNotCreateDownloadItems' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['doNotCreateDownloadItems'],
@@ -174,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'eval'      => ['tl_class' => 'clr', 'rte' => 'tinyMCE'],
             'sql'       => "text NULL",
         ],
-        'tags'                      => [
+        'tags'                     => [
             'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['tags'],
             'exclude'    => true,
             'search'     => true,
@@ -191,21 +194,18 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'attributes' => ['legend' => 'general_legend', 'multilingual' => true, 'fixed' => true, 'fe_sorting' => true, 'fe_search' => true],
             'sql'        => "blob NULL",
         ],
-        'licence'                  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
-            'inputType' => 'select',
-            'exclude'   => true,
-            'default'   => 'free',
-            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['licence'],
-            'options'   => [
-                \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_FREE,
-                \HeimrichHannot\MediaLibraryBundle\Model\ProductModel::ITEM_LICENCE_TYPE_LOCKED
+        'copyright'     => [
+            'label'            => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
+            'inputType'        => 'tagsinput',
+            'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
+            'eval'             => ['maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'long clr', 'freeInput' => true, 'multiple' => true, 'doNotSaveEmpty' => true],
+            'reference'        => &$GLOBALS['TL_LANG']['tl_files'],
+            'load_callback'    => [
+                ['huh.media_library.backend.product', 'getCopyright'],
             ],
-            'eval'      => [
-                'mandatory' => true,
-                'tl_class'  => 'w50',
+            'save_callback'    => [
+                ['huh.media_library.backend.product', 'setCopyright'],
             ],
-            'sql'       => "varchar(16) NOT NULL default ''"
         ],
         'published'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],
@@ -238,3 +238,5 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
     'tl_ml_product_archive',
     'tl_ml_product'
 );
+
+//$GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['mandatory'] = true;

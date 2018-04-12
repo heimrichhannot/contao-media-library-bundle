@@ -5,26 +5,42 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_product_archive'];
 /**
  * Fields
  */
-$lang['tstamp']               = ['Änderungsdatum', ''];
-$lang['title']                = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
-$lang['palette']              = ['Produktfelder', 'Wählen Sie hier die Felder für die Produkte dieser Kategorie aus.'];
-$lang['imageSizes']           = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
-$lang['uploadFolderMode']         = [
+$lang['tstamp']                          = ['Änderungsdatum', ''];
+$lang['title']                           = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
+$lang['type']                            = ['Typ', 'Wählen Sie hier den Typ aus, den Produkte dieses Archivs erhalten sollen.'];
+$lang['additionalFields']                = ['Zusätzliche Produktfelder', 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.'];
+$lang['imageSizes']                      =
+    ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
+$lang['uploadFolderMode']                = [
     'Uploadverzeichnis-Modus',
     'Wählen Sie hier aus, wo Dateien abgelegt werden, die '
 ];
-$lang['uploadFolder']         = [
+$lang['uploadFolder']                    = [
     'Uploadverzeichnis',
     'Wählen Sie hier den Ordner, der als Basisordner für die hochgeladenen Dateien genutzt werden soll. (In diesem Ordner werden Unterverzeichnisse anhand des Produktnamens angelegt. In diesem werden dann wiederum die Dateien abgelegt.)'
 ];
-$lang['createTagsFromValues'] = ['Schlagworte aus Feldern generieren', 'Wählen Sie diese Option, wenn aus den Produktfeldern Schlagworte generiert werden sollen.'];
+$lang['uploadFolderUserPattern']         = [
+    'Verzeichnismuster (aktueller Benutzer)',
+    'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch den akuellen Backend-Benutzer generiert werden soll (Beispiel "%name%-%id%").'
+];
+$lang['addProductPatternToUploadFolder'] = [
+    'Aktuelles Produkt zum Uploadverzeichnispfad hinzufügen',
+    'Wählen Sie diese Option, wenn der Uploadverzeichnispfad auch durch das aktuelle Produkt bestimmt werden soll.'
+];
+$lang['uploadFolderProductPattern']      = [
+    'Verzeichnismuster (aktuelles Produkt)',
+    'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch das akuelle Produkt generiert werden soll (Beispiel "%title%-%id%").'
+];
+
+$lang['createTagsFromValues'] =
+    ['Schlagworte aus Feldern generieren', 'Wählen Sie diese Option, wenn aus den Produktfeldern Schlagworte generiert werden sollen.'];
 $lang['fieldsForTags']        = ['Felder', 'Wählen Sie hier die Felder aus, die in Schlagworte umgewandelt werden sollen.'];
 
 /**
  * Legends
  */
 $lang['general_legend'] = 'Allgemeine Einstellungen';
-$lang['publish_legend'] = 'Veröffentlichung';
+$lang['config_legend']  = 'Konfiguration';
 
 /**
  * Buttons
