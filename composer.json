@@ -10,7 +10,8 @@
     "heimrichhannot/contao-categories-bundle": "^1.0",
     "heimrichhannot/contao-filecredits": "^3.0",
     "heimrichhannot/contao-multifileupload-bundle": "^1.0",
-    "heimrichhannot/contao-utils-bundle": "^2.5"
+    "heimrichhannot/contao-utils-bundle": "^2.5",
+    "codefog/tags-bundle": "^2.1"
   },
   "require-dev": {
     "contao/test-case": "^1.1",
