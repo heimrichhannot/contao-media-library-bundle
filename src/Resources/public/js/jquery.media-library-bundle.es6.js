@@ -15,8 +15,7 @@ let jQuery = require('jquery');
                 MediaLibrary.downloadSelectedItem();
             });
 
-            $(document).on('hide.bs.modal','#watchlistModal', function(){
-                console.log('modal hide');
+            $(document).on('hide.bs.modal','#mediaLibraryModal', function(){
                 setTimeout(function(){
                     $(document).find('#watchlistModal').remove();
                 },500);

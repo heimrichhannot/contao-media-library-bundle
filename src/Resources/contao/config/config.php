@@ -20,8 +20,7 @@ $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['huh.media_library.ajax_manager', 'aj
 /**
  * JavaScipt
  */
-
-if(\Contao\System::getContainer()->get('huh.utils.container')->isFrontend())
+if(\Contao\System::getContainer()->get('huh.utils.container')->isFrontend() && !class_exists(\HeimrichHannot\EncoreBundle\DependencyInjection\EncoreExtension::class))
 {
     $GLOBALS['TL_JAVASCRIPT']['contao-media-library-bundle'] = 'bundles/heimrichhannotcontaomedialibrary/js/jquery.media-library.min.js|static';
 }

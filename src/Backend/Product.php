@@ -240,6 +240,9 @@ class Product
         $folder = null;
 
         foreach ($downloads as $i => $download) {
+            // delete model
+            $download->delete();
+
             // delete (skip the original file)
             $files = StringUtil::deserialize($download->file, true);
 
@@ -258,9 +261,6 @@ class Product
 
                 $file->delete();
             }
-
-            // delete model
-            $download->delete();
         }
 
         $canDeleteFolder = !$keepFolder && null !== $folder
@@ -614,6 +614,26 @@ class Product
     }
 
     /**
+     * get ProductArchiveModel for product.
+     *
+     * @param int $id
+     *
+     * @return \Contao\Model\Collection|ProductArchiveModel|null
+     */
+    protected function getProductArchive(int $id)
+    {
+        if (null === ($product = $this->productRegistry->findByPk($id))) {
+            return null;
+        }
+
+        if (null === ($productArchive = $this->productArchiveRegistry->findByPk($product->pid))) {
+            return null;
+        }
+
+        return $productArchive;
+    }
+
+    /**
      * create the DownloadModel for the image size.
      *
      * @param string         $path
@@ -635,6 +655,7 @@ class Product
 
         if (null !== $size) {
             $title .= ' ('.$size->name.')';
+            $downloadItem->imageSize = $size->id;
         }
 
         $downloadItem->tstamp = $downloadItem->dateAdded = time();
@@ -646,25 +667,5 @@ class Product
         $downloadItem->published = true;
 
         $downloadItem->save();
-    }
-
-    /**
-     * get ProductArchiveModel for product.
-     *
-     * @param int $id
-     *
-     * @return \Contao\Model\Collection|ProductArchiveModel|null
-     */
-    protected function getProductArchive(int $id)
-    {
-        if (null === ($product = $this->productRegistry->findByPk($id))) {
-            return null;
-        }
-
-        if (null === ($productArchive = $this->productArchiveRegistry->findByPk($product->pid))) {
-            return null;
-        }
-
-        return $productArchive;
     }
 }
