@@ -33,7 +33,6 @@ let jQuery = require('jquery');
         downloadSelectedItem: function(){
             let file = $(document).find('#mediaLibrary-select option:selected').val();
 
-            console.log(file);
             if('' == file) {
                 alert('Keine Option ausgewählt');
             }

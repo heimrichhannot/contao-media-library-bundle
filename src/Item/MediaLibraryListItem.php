@@ -40,10 +40,12 @@ class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
         $template->uuid = '';
         $template->options = '';
 
-        if (null === ($downloadFiles = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
+        $fileUuid = StringUtil::deserialize($this->_raw['file'], true)[0];
+
+        if ('' != $fileUuid && null === ($downloadFiles = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
             $template->uuid = json_encode([
                 'title' => $this->_raw['title'],
-                'uuid' => StringUtil::binToUuid(StringUtil::deserialize($this->_raw['uploadedFiles'], true)[0]),
+                'uuid' => StringUtil::binToUuid($fileUuid),
             ]);
         }
 
