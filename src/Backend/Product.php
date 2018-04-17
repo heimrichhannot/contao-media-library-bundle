@@ -178,47 +178,6 @@ class Product
     }
 
     /**
-     * generate tags from values of product.
-     *
-     * @param DataContainer $dc
-     *
-     * @return bool
-     */
-    public function generateTags(DataContainer $dc)
-    {
-        if (null === ($productArchive = $this->getProductArchive($dc->id)) || !$productArchive->createTagsFromValues) {
-            return false;
-        }
-
-        if (null === ($product = $this->productRegistry->findByPk($dc->id))) {
-            return false;
-        }
-
-        $fieldsForTags = StringUtil::deserialize($productArchive->fieldsForTags, true);
-
-        // use all fields if none is defined
-        if (empty($fieldsForTags)) {
-            $fieldsForTags = System::getContainer()->get('huh.utils.dca')->getFields(
-                'tl_ml_product',
-                ['inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'], 'localizeLabels' => false]
-            );
-        }
-
-        $tags = [];
-
-        foreach ($fieldsForTags as $field) {
-            $this->addToTags($dc, $field, $tags);
-        }
-
-        if (isset($dc->activeRecord->tags) && !in_array('tags', $fieldsForTags, true)) {
-            $tags = array_unique(array_merge($tags, StringUtil::deserialize($dc->activeRecord->tags, true)));
-        }
-
-        $product->tags = serialize($tags);
-        $product->save();
-    }
-
-    /**
      * before generating the download items delete all products that have no author.
      *
      * @param DataContainer $dc
@@ -489,31 +448,6 @@ class Product
             $dc->activeRecord->title
         );
         $product->save();
-    }
-
-    /**
-     * add values to tags.
-     *
-     * @param DataContainer $dc
-     * @param string        $field
-     * @param array         $tags
-     */
-    protected function addToTags(DataContainer $dc, string $field, array &$tags)
-    {
-        $fieldValue = $dc->activeRecord->{$field};
-
-        if (!is_array(StringUtil::deserialize($fieldValue))) {
-            $tags[] = System::getContainer()->get('huh.utils.form')->prepareSpecialValueForOutput($field, $dc->activeRecord->{$field}, $dc);
-
-            return;
-        }
-
-        $values = [];
-        foreach (StringUtil::deserialize($fieldValue) as $value) {
-            $values[] = System::getContainer()->get('huh.utils.form')->prepareSpecialValueForOutput($field, $value, $dc);
-        }
-
-        $tags = array_unique(array_merge($tags, $values));
     }
 
     /**

@@ -35,3 +35,11 @@ services:
     class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
     arguments:
       - "@contao.framework"
+  huh.media_library.tag_manager.product:
+    class: Codefog\TagsBundle\Manager\DefaultManager
+    arguments:
+      - "@contao.framework"
+      - "tl_ml_product"
+      - "tags"
+    tags:
+      - { name: codefog_tags.manager, alias: huh.media_library.tags.product }

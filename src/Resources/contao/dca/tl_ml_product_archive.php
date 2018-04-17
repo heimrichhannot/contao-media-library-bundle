@@ -73,16 +73,15 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'createTagsFromValues'],
-        'default'      => '{general_legend},title;{config_legend},type,additionalFields,createTagsFromValues;'
+        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder'],
+        'default'      => '{general_legend},title;{config_legend},type,additionalFields;'
     ],
     'subpalettes' => [
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                                          => 'uploadFolderMode,imageSizes',
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                                           => 'uploadFolderMode',
         'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
         'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
-        'addProductPatternToUploadFolder' => 'uploadFolderProductPattern',
-        'createTagsFromValues'                                                                                            => 'fieldsForTags'
+        'addProductPatternToUploadFolder' => 'uploadFolderProductPattern'
     ],
     'fields'      => [
         'id'                      => [
@@ -188,22 +187,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'inputType' => 'text',
             'eval'      => ['maxlength' => 255, 'tl_class' => 'w50 clr', 'mandatory' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'createTagsFromValues'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['createTagsFromValues'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true, 'tl_class' => 'w50 clr'],
-            'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'fieldsForTags'           => [
-            'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['fieldsForTags'],
-            'exclude'          => true,
-            'inputType'        => 'checkboxWizard',
-            'options_callback' => ['huh.media_library.backend.product_archive', 'getFieldsForTags'],
-            'eval'             => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'w50 autoheight'],
-            'sql'              => "blob NULL"
-        ],
+        ]
     ]
 ];

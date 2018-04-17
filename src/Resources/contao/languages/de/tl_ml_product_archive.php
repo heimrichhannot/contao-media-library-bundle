@@ -32,10 +32,6 @@ $lang['uploadFolderProductPattern']      = [
     'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch das akuelle Produkt generiert werden soll (Beispiel "%title%-%id%").'
 ];
 
-$lang['createTagsFromValues'] =
-    ['Schlagworte aus Feldern generieren', 'Wählen Sie diese Option, wenn aus den Produktfeldern Schlagworte generiert werden sollen.'];
-$lang['fieldsForTags']        = ['Felder', 'Wählen Sie hier die Felder aus, die in Schlagworte umgewandelt werden sollen.'];
-
 /**
  * Legends
  */

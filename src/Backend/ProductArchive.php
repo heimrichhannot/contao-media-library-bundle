@@ -48,23 +48,6 @@ class ProductArchive
         return $imageSizes['image_sizes'];
     }
 
-    /**
-     * get fields that have been selected in palette.
-     *
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     */
-    public function getFieldsForTags(DataContainer $dc)
-    {
-        return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
-            [
-                'dataContainer' => 'tl_ml_product',
-                'inputTypes' => ['text', 'textarea', 'select', 'multifileupload', 'checkbox', 'tagsinput'],
-            ]
-        );
-    }
-
     public function getUploadFolderByProduct(DataContainer $dc)
     {
         return $this->doGetUploadFolder($dc->activeRecord);

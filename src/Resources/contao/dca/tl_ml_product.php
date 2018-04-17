@@ -13,7 +13,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
             ['huh.media_library.backend.product', 'generateDownloadItems'],
-            ['huh.media_library.backend.product', 'generateTags'],
             ['huh.media_library.backend.product', 'generateAlias'],
         ],
         'oncopy_callback'   => [
@@ -70,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm']
-                                . '\'))return false;Backend.getScrollOffset()"'
+                    . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle'    => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_ml_product']['toggle'],
@@ -178,23 +177,15 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'sql'       => "text NULL",
         ],
         'tags'                     => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['tags'],
-            'exclude'    => true,
-            'search'     => true,
-            'sorting'    => true,
-            'inputType'  => 'tagsinput',
-            'eval'       => [
-                'tl_class'       => 'long clr autoheight',
-                'multiple'       => true,
-                'freeInput'      => true,
-                'trimValue'      => true,
-                'decodeEntities' => true,
-                'highlight'      => true
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['tags'],
+            'exclude'   => true,
+            'inputType' => 'cfgTags',
+            'eval'      => [
+                'tagsManager' => 'huh.media_library.tags.product',
+                'tl_class'    => 'clr'
             ],
-            'attributes' => ['legend' => 'general_legend', 'multilingual' => true, 'fixed' => true, 'fe_sorting' => true, 'fe_search' => true],
-            'sql'        => "blob NULL",
         ],
-        'copyright'     => [
+        'copyright'                => [
             'label'            => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
             'inputType'        => 'tagsinput',
             'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],

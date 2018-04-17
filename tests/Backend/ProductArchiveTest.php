@@ -9,7 +9,6 @@
 namespace HeimrichHannot\MediaLibraryBundle\Test\Backend;
 
 use Contao\CoreBundle\Image\ImageSizes;
-use Contao\DataContainer;
 use Contao\System;
 use Contao\TestCase\ContaoTestCase;
 use HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive;
@@ -65,18 +64,4 @@ class ProductArchiveTest extends ContaoTestCase
 //        $this->assertCount(3,$options);
 //        $this->assertEquals(['option1','option2','option3'],$options);
 //    }
-
-    public function testGetFieldsForTags()
-    {
-        $dc = $this->mockClassWithProperties(DataContainer::class, ['activeRecord' => new \stdClass()]);
-        $dc->activeRecord->palette = serialize(['field1', 'field2', 'field3']);
-
-        $productArchive = new ProductArchive($this->framework);
-
-        $paletteFields = $productArchive->getFieldsForTags($dc);
-
-        $this->assertNotEmpty($paletteFields);
-        $this->assertCount(3, $paletteFields);
-        $this->assertSame(['field1', 'field2', 'field3'], $paletteFields);
-    }
 }
