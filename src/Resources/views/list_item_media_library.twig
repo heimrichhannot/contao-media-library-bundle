@@ -1,0 +1,32 @@
+<div class="{{ cssClass }}">
+    {% if addDetails|default() and (detailsUrl|default() or modalUrl|default()) %}
+    {% if useModal|default() %}
+    <a class="details" href="{{ modalUrl }}" data-toggle="modal">
+        {% else %}
+        <a class="details" href="{{ detailsUrl }}">
+            {% endif %}
+            {% endif %}
+
+            <figure class="image_container">
+                {%  if images|default() %}
+                    {% if  images.file is defined%}
+                        {{ include('@HeimrichHannotContaoUtils/picture.html.twig', images.file.picture) }}
+                    {% endif %}
+                {% elseif file|default() %}
+                    <img src="{{ file }}" alt="{{ title }}" />
+                {% endif %}
+            </figure>
+
+            <h5>{{ title }}</h5>
+            {% if text|default() %}
+                {{ truncateHTML(text|raw, 100)|raw }}
+            {% endif %}
+
+            {% if addDetails|default() and (detailsUrl|default() or modalUrl|default()) %}
+        </a>
+        {% endif %}
+
+        {% if (downloadLink|default()) %}
+            {{ downloadLink|raw }}
+        {% endif %}
+</div>

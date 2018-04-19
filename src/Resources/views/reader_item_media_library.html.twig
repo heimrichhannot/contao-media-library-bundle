@@ -1,0 +1,50 @@
+<div class="item">
+    <h1>{{ title }}</h1>
+    <figure class="image_container">
+        {% if images|default() %}
+            {% if  images.file is defined%}
+                {{ include('@HeimrichHannotContaoUtils/picture.html.twig', images.file.picture) }}
+            {% endif %}
+        {% elseif image|default() %}
+            <img src="{{ image }}" alt="{{ title }}" title="{{ title }}" />
+        {% endif %}
+    </figure>
+
+    {% if text|default() %}
+        <div class="text">
+            {{ text|raw }}
+        </div>
+    {% endif %}
+
+
+    <div class="item-data">
+        {% if additionalData|default() %}
+            {% for field,values in additionalData %}
+                <div class="{{ field }}">
+                    <h5>{{ values.label }}</h5>
+                    <span>{{ values.value }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if copyright|default() %}
+            <div class="copyright">
+                <h5>Copyright</h5>
+                {% for value in copyright %}
+                    <span>{{ value }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if downloadItems|default() %}
+        <div class="downloads">
+            <h5>Dateien</h5>
+            <ul>
+                {% for item in downloadItems %}
+                    <li><a href="{{ item.file }}" title="{{ item.label }}">{{ item.label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>

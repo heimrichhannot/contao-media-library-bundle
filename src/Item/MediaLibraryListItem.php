@@ -13,64 +13,9 @@ use Contao\FrontendUser;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
-use HeimrichHannot\WatchlistBundle\Manager\AjaxManager;
-use HeimrichHannot\WatchlistBundle\Model\WatchlistItemModel;
 
 class MediaLibraryListItem extends \HeimrichHannot\ListBundle\Item\DefaultItem
 {
-    /**
-     * add the add-to-watchlist button to the template.
-     *
-     * @return string
-     */
-    public function getAddToWatchlistButton()
-    {
-        $module = $this->getModule();
-
-        $listConfig = System::getContainer()->get('huh.list.list-config-registry')->findByPk($module['listConfig']);
-
-        if (null !== ($watchlistConfig =
-                System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_module', $listConfig->watchlist_config))
-            && !System::getContainer()->get('huh.watchlist.watchlist_manager')->checkPermission($watchlistConfig)) {
-            return;
-        }
-
-        $template = new FrontendTemplate('watchlist_add_action');
-        $template->added = false;
-        $template->uuid = '';
-        $template->options = '';
-
-        $fileUuid = StringUtil::deserialize($this->_raw['file'], true)[0];
-
-        if ('' != $fileUuid && null === ($downloadFiles = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
-            $template->uuid = json_encode([
-                'title' => $this->_raw['title'],
-                'uuid' => StringUtil::binToUuid($fileUuid),
-            ]);
-        }
-
-        if (null !== $downloadFiles && 1 === count($downloadFiles)) {
-            $template->uuid = json_encode([
-                'title' => $downloadFiles->title,
-                'uuid' => StringUtil::binToUuid($downloadFiles->file),
-            ]);
-        }
-
-        if (null !== $downloadFiles && count($downloadFiles) > 1) {
-            $template->options = $this->getOptions($downloadFiles);
-        }
-
-        $template->id = $this->_raw['id'];
-        $template->moduleId = $listConfig->watchlist_config;
-        $template->type = WatchlistItemModel::WATCHLIST_ITEM_TYPE_FILE;
-        $template->action =
-            System::getContainer()->get('huh.ajax.action')->generateUrl(AjaxManager::XHR_GROUP, AjaxManager::XHR_WATCHLIST_ADD_ACTION);
-        $template->title = sprintf($GLOBALS['TL_LANG']['WATCHLIST']['addTitle'], $this->_raw['title']);
-        $template->link = $GLOBALS['TL_LANG']['WATCHLIST']['addLink'];
-
-        return $template->parse();
-    }
-
     public function getDownloadLink()
     {
         if (ProductModel::ITEM_LICENCE_TYPE_LOCKED === $this->_raw['licence']) {

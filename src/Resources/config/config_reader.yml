@@ -1,0 +1,7 @@
+huh:
+    reader:
+        items:
+          - { name: media-library-reader-default, class: HeimrichHannot\MediaLibraryBundle\Item\MediaLibraryReaderItem }
+        templates:
+            item:
+             - { name: media-library-reader-item, template: "@HeimrichHannotContaoMediaLibrary/reader_item_media_library.html.twig" }

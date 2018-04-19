@@ -44,6 +44,13 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
             $container->getParameter('kernel.project_dir').'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_list.yml'
         );
 
+        $extensionConfigs = ContainerUtil::mergeConfigFile(
+            'huh_reader',
+            $extensionName,
+            $extensionConfigs,
+            $container->getParameter('kernel.project_dir').'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_reader.yml'
+        );
+
         return ContainerUtil::mergeConfigFile(
             'huh_encore',
             $extensionName,
