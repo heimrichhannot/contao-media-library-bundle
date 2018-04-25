@@ -8,31 +8,33 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_product'];
 $lang['tstamp']                   = ['Änderungsdatum', ''];
 $lang['title']                    = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['pid']                      = ['Kategorie', 'Wählen Sie hier die Kategorie aus.'];
-$lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
-$lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
-$lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
 $lang['file']                     = ['Datei', 'Laden Sie hier die zum Produkt gehörige Datei hoch.'];
+$lang['alias']                    = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
+$lang['copyright']                = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
 $lang['text']                     = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
 $lang['tags']                     = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
 $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'
 ];
+$lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
+$lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
+$lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
 
 /**
  * Legends
  */
-$lang['general_legend'] = 'Allgemeine Einstellungen';
-$lang['product_legend'] = 'Produkt-Einstellungen';
+$lang['general_legend']           = 'Allgemeine Einstellungen';
+$lang['product_legend']           = 'Produkt-Einstellungen';
 $lang['additional_fields_legend'] = 'Zusätzliche Einstellungen';
-$lang['publish_legend'] = 'Veröffentlichung';
+$lang['publish_legend']           = 'Veröffentlichung';
 
 /**
  * Reference
  */
 $lang['reference'] = [
     \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'Bild',
-    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => 'Datei',
+    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE  => 'Datei',
 ];
 
 /**

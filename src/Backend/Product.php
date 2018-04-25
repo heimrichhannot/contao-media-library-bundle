@@ -173,26 +173,30 @@ class Product
             return;
         }
 
-        $this->cleanGeneratedDownloadItems($dc, true, true);
+        $this->doDeleteDownloads($dc->id, [
+            'keepManuallyAdded' => true,
+            'keepFolder' => true,
+            'keepOriginal' => true,
+        ]);
+
         $this->createDownloadItems($dc);
     }
 
-    /**
-     * before generating the download items delete all products that have no author.
-     *
-     * @param DataContainer $dc
-     * @param bool          $deleteOnlyGenerated
-     */
-    public function cleanGeneratedDownloadItems(DataContainer $dc, $deleteOnlyGenerated = false, $keepFolder = false)
+    public function deleteDownloads(DataContainer $dc, int $undoId)
     {
-        $downloads = $deleteOnlyGenerated
-            ? $this->downloadRegistry->findGeneratedImages($dc->id)
+        $this->doDeleteDownloads($dc->id);
+    }
+
+    public function doDeleteDownloads(int $id, array $options = [])
+    {
+        $downloads = isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']
+            ? $this->downloadRegistry->findGeneratedImages($id)
             : $this->downloadRegistry->findBy(
                 'pid',
-                $dc->activeRecord->pid
+                $id
             );
 
-        if (null === $downloads || (null === ($productArchive = $this->getProductArchive($dc->id)))) {
+        if (null === $downloads || (null === ($productArchive = $this->getProductArchive($id)))) {
             return;
         }
 
@@ -202,15 +206,15 @@ class Product
             // delete model
             $download->delete();
 
-            // delete (skip the original file)
+            // delete file
             $files = StringUtil::deserialize($download->file, true);
 
-            if (count($files) < 1 || !$download->imageSize) {
+            if (count($files) < 1 || (isset($options['keepOriginal']) && $options['keepOriginal'] && !$download->imageSize)) {
                 continue;
             }
 
             if (null !== ($file = System::getContainer()->get('huh.utils.file')->getFileFromUuid($files[0]))) {
-                if (0 === $i) {
+                if (!$folder) {
                     $folder = str_replace(
                         System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR,
                         '',
@@ -222,16 +226,55 @@ class Product
             }
         }
 
-        $canDeleteFolder = !$keepFolder && null !== $folder
-                           && ($productArchive->uploadFolderUserPattern
-                               || $productArchive->addProductPatternToUploadFolder
-                                  && $productArchive->uploadFolderProductPattern);
+        $canDeleteFolder = !(isset($options['keepFolder']) && $options['keepFolder']) && null !== $folder
+            && ($productArchive->uploadFolderUserPattern
+                || $productArchive->addProductPatternToUploadFolder
+                && $productArchive->uploadFolderProductPattern);
 
         if ($canDeleteFolder) {
             if (null !== ($folder = new Folder($folder))) {
                 $folder->delete();
             }
         }
+    }
+
+    /**
+     * Sets the current date as the date added -> usually used on submit.
+     *
+     * @param DataContainer $dc
+     */
+    public function copyFile($insertId, DataContainer $dc)
+    {
+        if (null === ($oldProduct = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $dc->id))) {
+            return;
+        }
+
+        if (null === ($newProduct = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $insertId))) {
+            return;
+        }
+
+        $file = StringUtil::deserialize($oldProduct->file, true);
+
+        if (empty($file)) {
+            return;
+        }
+
+        $file = $file[0];
+
+        if (null === ($fileObj = (System::getContainer()->get('huh.utils.file')->getFileFromUuid($file)))) {
+            return;
+        }
+
+        $newFilename = System::getContainer()->get('huh.media_library.backend.product_archive')->doGetUploadFolder($newProduct).'/'.$fileObj->name;
+
+        $fileObj->copyTo($newFilename);
+
+        if (null === ($newFileModel = ($this->modelUtil->findOneModelInstanceBy('tl_files', ['path=?'], [$newFilename])))) {
+            return;
+        }
+
+        $newProduct->file = $newFileModel->uuid;
+        $newProduct->save();
     }
 
     public function checkPermission()
@@ -354,7 +397,7 @@ class Product
         }
 
         return '<a href="'.Controller::addToUrl($href).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'
-               .$attributes.'>'.\Image::getHtml($icon, $label, 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
+            .$attributes.'>'.\Image::getHtml($icon, $label, 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
     }
 
     public function toggleVisibility($intId, $blnVisible, \DataContainer $dc = null)

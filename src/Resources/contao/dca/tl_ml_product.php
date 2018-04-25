@@ -17,9 +17,10 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ],
         'oncopy_callback'   => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
+            ['huh.media_library.backend.product', 'copyFile'],
         ],
         'ondelete_callback' => [
-            ['huh.media_library.backend.product', 'cleanGeneratedDownloadItems']
+            ['huh.media_library.backend.product', 'deleteDownloads']
         ],
         'sql'               => [
             'keys' => [
@@ -112,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'alias'                    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['alias'],
             'inputType' => 'text',
-            'eval'      => ['tl_class' => 'w50'],
+            'eval'      => ['tl_class' => 'w50', 'doNotCopy' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'dateAdded'                => [
