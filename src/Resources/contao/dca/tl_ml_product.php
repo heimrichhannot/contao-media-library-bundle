@@ -198,6 +198,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'save_callback'    => [
                 ['huh.media_library.backend.product', 'setCopyright'],
             ],
+            'sql' => "blob NULL"
         ],
         'published'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],

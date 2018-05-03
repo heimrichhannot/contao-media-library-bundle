@@ -38,7 +38,7 @@
     ]
   },
   "prefer-stable": true,
-  "minimum-stability": "beta",
+  "minimum-stability": "dev",
   "autoload-dev": {
     "psr-4": {
       "HeimrichHannot\\MediaLibraryBundle\\Test\\": "tests/"

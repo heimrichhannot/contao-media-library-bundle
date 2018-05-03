@@ -8,6 +8,7 @@ let jQuery = require('jquery');
         },
         registerEvents: function() {
             $(document).on('click','.media-library-download-action', function(){
+                console.log('download item');
                 MediaLibrary.showOptionsModal($(this));
             });
 
