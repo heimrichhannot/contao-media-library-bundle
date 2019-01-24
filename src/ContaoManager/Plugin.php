@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * Copyright (c) 2019 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -18,6 +18,7 @@ use HeimrichHannot\AjaxBundle\HeimrichHannotContaoAjaxBundle;
 use HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle;
 use HeimrichHannot\MediaLibraryBundle\HeimrichHannotContaoMediaLibraryBundle;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
+use HeimrichHannot\UtilsBundle\HeimrichHannotContaoUtilsBundle;
 
 class Plugin implements BundlePluginInterface, ExtensionPluginInterface
 {
@@ -29,6 +30,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
                     ContaoCoreBundle::class,
                     HeimrichHannotContaoAjaxBundle::class,
                     HeimrichHannotContaoFilterBundle::class,
+                    HeimrichHannotContaoUtilsBundle::class,
                     'filecredits',
                 ]
             ),

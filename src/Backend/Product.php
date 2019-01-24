@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * Copyright (c) 2019 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -209,9 +209,9 @@ class Product
             // delete file
             $files = StringUtil::deserialize($download->file, true);
 
-            if (count($files) < 1 || (isset($options['keepOriginal']) && $options['keepOriginal'] && !$download->imageSize)) {
-                continue;
-            }
+//            if (count($files) < 1 || (isset($options['keepOriginal']) && $options['keepOriginal'] && (!))) {
+//                continue;
+//            }
 
             if (null !== ($file = System::getContainer()->get('huh.utils.file')->getFileFromUuid($files[0]))) {
                 if (!$folder) {
@@ -227,9 +227,9 @@ class Product
         }
 
         $canDeleteFolder = !(isset($options['keepFolder']) && $options['keepFolder']) && null !== $folder
-            && ($productArchive->uploadFolderUserPattern
-                || $productArchive->addProductPatternToUploadFolder
-                && $productArchive->uploadFolderProductPattern);
+                           && ($productArchive->uploadFolderUserPattern
+                               || $productArchive->addProductPatternToUploadFolder
+                                  && $productArchive->uploadFolderProductPattern);
 
         if ($canDeleteFolder) {
             if (null !== ($folder = new Folder($folder))) {
@@ -265,7 +265,8 @@ class Product
             return;
         }
 
-        $newFilename = System::getContainer()->get('huh.media_library.backend.product_archive')->doGetUploadFolder($newProduct).'/'.$fileObj->name;
+        $newFilename =
+            System::getContainer()->get('huh.media_library.backend.product_archive')->doGetUploadFolder($newProduct).'/'.$fileObj->name;
 
         $fileObj->copyTo($newFilename);
 
@@ -397,7 +398,7 @@ class Product
         }
 
         return '<a href="'.Controller::addToUrl($href).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'
-            .$attributes.'>'.\Image::getHtml($icon, $label, 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
+               .$attributes.'>'.\Image::getHtml($icon, $label, 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
     }
 
     public function toggleVisibility($intId, $blnVisible, \DataContainer $dc = null)

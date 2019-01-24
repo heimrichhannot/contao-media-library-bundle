@@ -73,25 +73,28 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder'],
-        'default'      => '{general_legend},title;{config_legend},type,additionalFields;'
+        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected'],
+        'default'      => '{general_legend},title;{config_legend},type,additionalFields;{protected_legend},protected;'
     ],
     'subpalettes' => [
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                                          => 'uploadFolderMode,imageSizes',
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                                           => 'uploadFolderMode',
-        'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
-        'uploadFolderMode_' . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
-        'addProductPatternToUploadFolder' => 'uploadFolderProductPattern'
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes',
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                       => 'uploadFolderMode',
+        'uploadFolderMode_'
+        . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
+        'uploadFolderMode_'
+        . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
+        'addProductPatternToUploadFolder'                                                             => 'uploadFolderProductPattern',
+        'protected'                                                                                   => 'groups'
     ],
     'fields'      => [
-        'id'                      => [
+        'id'                              => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'                  => [
+        'tstamp'                          => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['tstamp'],
             'sql'   => "int(10) unsigned NOT NULL default '0'"
         ],
-        'dateAdded'               => [
+        'dateAdded'                       => [
             'label'   => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
             'sorting' => true,
             'flag'    => 6,
@@ -99,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
         // general
-        'title'                   => [
+        'title'                           => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['title'],
             'exclude'   => true,
             'search'    => true,
@@ -109,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
-        'type'                    => [
+        'type'                            => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['type'],
             'exclude'   => true,
             'filter'    => true,
@@ -119,26 +122,26 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql'       => "varchar(64) NOT NULL default ''"
         ],
-        'additionalFields' => [
-            'label'                   => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['additionalFields'],
-            'exclude'                 => true,
-            'filter'                  => true,
-            'inputType'               => 'checkboxWizard',
-            'options_callback' => function(\Contao\DataContainer $dc) {
+        'additionalFields'                => [
+            'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['additionalFields'],
+            'exclude'          => true,
+            'filter'           => true,
+            'inputType'        => 'checkboxWizard',
+            'options_callback' => function (\Contao\DataContainer $dc) {
                 return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
                     [
-                        'dataContainer' => 'tl_ml_product',
+                        'dataContainer'  => 'tl_ml_product',
                         'evalConditions' => [
                             'isAdditionalField' => true
                         ]
                     ]
                 );
             },
-            'eval'                    => ['tl_class' => 'w50 autoheight', 'multiple' => true],
-            'sql'                     => "blob NULL"
+            'eval'             => ['tl_class' => 'w50 autoheight', 'multiple' => true],
+            'sql'              => "blob NULL"
         ],
         // image
-        'imageSizes'              => [
+        'imageSizes'                      => [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSizes'],
             'exclude'          => true,
             'flag'             => 1,
@@ -148,7 +151,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'              => "blob NULL"
         ],
         // config
-        'uploadFolderMode'        => [
+        'uploadFolderMode'                => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderMode'],
             'exclude'   => true,
             'filter'    => true,
@@ -158,14 +161,14 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql'       => "varchar(64) NOT NULL default ''"
         ],
-        'uploadFolder'            => [
+        'uploadFolder'                    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolder'],
             'exclude'   => true,
             'inputType' => 'fileTree',
             'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight', 'mandatory' => true],
             'sql'       => "binary(16) NULL",
         ],
-        'uploadFolderUserPattern' => [
+        'uploadFolderUserPattern'         => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderUserPattern'],
             'exclude'   => true,
             'search'    => true,
@@ -174,19 +177,34 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'addProductPatternToUploadFolder' => [
-            'label'                   => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['addProductPatternToUploadFolder'],
-            'exclude'                 => true,
-            'inputType'               => 'checkbox',
-            'eval'                    => ['tl_class' => 'w50', 'submitOnChange' => true],
-            'sql'                     => "char(1) NOT NULL default ''"
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['addProductPatternToUploadFolder'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => ['tl_class' => 'w50', 'submitOnChange' => true],
+            'sql'       => "char(1) NOT NULL default ''"
         ],
-        'uploadFolderProductPattern' => [
+        'uploadFolderProductPattern'      => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderProductPattern'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
             'eval'      => ['maxlength' => 255, 'tl_class' => 'w50 clr', 'mandatory' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
+        ],
+        'protected'                         => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['protected'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => ['submitOnChange' => true],
+            'sql'       => "char(1) NOT NULL default ''"
+        ],
+        'groups'                          => [
+            'label'      => &$GLOBALS['TL_LANG']['tl_page']['groups'],
+            'exclude'    => true,
+            'inputType'  => 'checkbox',
+            'foreignKey' => 'tl_member_group.name',
+            'eval'       => ['mandatory' => true, 'multiple' => true],
+            'sql'        => "blob NULL"
         ]
     ]
 ];

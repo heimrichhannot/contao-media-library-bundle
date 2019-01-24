@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ],
         'pid'                      => [
             'label'      => &$GLOBALS['TL_LANG']['tl_ml_product']['pid'],
-            'foreignKey' => 'tl_ml_product_archive.id',
+            'foreignKey' => 'tl_ml_product_archive.title',
             'exclude'    => true,
             'search'     => true,
             'sorting'    => true,
@@ -148,7 +148,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'exclude'   => true,
             'inputType' => 'multifileupload',
             'eval'      => [
-                'tl_class'       => 'clr',
+                'tl_class'       => 'long clr',
                 'extensions'     => \Config::get('validImageTypes'),
                 'filesOnly'      => true,
                 'fieldType'      => 'radio',
@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'addRemoveLinks' => true,
                 'maxFiles'       => 1,
                 'maxUploadSize'  => \Config::get('maxFileSize'),
-                'mandatory'      => true
+                'mandatory'      => true,
             ],
             'sql'       => "blob NULL",
         ],

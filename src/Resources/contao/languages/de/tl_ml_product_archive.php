@@ -32,11 +32,14 @@ $lang['uploadFolderProductPattern']      = [
     'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch das akuelle Produkt generiert werden soll (Beispiel "%title%-%id%").'
 ];
 
+$lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
+
 /**
  * Legends
  */
 $lang['general_legend'] = 'Allgemeine Einstellungen';
 $lang['config_legend']  = 'Konfiguration';
+$lang['protected_legend']  = 'Zugriffsschutz';
 
 /**
  * Buttons
