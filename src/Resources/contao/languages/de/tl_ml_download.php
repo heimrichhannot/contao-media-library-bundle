@@ -5,12 +5,12 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_download'];
 /**
  * Fields
  */
-$lang['tstamp']       = ['Änderungsdatum', ''];
-$lang['title']        = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
-$lang['published']    = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
-$lang['start']        = ['Anzeigen ab', 'Download erst ab diesem Tag auf der Webseite anzeigen.'];
-$lang['stop']         = ['Anzeigen bis', 'Download nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['downloadFile'] = ['Datei', 'Laden Sie hier die Download-Datei hoch.'];
+$lang['tstamp']    = ['Änderungsdatum', ''];
+$lang['title']     = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
+$lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
+$lang['start']     = ['Anzeigen ab', 'Download erst ab diesem Tag auf der Webseite anzeigen.'];
+$lang['stop']      = ['Anzeigen bis', 'Download nur bis zu diesem Tag auf der Webseite anzeigen.'];
+$lang['file']      = ['Datei', 'Laden Sie hier die Download-Datei hoch.'];
 
 /**
  * Legends
