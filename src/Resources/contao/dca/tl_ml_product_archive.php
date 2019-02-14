@@ -12,6 +12,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
+            ['huh.media_library.backend.product_archive', 'modifyUploadFolder']
         ],
         'oncopy_callback'   => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
@@ -73,8 +74,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected'],
-        'default'      => '{general_legend},title;{config_legend},type,additionalFields;{protected_legend},protected;'
+        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected', 'published'],
+        'default'      => '{general_legend},title;{config_legend},type,additionalFields;{protected_legend},protected;{publish_legend},published;'
     ],
     'subpalettes' => [
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes',
@@ -84,7 +85,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'uploadFolderMode_'
         . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
         'addProductPatternToUploadFolder'                                                             => 'uploadFolderProductPattern',
-        'protected'                                                                                   => 'groups'
+        'protected'                                                                                   => 'groups',
+        'published'                                                                                   => 'start,stop'
     ],
     'fields'      => [
         'id'                              => [
@@ -205,6 +207,29 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'foreignKey' => 'tl_member_group.name',
             'eval'       => ['mandatory' => true, 'multiple' => true],
             'sql'        => "blob NULL"
+        ],
+        'published' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'eval' => ['doNotCopy' => true, 'submitOnChange' => true, 'tl_class' => 'clr'],
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'start' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['start'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'stop' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['stop'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];

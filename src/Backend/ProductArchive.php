@@ -13,26 +13,86 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
+use Contao\Dbafs;
 use Contao\System;
+use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
+use HeimrichHannot\UtilsBundle\File\FileUtil;
+use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class ProductArchive
 {
     const UPLOAD_FOLDER_MODE_STATIC = 'static';
     const UPLOAD_FOLDER_MODE_USER_HOME_DIR = 'user_home_dir';
 
-    const UPLOAD_FOLDER_MODES = [
-        self::UPLOAD_FOLDER_MODE_STATIC,
-        self::UPLOAD_FOLDER_MODE_USER_HOME_DIR,
-    ];
+    const UPLOAD_FOLDER_MODES
+        = [
+            self::UPLOAD_FOLDER_MODE_STATIC,
+            self::UPLOAD_FOLDER_MODE_USER_HOME_DIR,
+        ];
 
     /**
      * @var ContaoFrameworkInterface
      */
     protected $framework;
 
-    public function __construct(ContaoFrameworkInterface $framework)
-    {
+    /**
+     * @var FileUtil
+     */
+    protected $fileUtil;
+
+    /**
+     * @var ProductArchiveRegistry
+     */
+    protected $archiveRegistry;
+
+    /**
+     * @var ModelUtil
+     */
+    protected $modelUtil;
+
+    public function __construct(
+        ContaoFrameworkInterface $framework,
+        FileUtil $fileUtil,
+        ModelUtil $modelUtil,
+        ProductArchiveRegistry $archiveRegistry
+    ) {
         $this->framework = $framework;
+        $this->fileUtil = $fileUtil;
+        $this->archiveRegistry = $archiveRegistry;
+        $this->modelUtil = $modelUtil;
+    }
+
+    /**
+     * @param DataContainer $dc
+     */
+    public function modifyUploadFolder(DataContainer $dc)
+    {
+        if (!$dc->activeRecord->title) {
+            return;
+        }
+
+        if (null === ($path = $this->fileUtil->getPathFromUuid($dc->activeRecord->uploadFolder))) {
+            return;
+        }
+
+        $archiveFolder = $this->fileUtil->sanitizeFileName($dc->activeRecord->title);
+        $targetFolder = $path.DIRECTORY_SEPARATOR.$archiveFolder;
+
+        if (!file_exists($targetFolder)) {
+            mkdir($targetFolder);
+            $folder = Dbafs::addResource($targetFolder);
+        }
+
+        if (null === $folder) {
+            return;
+        }
+
+        if (null === ($archive = $this->archiveRegistry->findByPk($dc->activeRecord->id))) {
+            return;
+        }
+
+        $archive->uploadFolder = $folder->uuid;
+        $archive->save();
     }
 
     /**
@@ -55,11 +115,11 @@ class ProductArchive
 
     public function getUploadFolderByDownload(DataContainer $dc)
     {
-        if (null === ($download = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_download', $dc->id))) {
+        if (null === ($download = $this->modelUtil->findModelInstanceByPk('tl_ml_download', $dc->id))) {
             return \Contao\Config::get('uploadPath');
         }
 
-        if (null === ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $download->pid))) {
+        if (null === ($product = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $download->pid))) {
             return \Contao\Config::get('uploadPath');
         }
 
@@ -75,24 +135,22 @@ class ProductArchive
      */
     public function doGetUploadFolder($product)
     {
-        if (null === ($productArchive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive',
-                                                                                                              $product->pid))) {
+        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive',
+                $product->pid))) {
             return Config::get('uploadPath');
         }
 
-        if (null === ($uploadFolder = System::getContainer()->get('huh.utils.file')->getPathFromUuid($productArchive->uploadFolder))) {
+        if (null === ($uploadFolder = $this->fileUtil->getPathFromUuid($productArchive->uploadFolder))) {
             return Config::get('uploadPath');
         }
-
-        $modelUtil = System::getContainer()->get('huh.utils.model');
 
         switch ($productArchive->uploadFolderMode) {
             case static::UPLOAD_FOLDER_MODE_USER_HOME_DIR:
                 if ($productArchive->uploadFolderUserPattern) {
                     $backendUser = $this->framework->createInstance(BackendUser::class);
 
-                    if (null !== ($user = $modelUtil->findModelInstanceByPk('tl_user', $backendUser->id))) {
-                        $userPattern = $modelUtil->computeStringPattern(
+                    if (null !== ($user = $this->modelUtil->findModelInstanceByPk('tl_user', $backendUser->id))) {
+                        $userPattern = $this->modelUtil->computeStringPattern(
                             $productArchive->uploadFolderUserPattern,
                             $user,
                             'tl_user'
@@ -108,13 +166,13 @@ class ProductArchive
         }
 
         if ($productArchive->addProductPatternToUploadFolder && $productArchive->uploadFolderProductPattern) {
-            $productPattern = $modelUtil->computeStringPattern(
+            $productPattern = $this->modelUtil->computeStringPattern(
                 $productArchive->uploadFolderProductPattern,
                 $product,
                 'tl_ml_product'
             );
 
-            $uploadFolder .= DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($productPattern);
+            $uploadFolder .= DIRECTORY_SEPARATOR.$this->fileUtil->sanitizeFileName($productPattern);
         }
 
         return $uploadFolder;
@@ -161,7 +219,8 @@ class ProductArchive
 
                     $arrNew = $sessionBag->get('new_records');
 
-                    if (is_array($arrNew['tl_ml_product_archive']) && in_array(\Contao\Input::get('id'), $arrNew['tl_ml_product_archive'], true)) {
+                    if (is_array($arrNew['tl_ml_product_archive']) && in_array(\Contao\Input::get('id'),
+                            $arrNew['tl_ml_product_archive'], true)) {
                         // Add the permissions on group level
                         if ('custom' != $user->inherit) {
                             $objGroup = $database->execute(
@@ -178,7 +237,8 @@ class ProductArchive
                                 $arrModulep = \StringUtil::deserialize($objGroup->contao_media_library_bundlep);
 
                                 if (is_array($arrModulep) && in_array('create', $arrModulep, true)) {
-                                    $arrModules = \StringUtil::deserialize($objGroup->contao_media_library_bundles, true);
+                                    $arrModules = \StringUtil::deserialize($objGroup->contao_media_library_bundles,
+                                        true);
                                     $arrModules[] = \Contao\Input::get('id');
 
                                     $database->prepare('UPDATE tl_user_group SET contao_media_library_bundles=? WHERE id=?')->execute(
@@ -202,9 +262,9 @@ class ProductArchive
                                 $arrModules[] = \Contao\Input::get('id');
 
                                 $database->prepare('UPDATE tl_user SET contao_media_library_bundles=? WHERE id=?')->execute(
-                                        serialize($arrModules),
-                                        $user->id
-                                    );
+                                    serialize($arrModules),
+                                    $user->id
+                                );
                             }
                         }
 
@@ -235,7 +295,8 @@ class ProductArchive
             case 'deleteAll':
             case 'overrideAll':
                 $session = $objSession->all();
-                if ('deleteAll' == \Contao\Input::get('act') && !$user->hasAccess('delete', 'contao_media_library_bundlep')) {
+                if ('deleteAll' == \Contao\Input::get('act') && !$user->hasAccess('delete',
+                        'contao_media_library_bundlep')) {
                     $session['CURRENT']['IDS'] = [];
                 } else {
                     $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
@@ -265,7 +326,8 @@ class ProductArchive
 
     public function copyArchive($row, $href, $label, $title, $icon, $attributes)
     {
-        return \Contao\BackendUser::getInstance()->hasAccess('create', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
+        return \Contao\BackendUser::getInstance()->hasAccess('create',
+            'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
                 $href.'&amp;id='.$row['id']
             ).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml(
                 $icon,
@@ -275,7 +337,8 @@ class ProductArchive
 
     public function deleteArchive($row, $href, $label, $title, $icon, $attributes)
     {
-        return \Contao\BackendUser::getInstance()->hasAccess('delete', 'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
+        return \Contao\BackendUser::getInstance()->hasAccess('delete',
+            'contao_media_library_bundlep') ? '<a href="'.Controller::addToUrl(
                 $href.'&amp;id='.$row['id']
             ).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'.$attributes.'>'.\Image::getHtml(
                 $icon,

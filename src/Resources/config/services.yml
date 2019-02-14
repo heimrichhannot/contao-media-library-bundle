@@ -16,6 +16,9 @@ services:
       class: HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive
       arguments:
         - "@contao.framework"
+        - "@huh.utils.file"
+        - "@huh.utils.model"
+        - "@huh.media_library.product_archive_registry"
   huh.media_library.product_archive_registry:
     class: HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry
     arguments:
