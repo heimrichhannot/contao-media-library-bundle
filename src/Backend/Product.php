@@ -27,6 +27,7 @@ use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
+use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class Product
@@ -59,13 +60,19 @@ class Product
      */
     protected $dcaUtil;
 
+    /**
+     * @var FileUtil
+     */
+    protected $fileUtil;
+
     public function __construct(
         ContaoFrameworkInterface $framework,
         ProductArchiveRegistry $productArchiveRegistry,
         ProductRegistry $productRegistry,
         DownloadRegistry $downloadRegistry,
         ModelUtil $modelUtil,
-        DcaUtil $dcaUtil
+        DcaUtil $dcaUtil,
+        FileUtil $fileUtil
     ) {
         $this->framework = $framework;
         $this->productArchiveRegistry = $productArchiveRegistry;
@@ -73,6 +80,7 @@ class Product
         $this->downloadRegistry = $downloadRegistry;
         $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
+        $this->fileUtil = $fileUtil;
     }
 
     public function listChildren($row)
@@ -213,7 +221,7 @@ class Product
 //                continue;
 //            }
 
-            if (null !== ($file = System::getContainer()->get('huh.utils.file')->getFileFromUuid($files[0]))) {
+            if (null !== ($file = $this->fileUtil->getFileFromUuid($files[0]))) {
                 if (!$folder) {
                     $folder = str_replace(
                         System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR,
@@ -503,10 +511,15 @@ class Product
      */
     protected function createDownloadItems(DataContainer $dc)
     {
-        $file = StringUtil::deserialize($dc->activeRecord->file, true)[0];
+        $uuid = reset(StringUtil::deserialize($dc->activeRecord->file, true));
 
         /** @var FilesModel $fileObj */
-        $fileObj = $this->framework->getAdapter(FilesModel::class)->findByUuid($file);
+        if (null === ($file = $this->fileUtil->getFileFromUuid($uuid))) {
+            return;
+        }
+
+        // create a download for the original file
+        $this->createDownloadItem($file->path, $dc);
 
         if (in_array($fileObj->extension, explode(',', Config::get('validImageTypes')), true)) {
             $this->createImageDownloadItems($fileObj, $dc);
@@ -517,37 +530,19 @@ class Product
      * Create image download items that will be resized.
      *
      * @param FilesModel    $file
-     * @param string        $extension
      * @param DataContainer $dc
      *
      * @throws \Exception
-     *
-     * @return bool
      */
     protected function createImageDownloadItems(FilesModel $file, DataContainer $dc)
     {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
-            return false;
+        if (empty($sizes = $this->getSizes($dc))) {
+            return;
         }
 
-        $fileUtil = System::getContainer()->get('huh.utils.file');
         $stringUtil = System::getContainer()->get('huh.utils.string');
         $containerUtil = System::getContainer()->get('huh.utils.container');
         $imageFactory = System::getContainer()->get('contao.image.image_factory');
-
-        $sizes = StringUtil::deserialize(
-            System::getContainer()->get('huh.utils.dca')->getOverridableProperty(
-                'imageSizes',
-                [
-                    $productArchive,
-                    $dc->activeRecord,
-                ]
-            ),
-            true
-        );
-
-        // create a download for the original image
-        $this->createDownloadItem($file->path, $dc);
 
         foreach ($sizes as $size) {
             if (null === ($sizeModel = $this->framework->getAdapter(ImageSizeModel::class)->findByPk($size))) {
@@ -559,7 +554,7 @@ class Product
             }
 
             // compose filename
-            $sizeName = $fileUtil->sanitizeFileName($sizeModel->name);
+            $sizeName = $this->fileUtil->sanitizeFileName($sizeModel->name);
 
             $targetFilename = $stringUtil->removeTrailingString('\.'.$file->extension, $file->name).'_'.$sizeName.'.'.$file->extension;
 
@@ -570,6 +565,29 @@ class Product
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $sizeModel);
         }
+    }
+
+    /**
+     * @param DataContainer $dc
+     *
+     * @return array
+     */
+    protected function getSizes(DataContainer $dc)
+    {
+        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
+            return [];
+        }
+
+        return StringUtil::deserialize(
+            $this->dcaUtil->getOverridableProperty(
+                'imageSizes',
+                [
+                    $productArchive,
+                    $dc->activeRecord,
+                ]
+            ),
+            true
+        );
     }
 
     /**

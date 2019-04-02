@@ -12,6 +12,7 @@ services:
       - "@huh.media_library.download_registry"
       - "@huh.utils.model"
       - "@huh.utils.dca"
+      - "@huh.utils.file"
   huh.media_library.backend.product_archive:
       class: HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive
       arguments:
