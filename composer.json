@@ -11,7 +11,8 @@
     "heimrichhannot/contao-filecredits": "^3.0",
     "heimrichhannot/contao-multifileupload-bundle": "^1.0",
     "heimrichhannot/contao-utils-bundle": "^2.5",
-    "codefog/tags-bundle": "^2.1"
+    "codefog/tags-bundle": "^2.1",
+    "heimrichhannot-contao-components/alertifyjs": "1.11.2"
   },
   "require-dev": {
     "contao/test-case": "^1.1",
@@ -48,6 +49,7 @@
     "preferred-install": "dist"
   },
   "extra": {
-    "contao-manager-plugin": "HeimrichHannot\\MediaLibraryBundle\\ContaoManager\\Plugin"
+    "contao-manager-plugin": "HeimrichHannot\\MediaLibraryBundle\\ContaoManager\\Plugin",
+    "foxy": true
   }
 }

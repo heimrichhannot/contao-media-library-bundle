@@ -1,0 +1,14 @@
+{
+  "name": "@hundh/contao-media-library-bundle",
+  "version": "1.0.0",
+  "description": "Media library element with automated generation of download elements",
+  "author": "Heimrich & Hannot GmbH <digitales@heimrich-hannot.de>",
+  "license": "LGPL-3.0-or-later",
+  "dependencies": {
+    "@hundh/contao-media-library-bundle": "^1.0"
+  },
+  "scripts": {
+    "build-dev": "yarn encore dev",
+    "build-production": "yarn encore production"
+  }
+}

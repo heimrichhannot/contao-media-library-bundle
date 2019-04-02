@@ -155,7 +155,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'multifileupload',
             'eval' => [
                 'tl_class' => 'long clr',
-                'extensions' => \Config::get('validImageTypes'),
                 'filesOnly' => true,
                 'fieldType' => 'radio',
                 'maxImageWidth' => \Config::get('gdMaxImgWidth'),
