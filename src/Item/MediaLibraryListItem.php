@@ -81,7 +81,7 @@ class MediaLibraryListItem extends DefaultItem
         foreach ($downloadItems as $downloadItem) {
             $options[] = [
                 'title' => $downloadItem->title,
-                'uuid' => StringUtil::binToUuid(StringUtil::deserialize($downloadItem->file, true)[0]),
+                'uuid' => StringUtil::binToUuid(reset(StringUtil::deserialize($downloadItem->file, true))),
             ];
         }
 
