@@ -5,7 +5,8 @@
   "author": "Heimrich & Hannot GmbH <digitales@heimrich-hannot.de>",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
-    "@hundh/contao-media-library-bundle": "^1.0"
+    "@hundh/contao-media-library-bundle": "^1.0",
+    "alertifyjs": "^1.11"
   },
   "scripts": {
     "build-dev": "yarn encore dev",

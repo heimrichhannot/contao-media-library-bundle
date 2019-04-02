@@ -41,7 +41,7 @@ class MediaLibraryListItem extends DefaultItem
         $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->getRawValue('title'));
 
         if (!$hasOptions) {
-            $template->file = '?file='.$downloads;
+            $template->file = $downloads;
 
             return $template->parse();
         }
@@ -81,7 +81,7 @@ class MediaLibraryListItem extends DefaultItem
         foreach ($downloadItems as $downloadItem) {
             $options[] = [
                 'title' => $downloadItem->title,
-                'uuid' => StringUtil::binToUuid($downloadItem->file),
+                'uuid' => StringUtil::binToUuid(StringUtil::deserialize($downloadItem->file, true)[0]),
             ];
         }
 

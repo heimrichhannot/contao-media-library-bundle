@@ -14,6 +14,8 @@ use Contao\System;
 use HeimrichHannot\AjaxBundle\Response\ResponseData;
 use HeimrichHannot\AjaxBundle\Response\ResponseError;
 use HeimrichHannot\AjaxBundle\Response\ResponseSuccess;
+use HeimrichHannot\UtilsBundle\File\FileUtil;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AjaxManager
 {
@@ -23,11 +25,32 @@ class AjaxManager
 
     const MEDIA_LIBRARY_ARGUMENTS_OPTIONS = 'options';
 
+    /**
+     * @var ContaoFrameworkInterface
+     */
     protected $framework;
 
-    public function __construct(ContaoFrameworkInterface $framework)
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var FileUtil
+     */
+    protected $fileUtil;
+
+    /**
+     * @var \HeimrichHannot\AjaxBundle\Manager\AjaxManager
+     */
+    protected $ajax;
+
+    public function __construct(ContaoFrameworkInterface $framework, TranslatorInterface $translator, FileUtil $fileUtil, \HeimrichHannot\AjaxBundle\Manager\AjaxManager $ajax)
     {
         $this->framework = $framework;
+        $this->translator = $translator;
+        $this->fileUtil = $fileUtil;
+        $this->ajax = $ajax;
     }
 
     public function ajaxActions()
@@ -43,7 +66,7 @@ class AjaxManager
             ],
         ];
 
-        System::getContainer()->get('huh.ajax')->runActiveAction(static::MEDIA_LIBRARY_XHR_GROUP, static::MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS, $this);
+        $this->ajax->runActiveAction(static::MEDIA_LIBRARY_XHR_GROUP, static::MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS, $this);
     }
 
     public function showOptionsModal($options)
@@ -52,20 +75,19 @@ class AjaxManager
             return new ResponseError();
         }
 
+        if (empty($options = json_decode($options))) {
+            return new ResponseError();
+        }
+
         System::loadLanguageFile('tl_ml_product');
         $template = new FrontendTemplate('options_modal');
 
         $template->options = $this->getPathsFromOptions($options);
+        $template->label = $this->translator->trans('huh.mediaLibrary.options.label');
         $template->class = 'media-library-options';
-        $template->link = $GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'];
-
-        $wrapper = new FrontendTemplate('modal_wrapper');
-
-        $wrapper->title = $GLOBALS['TL_LANG']['tl_ml_product']['downloadItem'];
-        $wrapper->content = $template->parse();
 
         $response = new ResponseSuccess();
-        $response->setResult(new ResponseData('', ['modal' => $wrapper->parse()]));
+        $response->setResult(new ResponseData('', ['modal' => $template->parse(), 'config' => $this->getConfig()]));
 
         return $response;
     }
@@ -74,14 +96,23 @@ class AjaxManager
     {
         $files = [];
         foreach ($options as $option) {
-            if (is_array($option) && null !== ($path = System::getContainer()->get('huh.utils.file')->getPathFromUuid($option['uuid']))) {
-                $files[$path] = $option['title'];
+            if (null === ($path = $this->fileUtil->getPathFromUuid($option->uuid))) {
+                continue;
             }
-//            elseif(null !== ($path = System::getContainer()->get('huh.utils.file')->getPathFromUuid($option))) {
-//                $files[$path] = '';
-//            }
+
+            $files[$path] = $option->title;
         }
 
         return $files;
+    }
+
+    protected function getConfig()
+    {
+        return json_encode([
+            'btnLabel' => $this->translator->trans('huh.mediaLibrary.btn.label'),
+            'btnClass' => $this->translator->trans('huh.mediaLibrary.btn.class'),
+            'alertTitle' => $this->translator->trans('huh.mediaLibrary.alert.download.title'),
+            'abortLabel' => $this->translator->trans('huh.mediaLibrary.btn.abort.label'),
+        ]);
     }
 }

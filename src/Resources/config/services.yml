@@ -38,6 +38,9 @@ services:
     class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
     arguments:
       - "@contao.framework"
+      - "@translator"
+      - "@huh.utils.file"
+      - "@huh.ajax"
   huh.media_library.tag_manager.product:
     class: Codefog\TagsBundle\Manager\DefaultManager
     arguments:
