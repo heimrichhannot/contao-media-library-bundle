@@ -197,6 +197,12 @@ class Product
 
     public function doDeleteDownloads(int $id, array $options = [])
     {
+        if(null === ($product = $this->productRegistry->findByPk($id))){
+            return;
+        };
+
+        $originalFiles = StringUtil::deserialize($product->file, true);
+
         $downloads = isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']
             ? $this->downloadRegistry->findGeneratedImages($id)
             : $this->downloadRegistry->findBy(
@@ -217,9 +223,10 @@ class Product
             // delete file
             $files = StringUtil::deserialize($download->file, true);
 
-//            if (count($files) < 1 || (isset($options['keepOriginal']) && $options['keepOriginal'] && (!))) {
-//                continue;
-//            }
+            // do not delete the original files!
+            if(in_array($files[0], $originalFiles)){
+                continue;
+            }
 
             if (null !== ($file = $this->fileUtil->getFileFromUuid($files[0]))) {
                 if (!$folder) {
