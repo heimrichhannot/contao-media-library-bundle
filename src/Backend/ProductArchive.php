@@ -14,7 +14,9 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
 use Contao\Dbafs;
+use Contao\StringUtil;
 use Contao\System;
+use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
@@ -135,13 +137,22 @@ class ProductArchive
      */
     public function doGetUploadFolder($product)
     {
+        Controller::loadDataContainer('tl_md_product_archive');
+
+        $uploadPath = $GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['uploadFolder']['default'] ?? Config::get('uploadPath');
+
+        if(Validator::isUuid($uploadPath) && null === ($uploadPath = $this->fileUtil->getPathFromUuid($uploadPath)))
+        {
+            $uploadPath = Config::get('uploadPath');
+        }
+
         if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive',
                 $product->pid))) {
-            return Config::get('uploadPath');
+            return $uploadPath;
         }
 
         if (null === ($uploadFolder = $this->fileUtil->getPathFromUuid($productArchive->uploadFolder))) {
-            return Config::get('uploadPath');
+            return $uploadPath;
         }
 
         switch ($productArchive->uploadFolderMode) {

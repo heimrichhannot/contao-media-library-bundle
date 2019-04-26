@@ -118,33 +118,31 @@ class Product
         }
     }
 
-    public function setCopyright($varValue, DataContainer $dc)
+    public function setCopyright(DataContainer $dc)
     {
         if (!$dc->activeRecord || !$dc->activeRecord->file) {
-            return '';
+            return;
         }
 
         $file = StringUtil::deserialize($dc->activeRecord->file, true);
 
         if (empty($file)) {
-            return '';
+            return;
         }
 
         $model = FilesModel::findByUuid($file[0]);
 
         if (null === $model) {
-            return '';
+            return;
         }
 
         $versions = new Versions('tl_files', $model->id);
         $versions->initialize();
 
-        $model->copyright = $varValue;
+        $model->copyright = $dc->activeRecord->copyright ?? null;
         $model->save();
 
         $versions->create();
-
-        return '';
     }
 
     public function getCopyright($value, DataContainer $dc)
@@ -162,10 +160,10 @@ class Product
         $model = FilesModel::findByUuid($file[0]);
 
         if (null === $model) {
-            return '';
+            return $dc->activeRecord->copyright ?? '';
         }
 
-        return $model->copyright;
+        return $model->copyright ?? $dc->activeRecord->copyright;
     }
 
     /**
@@ -181,7 +179,7 @@ class Product
             return;
         }
 
-        $this->doDeleteDownloads($dc->id, [
+        $this->doDeleteDownloads($dc->id,  StringUtil::deserialize($dc->activeRecord->file, true),[
             'keepManuallyAdded' => true,
             'keepFolder' => true,
             'keepOriginal' => true,
@@ -195,7 +193,7 @@ class Product
         $this->doDeleteDownloads($dc->id);
     }
 
-    public function doDeleteDownloads(int $id, array $options = [])
+    public function doDeleteDownloads(int $id, array $currentFiles = [], array $options = [])
     {
         if(null === ($product = $this->productRegistry->findByPk($id))){
             return;
@@ -216,6 +214,12 @@ class Product
 
         $folder = null;
 
+        $keepFiles = array_intersect($originalFiles, $currentFiles);
+
+        foreach ($keepFiles as $i => $keepFile){
+            $keepFiles[$i] = $this->fileUtil->getFileFromUuid($keepFile);
+        }
+
         foreach ($downloads as $i => $download) {
             // delete model
             $download->delete();
@@ -223,12 +227,16 @@ class Product
             // delete file
             $files = StringUtil::deserialize($download->file, true);
 
-            // do not delete the original files!
-            if(in_array($files[0], $originalFiles)){
-                continue;
-            }
 
             if (null !== ($file = $this->fileUtil->getFileFromUuid($files[0]))) {
+
+                // do not delete the current original file
+                foreach ($keepFiles as $keepFile){
+                    if (System::getContainer()->get('huh.utils.string')->startsWith($keepFile->path, ltrim($file->path, '/'))) {
+                        continue 2;
+                    }
+                }
+
                 if (!$folder) {
                     $folder = str_replace(
                         System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR,

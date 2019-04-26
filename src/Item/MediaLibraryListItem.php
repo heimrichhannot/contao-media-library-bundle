@@ -12,6 +12,7 @@ use Contao\FrontendTemplate;
 use Contao\FrontendUser;
 use Contao\StringUtil;
 use Contao\System;
+use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 
@@ -56,7 +57,9 @@ class MediaLibraryListItem extends DefaultItem
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->getRawValue('id')))) {
             if (1 === count($downloads)) {
-                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads->file), false];
+                $uuid = Validator::isUuid($downloads->file) ? $downloads->file : reset(StringUtil::deserialize($downloads->file));
+
+                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false)];
             }
 
             return [$this->getOptions($downloads), true];

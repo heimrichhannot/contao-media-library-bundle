@@ -14,6 +14,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             ['huh.utils.dca', 'setDateAdded'],
             ['huh.media_library.backend.product', 'generateDownloadItems'],
             ['huh.media_library.backend.product', 'generateAlias'],
+            ['huh.media_library.backend.product', 'setCopyright'],
         ],
         'oncopy_callback' => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
@@ -207,9 +208,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'reference' => &$GLOBALS['TL_LANG']['tl_files'],
             'load_callback' => [
                 ['huh.media_library.backend.product', 'getCopyright'],
-            ],
-            'save_callback' => [
-                ['huh.media_library.backend.product', 'setCopyright'],
             ],
             'sql' => "blob NULL"
         ],
