@@ -8,7 +8,6 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Backend;
 
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\System;
@@ -41,13 +40,13 @@ class Download
         }
 
         // Set the root IDs
-        if (!is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
+        if (!\is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
             $root = [0];
         } else {
             $root = $user->contao_media_library_bundles;
         }
 
-        $id = strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
+        $id = \strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
 
         // Check current action
         switch (\Contao\Input::get('act')) {
@@ -56,14 +55,14 @@ class Download
                 break;
 
             case 'create':
-                if (!strlen(\Contao\Input::get('pid')) || !in_array(\Contao\Input::get('pid'), $root, true)) {
+                if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_download items in ml_download archive ID '.\Contao\Input::get('pid').'.');
                 }
                 break;
 
             case 'cut':
             case 'copy':
-                if (!in_array(\Contao\Input::get('pid'), $root, true)) {
+                if (!\in_array(\Contao\Input::get('pid'), $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_download item ID '.$id.' to ml_download archive ID '.\Contao\Input::get('pid').'.');
                 }
             // no break STATEMENT HERE
@@ -81,7 +80,7 @@ class Download
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid ml_download item ID '.$id.'.');
                 }
 
-                if (!in_array($objArchive->pid, $root, true)) {
+                if (!\in_array($objArchive->pid, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_download item ID '.$id.' of ml_download archive ID '.$objArchive->pid.'.');
                 }
                 break;
@@ -92,7 +91,7 @@ class Download
             case 'overrideAll':
             case 'cutAll':
             case 'copyAll':
-                if (!in_array($id, $root, true)) {
+                if (!\in_array($id, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_download archive ID '.$id.'.');
                 }
 
@@ -112,9 +111,9 @@ class Download
                 break;
 
             default:
-                if (strlen(\Contao\Input::get('act'))) {
+                if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid command "'.\Contao\Input::get('act').'".');
-                } elseif (!in_array($id, $root, true)) {
+                } elseif (!\in_array($id, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_download archive ID '.$id.'.');
                 }
                 break;
@@ -125,7 +124,7 @@ class Download
     {
         $user = \Contao\BackendUser::getInstance();
 
-        if (strlen(\Contao\Input::get('tid'))) {
+        if (\strlen(\Contao\Input::get('tid'))) {
             $this->toggleVisibility(\Contao\Input::get('tid'), ('1' === \Contao\Input::get('state')), (@func_get_arg(12) ?: null));
             Controller::redirect(System::getReferer());
         }
@@ -158,11 +157,11 @@ class Download
         }
 
         // Trigger the onload_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_download']['config']['onload_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_download']['config']['onload_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_download']['config']['onload_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $callback($dc);
                 }
             }
@@ -188,11 +187,11 @@ class Download
         $objVersions->initialize();
 
         // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_download']['fields']['published']['save_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_download']['fields']['published']['save_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_download']['fields']['published']['save_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     $blnVisible = System::importStatic($callback[0])->{$callback[1]}($blnVisible, $dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $blnVisible = $callback($blnVisible, $dc);
                 }
             }
@@ -210,11 +209,11 @@ class Download
         }
 
         // Trigger the onsubmit_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_download']['config']['onsubmit_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_download']['config']['onsubmit_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_download']['config']['onsubmit_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $callback($dc);
                 }
             }

@@ -14,7 +14,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
 use Contao\Dbafs;
-use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
@@ -78,7 +77,7 @@ class ProductArchive
         }
 
         $archiveFolder = $this->fileUtil->sanitizeFileName($dc->activeRecord->title);
-        $targetFolder = $path.DIRECTORY_SEPARATOR.$archiveFolder;
+        $targetFolder = $path.\DIRECTORY_SEPARATOR.$archiveFolder;
 
         if (!file_exists($targetFolder)) {
             mkdir($targetFolder);
@@ -141,8 +140,7 @@ class ProductArchive
 
         $uploadPath = $GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['uploadFolder']['default'] ?? Config::get('uploadPath');
 
-        if(Validator::isUuid($uploadPath) && null === ($uploadPath = $this->fileUtil->getPathFromUuid($uploadPath)))
-        {
+        if (Validator::isUuid($uploadPath) && null === ($uploadPath = $this->fileUtil->getPathFromUuid($uploadPath))) {
             $uploadPath = Config::get('uploadPath');
         }
 
@@ -168,7 +166,7 @@ class ProductArchive
                         );
 
                         if ($userPattern) {
-                            $uploadFolder .= DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($userPattern);
+                            $uploadFolder .= \DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($userPattern);
                         }
                     }
                 }
@@ -183,7 +181,7 @@ class ProductArchive
                 'tl_ml_product'
             );
 
-            $uploadFolder .= DIRECTORY_SEPARATOR.$this->fileUtil->sanitizeFileName($productPattern);
+            $uploadFolder .= \DIRECTORY_SEPARATOR.$this->fileUtil->sanitizeFileName($productPattern);
         }
 
         return $uploadFolder;
@@ -199,7 +197,7 @@ class ProductArchive
         }
 
         // Set root IDs
-        if (!is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
+        if (!\is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
             $root = [0];
         } else {
             $root = $user->contao_media_library_bundles;
@@ -224,13 +222,13 @@ class ProductArchive
 
             case 'edit':
                 // Dynamically add the record to the user profile
-                if (!in_array(\Contao\Input::get('id'), $root, true)) {
+                if (!\in_array(\Contao\Input::get('id'), $root, true)) {
                     /** @var \Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface $sessionBag */
                     $sessionBag = $objSession->getBag('contao_backend');
 
                     $arrNew = $sessionBag->get('new_records');
 
-                    if (is_array($arrNew['tl_ml_product_archive']) && in_array(\Contao\Input::get('id'),
+                    if (\is_array($arrNew['tl_ml_product_archive']) && \in_array(\Contao\Input::get('id'),
                             $arrNew['tl_ml_product_archive'], true)) {
                         // Add the permissions on group level
                         if ('custom' != $user->inherit) {
@@ -247,7 +245,7 @@ class ProductArchive
                             while ($objGroup->next()) {
                                 $arrModulep = \StringUtil::deserialize($objGroup->contao_media_library_bundlep);
 
-                                if (is_array($arrModulep) && in_array('create', $arrModulep, true)) {
+                                if (\is_array($arrModulep) && \in_array('create', $arrModulep, true)) {
                                     $arrModules = \StringUtil::deserialize($objGroup->contao_media_library_bundles,
                                         true);
                                     $arrModules[] = \Contao\Input::get('id');
@@ -268,7 +266,7 @@ class ProductArchive
 
                             $arrModulep = \StringUtil::deserialize($user->contao_media_library_bundlep);
 
-                            if (is_array($arrModulep) && in_array('create', $arrModulep, true)) {
+                            if (\is_array($arrModulep) && \in_array('create', $arrModulep, true)) {
                                 $arrModules = \StringUtil::deserialize($user->contao_media_library_bundles, true);
                                 $arrModules[] = \Contao\Input::get('id');
 
@@ -289,7 +287,7 @@ class ProductArchive
             case 'copy':
             case 'delete':
             case 'show':
-                if (!in_array(\Contao\Input::get('id'), $root, true)
+                if (!\in_array(\Contao\Input::get('id'), $root, true)
                     || ('delete' == \Contao\Input::get('act')
                         && !$user->hasAccess(
                             'delete',
@@ -316,7 +314,7 @@ class ProductArchive
                 break;
 
             default:
-                if (strlen(\Contao\Input::get('act'))) {
+                if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.'
                     );

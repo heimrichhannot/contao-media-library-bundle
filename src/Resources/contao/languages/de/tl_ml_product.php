@@ -9,6 +9,7 @@ $lang['tstamp']                   = ['Änderungsdatum', ''];
 $lang['title']                    = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['pid']                      = ['Kategorie', 'Wählen Sie hier die Kategorie aus.'];
 $lang['file']                     = ['Datei', 'Laden Sie hier die zum Produkt gehörige Datei hoch.'];
+$lang['videoPosterImage']         = ['Video-Vorschaubild', 'Laden Sie hier en Vorschaubild für das Video hoch.'];
 $lang['alias']                    = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $lang['copyright']                = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
 $lang['text']                     = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
@@ -35,6 +36,7 @@ $lang['publish_legend']           = 'Veröffentlichung';
 $lang['reference'] = [
     \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'Bild',
     \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE  => 'Datei',
+    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO => 'Video',
 ];
 
 /**

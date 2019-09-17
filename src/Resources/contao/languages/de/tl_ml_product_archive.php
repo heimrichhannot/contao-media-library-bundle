@@ -35,11 +35,19 @@ $lang['uploadFolderProductPattern']      = [
 $lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
 
 /**
+ * Reference
+ */
+$lang['reference'] = [
+    \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'Statisch',
+    \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'Benutzerverzeichnis',
+];
+
+/**
  * Legends
  */
-$lang['general_legend'] = 'Allgemeine Einstellungen';
-$lang['config_legend']  = 'Konfiguration';
-$lang['protected_legend']  = 'Zugriffsschutz';
+$lang['general_legend']   = 'Allgemeine Einstellungen';
+$lang['config_legend']    = 'Konfiguration';
+$lang['protected_legend'] = 'Zugriffsschutz';
 
 /**
  * Buttons

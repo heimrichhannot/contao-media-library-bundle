@@ -56,7 +56,7 @@ class MediaLibraryListItem extends DefaultItem
     protected function getDownloadItems(string $fileField = 'uploadedFiles')
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->getRawValue('id')))) {
-            if (1 === count($downloads)) {
+            if (1 === \count($downloads)) {
                 $uuid = Validator::isUuid($downloads->file) ? $downloads->file : reset(StringUtil::deserialize($downloads->file));
 
                 return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false)];
@@ -71,7 +71,7 @@ class MediaLibraryListItem extends DefaultItem
             return [];
         }
 
-        if (1 === count($downloads)) {
+        if (1 === \count($downloads)) {
             return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads[0]), false];
         }
 

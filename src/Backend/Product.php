@@ -34,10 +34,12 @@ class Product
 {
     const TYPE_FILE = 'file';
     const TYPE_IMAGE = 'image';
+    const TYPE_VIDEO = 'video';
 
     const TYPES = [
         self::TYPE_FILE,
         self::TYPE_IMAGE,
+        self::TYPE_VIDEO,
     ];
 
     /**
@@ -179,7 +181,7 @@ class Product
             return;
         }
 
-        $this->doDeleteDownloads($dc->id,  StringUtil::deserialize($dc->activeRecord->file, true),[
+        $this->doDeleteDownloads($dc->id, StringUtil::deserialize($dc->activeRecord->file, true), [
             'keepManuallyAdded' => true,
             'keepFolder' => true,
             'keepOriginal' => true,
@@ -195,9 +197,9 @@ class Product
 
     public function doDeleteDownloads(int $id, array $currentFiles = [], array $options = [])
     {
-        if(null === ($product = $this->productRegistry->findByPk($id))){
+        if (null === ($product = $this->productRegistry->findByPk($id))) {
             return;
-        };
+        }
 
         $originalFiles = StringUtil::deserialize($product->file, true);
 
@@ -216,7 +218,7 @@ class Product
 
         $keepFiles = array_intersect($originalFiles, $currentFiles);
 
-        foreach ($keepFiles as $i => $keepFile){
+        foreach ($keepFiles as $i => $keepFile) {
             $keepFiles[$i] = $this->fileUtil->getFileFromUuid($keepFile);
         }
 
@@ -227,11 +229,9 @@ class Product
             // delete file
             $files = StringUtil::deserialize($download->file, true);
 
-
             if (null !== ($file = $this->fileUtil->getFileFromUuid($files[0]))) {
-
                 // do not delete the current original file
-                foreach ($keepFiles as $keepFile){
+                foreach ($keepFiles as $keepFile) {
                     if (System::getContainer()->get('huh.utils.string')->startsWith($keepFile->path, ltrim($file->path, '/'))) {
                         continue 2;
                     }
@@ -239,7 +239,7 @@ class Product
 
                 if (!$folder) {
                     $folder = str_replace(
-                        System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR,
+                        System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR,
                         '',
                         $file->dirname
                     );
@@ -311,13 +311,13 @@ class Product
         }
 
         // Set the root IDs
-        if (!is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
+        if (!\is_array($user->contao_media_library_bundles) || empty($user->contao_media_library_bundles)) {
             $root = [0];
         } else {
             $root = $user->contao_media_library_bundles;
         }
 
-        $id = strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
+        $id = \strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
 
         // Check current action
         switch (\Contao\Input::get('act')) {
@@ -326,7 +326,7 @@ class Product
                 break;
 
             case 'create':
-                if (!strlen(\Contao\Input::get('pid')) || !in_array(\Contao\Input::get('pid'), $root, true)) {
+                if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to create ml_product items in ml_product archive ID '.\Contao\Input::get('pid').'.'
                     );
@@ -335,7 +335,7 @@ class Product
 
             case 'cut':
             case 'copy':
-                if (!in_array(\Contao\Input::get('pid'), $root, true)) {
+                if (!\in_array(\Contao\Input::get('pid'), $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' to ml_product archive ID '
                         .\Contao\Input::get('pid').'.'
@@ -354,7 +354,7 @@ class Product
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid ml_product item ID '.$id.'.');
                 }
 
-                if (!in_array($objArchive->pid, $root, true)) {
+                if (!\in_array($objArchive->pid, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '
                         .$objArchive->pid.'.'
@@ -368,7 +368,7 @@ class Product
             case 'overrideAll':
             case 'cutAll':
             case 'copyAll':
-                if (!in_array($id, $root, true)) {
+                if (!\in_array($id, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to access ml_product archive ID '.$id.'.'
                     );
@@ -389,9 +389,9 @@ class Product
                 break;
 
             default:
-                if (strlen(\Contao\Input::get('act'))) {
+                if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid command "'.\Contao\Input::get('act').'".');
-                } elseif (!in_array($id, $root, true)) {
+                } elseif (!\in_array($id, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException(
                         'Not enough permissions to access ml_product archive ID '.$id.'.'
                     );
@@ -404,7 +404,7 @@ class Product
     {
         $user = \Contao\BackendUser::getInstance();
 
-        if (strlen(\Contao\Input::get('tid'))) {
+        if (\strlen(\Contao\Input::get('tid'))) {
             $this->toggleVisibility(\Contao\Input::get('tid'), ('1' === \Contao\Input::get('state')), (@func_get_arg(12) ?: null));
             Controller::redirect(System::getReferer());
         }
@@ -438,11 +438,11 @@ class Product
         }
 
         // Trigger the onload_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $callback($dc);
                 }
             }
@@ -468,11 +468,11 @@ class Product
         $objVersions->initialize();
 
         // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     $blnVisible = System::importStatic($callback[0])->{$callback[1]}($blnVisible, $dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $blnVisible = $callback($blnVisible, $dc);
                 }
             }
@@ -489,11 +489,11 @@ class Product
         }
 
         // Trigger the onsubmit_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'] as $callback) {
-                if (is_array($callback)) {
+                if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
-                } elseif (is_callable($callback)) {
+                } elseif (\is_callable($callback)) {
                     $callback($dc);
                 }
             }
@@ -536,7 +536,7 @@ class Product
         // create a download for the original file
         $this->createDownloadItem($file->path, $dc);
 
-        if (in_array($fileObj->extension, explode(',', Config::get('validImageTypes')), true)) {
+        if (\in_array($fileObj->extension, explode(',', Config::get('validImageTypes')), true)) {
             $this->createImageDownloadItems($fileObj, $dc);
         }
     }
@@ -574,9 +574,9 @@ class Product
             $targetFilename = $stringUtil->removeTrailingString('\.'.$file->extension, $file->name).'_'.$sizeName.'.'.$file->extension;
 
             // compose path
-            $targetFile = $containerUtil->getProjectDir().DIRECTORY_SEPARATOR.dirname($file->path).DIRECTORY_SEPARATOR.$targetFilename;
+            $targetFile = $containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
 
-            $resizeImage = $imageFactory->create($containerUtil->getProjectDir().DIRECTORY_SEPARATOR.$file->path, $size, $targetFile);
+            $resizeImage = $imageFactory->create($containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path, $size, $targetFile);
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $sizeModel);
         }
@@ -615,7 +615,7 @@ class Product
      */
     protected function isResizable(FilesModel $file, ImageSizeModel $size)
     {
-        $imageSize = getimagesize(System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR.$file->path);
+        $imageSize = getimagesize(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR.$file->path);
 
         if ($size->width > $imageSize[0] && $size->height > $imageSize[1]) {
             return false;
@@ -658,7 +658,7 @@ class Product
         $downloadItem = new DownloadModel();
         $title = $dc->activeRecord->title;
 
-        $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().DIRECTORY_SEPARATOR, '', $path);
+        $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR, '', $path);
 
         if (null === ($file = FilesModel::findByPath($path))) {
             $file = Dbafs::addResource(urldecode($path));

@@ -89,7 +89,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     'palettes' => [
         '__selector__' => ['type', 'published'],
         \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags,overrideImageSizes;{additional_fields_legend};{publish_legend},published;'
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags,overrideImageSizes;{additional_fields_legend};{publish_legend},published;',
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -158,6 +159,25 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'tl_class' => 'long clr',
                 'filesOnly' => true,
                 'fieldType' => 'radio',
+                'maxImageWidth' => \Config::get('gdMaxImgWidth'),
+                'maxImageHeight' => \Config::get('gdMaxImgHeight'),
+                'uploadFolder' => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
+                'addRemoveLinks' => true,
+                'maxFiles' => 1,
+                'maxUploadSize' => \Config::get('maxFileSize'),
+                'mandatory' => true,
+            ],
+            'sql' => "blob NULL",
+        ],
+        'videoPosterImage' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['videoPosterImage'],
+            'exclude' => true,
+            'inputType' => 'multifileupload',
+            'eval' => [
+                'tl_class' => 'long clr',
+                'filesOnly' => true,
+                'fieldType' => 'radio',
+                'extensions'    => Config::get('validImageTypes'),
                 'maxImageWidth' => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight' => \Config::get('gdMaxImgHeight'),
                 'uploadFolder' => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
