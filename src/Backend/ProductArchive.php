@@ -13,7 +13,6 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
-use Contao\Dbafs;
 use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
@@ -61,39 +60,6 @@ class ProductArchive
         $this->fileUtil = $fileUtil;
         $this->archiveRegistry = $archiveRegistry;
         $this->modelUtil = $modelUtil;
-    }
-
-    /**
-     * @param DataContainer $dc
-     */
-    public function modifyUploadFolder(DataContainer $dc)
-    {
-        if (!$dc->activeRecord->title) {
-            return;
-        }
-
-        if (null === ($path = $this->fileUtil->getPathFromUuid($dc->activeRecord->uploadFolder))) {
-            return;
-        }
-
-        $archiveFolder = $this->fileUtil->sanitizeFileName($dc->activeRecord->title);
-        $targetFolder = $path.\DIRECTORY_SEPARATOR.$archiveFolder;
-
-        if (!file_exists($targetFolder)) {
-            mkdir($targetFolder);
-            $folder = Dbafs::addResource($targetFolder);
-        }
-
-        if (null === $folder) {
-            return;
-        }
-
-        if (null === ($archive = $this->archiveRegistry->findByPk($dc->activeRecord->id))) {
-            return;
-        }
-
-        $archive->uploadFolder = $folder->uuid;
-        $archive->save();
     }
 
     /**

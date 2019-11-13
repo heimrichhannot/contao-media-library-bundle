@@ -11,6 +11,7 @@ $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffe
 $lang['start']     = ['Anzeigen ab', 'Download erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop']      = ['Anzeigen bis', 'Download nur bis zu diesem Tag auf der Webseite anzeigen.'];
 $lang['file']      = ['Datei', 'Laden Sie hier die Download-Datei hoch.'];
+$lang['imageSize'] = ['Bildgröße', 'Der Download liegt in o.g. Bildgröße vor.'];
 
 /**
  * Legends

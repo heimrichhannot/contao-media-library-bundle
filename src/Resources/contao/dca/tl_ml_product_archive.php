@@ -11,8 +11,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             ['huh.media_library.backend.product_archive', 'checkPermission'],
         ],
         'onsubmit_callback' => [
-            ['huh.utils.dca', 'setDateAdded'],
-            ['huh.media_library.backend.product_archive', 'modifyUploadFolder']
+            ['huh.utils.dca', 'setDateAdded']
         ],
         'oncopy_callback'   => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],

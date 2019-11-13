@@ -131,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],
             'exclude'          => true,
             'inputType'        => 'select',
-            'eval'             => ['tl_class' => 'w50', 'readonly' => true],
+            'eval'             => ['tl_class' => 'w50', 'readonly' => true, 'includeBlankOption' => true],
             'options_callback' => ['huh.media_library.backend.product_archive', 'getImageSizes'],
             'sql'              => "int(10) unsigned NOT NULL default '0'"
         ],
