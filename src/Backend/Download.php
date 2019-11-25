@@ -47,6 +47,13 @@ class Download
         }
 
         $id = \strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
+        $pid = 0;
+
+        if (null !== ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $id))) {
+            if (null !== ($archive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+                $pid = $archive->id;
+            }
+        }
 
         // Check current action
         switch (\Contao\Input::get('act')) {
@@ -55,15 +62,15 @@ class Download
                 break;
 
             case 'create':
-                if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_download items in ml_download archive ID '.\Contao\Input::get('pid').'.');
+                if (!\strlen($pid) || !\in_array($pid, $root, true)) {
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_download items in ml_download archive ID '.$pid.'.');
                 }
                 break;
 
             case 'cut':
             case 'copy':
-                if (!\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_download item ID '.$id.' to ml_download archive ID '.\Contao\Input::get('pid').'.');
+                if (!\in_array($pid, $root, true)) {
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_download item ID '.$id.' to ml_download archive ID '.$pid.'.');
                 }
             // no break STATEMENT HERE
 
@@ -72,15 +79,21 @@ class Download
             case 'delete':
             case 'toggle':
             case 'feature':
-                $objArchive = $database->prepare('SELECT pid FROM tl_ml_download WHERE id=?')
-                    ->limit(1)
-                    ->execute($id);
+                $pid = 0;
 
-                if ($objArchive->numRows < 1) {
+                if (null !== ($download = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_download', $id))) {
+                    if (null !== ($product = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product', $download->pid))) {
+                        if (null !== ($archive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+                            $pid = $archive->id;
+                        }
+                    }
+                }
+
+                if (!$pid) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid ml_download item ID '.$id.'.');
                 }
 
-                if (!\in_array($objArchive->pid, $root, true)) {
+                if (!\in_array($pid, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_download item ID '.$id.' of ml_download archive ID '.$objArchive->pid.'.');
                 }
                 break;
@@ -113,7 +126,7 @@ class Download
             default:
                 if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid command "'.\Contao\Input::get('act').'".');
-                } elseif (!\in_array($id, $root, true)) {
+                } elseif (!\in_array($pid, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_download archive ID '.$id.'.');
                 }
                 break;
