@@ -56,14 +56,16 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'copy'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['copy'],
                 'href'  => 'act=copy',
-                'icon'  => 'copy.gif',
+                'icon'  => 'copy.svg',
+                'button_callback' => ['huh.media_library.backend.product_archive', 'copyArchive'],
             ],
             'delete'     => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['delete'],
                 'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
+                'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm']
                     . '\'))return false;Backend.getScrollOffset()"',
+                'button_callback' => ['huh.media_library.backend.product_archive', 'deleteArchive'],
             ],
             'show'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['show'],
