@@ -166,6 +166,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxFiles' => 1,
                 'maxUploadSize' => \Config::get('maxFileSize'),
                 'mandatory' => true,
+                'skipDeleteAfterSubmit' => true
             ],
             'sql' => "blob NULL",
         ],
@@ -185,6 +186,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxFiles' => 1,
                 'maxUploadSize' => \Config::get('maxFileSize'),
                 'mandatory' => true,
+                'skipDeleteAfterSubmit' => true
             ],
             'sql' => "blob NULL",
         ],
