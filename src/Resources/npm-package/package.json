@@ -1,6 +1,6 @@
 {
   "name": "@hundh/contao-media-library-bundle",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "This package contains the frontend assets of the composer bundle heimrichhannot/contao-media-library-bundle.",
   "main": "js/contao-media-library-bundle.js",
   "repository": "git@github.com:heimrichhannot/contao-media-library-bundle.git",
