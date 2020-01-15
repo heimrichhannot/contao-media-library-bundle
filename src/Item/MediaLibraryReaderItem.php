@@ -8,14 +8,14 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
+use Contao\Controller;
+use Contao\Environment;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\ReaderBundle\Item\DefaultItem;
 
 class MediaLibraryReaderItem extends DefaultItem
 {
-    const WATCHLIST_MODULE_ID = 9;
-
     public function getDownloadItems()
     {
         $options = [];
@@ -30,8 +30,9 @@ class MediaLibraryReaderItem extends DefaultItem
             }
 
             $options[] = [
-                'label' => $downloadItem->title,
-                'file' => '?file='.$file,
+                'label' => htmlentities($downloadItem->title),
+                'file' => Environment::get('url') . '?file=' . $file,
+                'uuid' => $downloadItem->file
             ];
         }
 

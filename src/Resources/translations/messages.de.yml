@@ -4,3 +4,6 @@ huh.mediaLibrary.btn.class: 'btn btn-primary border-0'
 huh.mediaLibrary.btn.label: 'herunterladen'
 huh.mediaLibrary.btn.abort.label: 'abbrechen'
 huh.mediaLibrary.alert.download.title: 'Option wählen'
+
+huh.mediaLibrary.downloadTitle.original: 'Originalgröße'
+huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '%s (%s)'

@@ -33,6 +33,8 @@ $lang['uploadFolderProductPattern']      = [
 ];
 
 $lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
+$lang['keepProductTitleForDownloadItems'] = ['Produktnamen im Downloadtitel behalten', 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.'];
+
 
 /**
  * Reference

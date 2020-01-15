@@ -1,6 +1,6 @@
 <a class="media-library-download<?php if($this->action): ?>-action<?php endif; ?>" data-type="<?= $this->type; ?>" title="<?= $this->title; ?>"
    <?php if($this->file): ?>href="{{env::path}}<?= $this->file ?>" download<?php endif; ?>
-   <?php if ($this->action): ?> data-action="<?= $this->action; ?>" data-options='<?= $this->options; ?>'<?php endif; ?>
-   >
+    <?php if ($this->action): ?> data-action="<?= $this->action; ?>" data-options='<?= $this->options; ?>'<?php endif; ?>
+>
     <span><?= $this->link; ?></span>
 </a>

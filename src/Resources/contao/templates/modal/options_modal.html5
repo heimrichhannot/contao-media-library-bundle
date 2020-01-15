@@ -3,12 +3,8 @@
         <label for="mediaLibrary-select"><?= $this->label ?></label>
         <select id="mediaLibrary-select" class="form-control">
             <option value="" selected>-</option>
-            <?php foreach ($this->options as $key => $value): ?>
-                <?php if(is_array($value)): ?>
-                    <option value='<?= $value['uuid'] ?>' <?php if($key == $this->currentOption || $value == $this->currentOption):?>selected<?php endif; ?>><?= $value['title'] ?></option>
-                <?php else: ?>
-                    <option value='<?= $key ?>' <?php if($key == $this->currentOption || $value == $this->currentOption):?>selected<?php endif; ?>><?= $value ?></option>
-                <?php endif; ?>
+            <?php foreach ($this->options as $option): ?>
+                <option value="<?= $option->file; ?>" ><?= $option->label ?></option>
             <?php endforeach; ?>
         </select>
     </div>

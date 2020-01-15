@@ -14,15 +14,14 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Dbafs;
-use Contao\File;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\ImageSizeModel;
+use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
@@ -162,10 +161,10 @@ class Product
         $model = FilesModel::findByUuid($file[0]);
 
         if (null === $model) {
-            return $dc->activeRecord->copyright ?? '';
+            return $dc->activeRecord->copyright;
         }
 
-        return $model->copyright ?? $dc->activeRecord->copyright;
+        return $dc->activeRecord->copyright ? $dc->activeRecord->copyright : $model->copyright;
     }
 
     /**
@@ -528,16 +527,20 @@ class Product
     {
         $uuid = reset(StringUtil::deserialize($dc->activeRecord->file, true));
 
-        /** @var FilesModel $fileObj */
         if (null === ($file = $this->fileUtil->getFileFromUuid($uuid))) {
             return;
         }
 
-        // create a download for the original file
-        $this->createDownloadItem($file->path, $dc);
+        $fileModel = $file->getModel();
+        if(null === ($archiveModel = $this->getProductArchive($dc->id))) {
+            return;
+        }
 
-        if (\in_array($fileObj->extension, explode(',', Config::get('validImageTypes')), true)) {
-            $this->createImageDownloadItems($fileObj, $dc);
+        // create a download for the original file
+        $this->createDownloadItem($fileModel->path, $dc, $archiveModel->keepProductTitleForDownloadItems);
+
+        if (\in_array($fileModel->extension, explode(',', Config::get('validImageTypes')), true)) {
+            $this->createImageDownloadItems($fileModel, $dc, $archiveModel);
         }
     }
 
@@ -549,9 +552,9 @@ class Product
      *
      * @throws \Exception
      */
-    protected function createImageDownloadItems(FilesModel $file, DataContainer $dc)
+    protected function createImageDownloadItems(FilesModel $file, DataContainer $dc, Model $archiveModel)
     {
-        if (empty($sizes = $this->getSizes($dc))) {
+        if (empty($sizes = $this->getSizes($archiveModel, $dc))) {
             return;
         }
 
@@ -578,26 +581,23 @@ class Product
 
             $resizeImage = $imageFactory->create($containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path, $size, $targetFile);
 
-            $this->createDownloadItem($resizeImage->getPath(), $dc, $sizeModel);
+            $this->createDownloadItem($resizeImage->getPath(), $dc, $archiveModel->keepProductTitleForDownloadItems, $sizeModel);
         }
     }
 
     /**
+     * @param Model $archiveModel
      * @param DataContainer $dc
      *
      * @return array
      */
-    protected function getSizes(DataContainer $dc)
+    protected function getSizes(Model $archiveModel, DataContainer $dc)
     {
-        if (null === ($productArchive = $this->getProductArchive($dc->id))) {
-            return [];
-        }
-
         return StringUtil::deserialize(
             $this->dcaUtil->getOverridableProperty(
                 'imageSizes',
                 [
-                    $productArchive,
+                    $archiveModel,
                     $dc->activeRecord,
                 ]
             ),
@@ -625,11 +625,11 @@ class Product
     }
 
     /**
-     * get ProductArchiveModel for product.
+     * get Model for product.
      *
      * @param int $id
      *
-     * @return \Contao\Model\Collection|ProductArchiveModel|null
+     * @return \Contao\Model\Collection|Model|null
      */
     protected function getProductArchive(int $id)
     {
@@ -653,10 +653,9 @@ class Product
      *
      * @throws \Exception
      */
-    protected function createDownloadItem(string $path, DataContainer $dc, ImageSizeModel $size = null)
+    protected function createDownloadItem(string $path, DataContainer $dc, bool $keepProductName = false, ImageSizeModel $size = null)
     {
         $downloadItem = new DownloadModel();
-        $title = $dc->activeRecord->title;
 
         $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR, '', $path);
 
@@ -665,18 +664,35 @@ class Product
         }
 
         if (null !== $size) {
-            $title .= ' ('.$size->name.')';
             $downloadItem->imageSize = $size->id;
         }
 
         $downloadItem->tstamp = $downloadItem->dateAdded = time();
 
-        $downloadItem->title = $title;
+        $downloadItem->title = $this->getDownloadTitle($dc, $keepProductName, $size);
         $downloadItem->pid = $dc->id;
         $downloadItem->file = $file->uuid;
 
         $downloadItem->published = true;
 
         $downloadItem->save();
+    }
+
+    /**
+     * @param DataContainer $dc
+     * @param bool $keepProductName
+     * @param ImageSizeModel|null $size
+     * @return string
+     */
+    protected function getDownloadTitle(DataContainer $dc, bool $keepProductName = false, ImageSizeModel $size = null): string
+    {
+        $title = $dc->activeRecord->title;
+        $translator = System::getContainer()->get('translator');
+
+        if(null === $size) {
+            return $keepProductName ? $title : $translator->trans('huh.mediaLibrary.downloadTitle.original');
+        }
+
+        return $keepProductName ? $translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', $title, $size->name) : $size->name;
     }
 }

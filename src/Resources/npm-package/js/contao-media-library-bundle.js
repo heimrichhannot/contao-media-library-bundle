@@ -1,3 +1,5 @@
+require('alertifyjs/build/css/alertify.css');
+
 import '@hundh/contao-utils-bundle';
 import alertify from 'alertifyjs';
 

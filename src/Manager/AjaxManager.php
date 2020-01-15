@@ -75,14 +75,14 @@ class AjaxManager
             return new ResponseError();
         }
 
-        if (empty($options = json_decode($options))) {
+        if (!is_array($options) && empty($options = json_decode($options))) {
             return new ResponseError();
         }
 
         System::loadLanguageFile('tl_ml_product');
         $template = new FrontendTemplate('options_modal');
 
-        $template->options = $this->getPathsFromOptions($options);
+        $template->options = $options;
         $template->label = $this->translator->trans('huh.mediaLibrary.options.label');
         $template->class = 'media-library-options';
 

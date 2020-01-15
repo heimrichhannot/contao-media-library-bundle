@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
+use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
 use Contao\StringUtil;
@@ -56,13 +57,24 @@ class MediaLibraryListItem extends DefaultItem
     protected function getDownloadItems(string $fileField = 'uploadedFiles')
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->getRawValue('id')))) {
-            if (1 === \count($downloads)) {
+            $items = [];
+
+            foreach($downloads as $download) {
                 $uuid = Validator::isUuid($downloads->file) ? $downloads->file : reset(StringUtil::deserialize($downloads->file));
 
-                return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false)];
+
+                $items[] = [
+                    'label' => htmlentities($download->title),
+                    'file' => System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false),
+                    'uuid' => StringUtil::binToUuid($uuid)
+                ];
             }
 
-            return [$this->getOptions($downloads), true];
+            if(1 == count($items)) {
+                return [$items[0]['file'],false];
+            }
+
+            return [json_encode($items), true];
         }
 
         $downloads = StringUtil::deserialize($this->getRawValue($fileField), true);
@@ -78,18 +90,6 @@ class MediaLibraryListItem extends DefaultItem
         return [$this->getOptionsFromArray($downloads), true];
     }
 
-    protected function getOptions($downloadItems)
-    {
-        $options = [];
-        foreach ($downloadItems as $downloadItem) {
-            $options[] = [
-                'title' => $downloadItem->title,
-                'uuid' => StringUtil::binToUuid(reset(StringUtil::deserialize($downloadItem->file, true))),
-            ];
-        }
-
-        return json_encode($options);
-    }
 
     protected function getOptionsFromArray($downloadItems)
     {

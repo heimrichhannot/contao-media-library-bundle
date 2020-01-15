@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'default'      => '{general_legend},title;{config_legend},type,additionalFields;{protected_legend},protected;{publish_legend},published;'
     ],
     'subpalettes' => [
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes',
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes,keepProductTitleForDownloadItems',
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                       => 'uploadFolderMode',
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO                      => 'uploadFolderMode',
         'uploadFolderMode_'
@@ -232,6 +232,15 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'inputType' => 'text',
             'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql'       => "varchar(10) NOT NULL default ''"
+        ],
+        'keepProductTitleForDownloadItems' => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product']['keepProductTitleForDownloadItems'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'default'   => true,
+            'eval'      => ['tl_class' => 'clr'],
+            'sql'       => "char(1) NOT NULL default ''"
         ]
     ]
 ];
