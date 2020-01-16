@@ -60,7 +60,7 @@ class MediaLibraryListItem extends DefaultItem
             $items = [];
 
             foreach($downloads as $download) {
-                $uuid = Validator::isUuid($downloads->file) ? $downloads->file : reset(StringUtil::deserialize($downloads->file));
+                $uuid = Validator::isUuid($download->file) ? $download->file : reset(StringUtil::deserialize($download->file));
 
 
                 $items[] = [

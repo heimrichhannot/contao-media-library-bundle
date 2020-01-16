@@ -1,4 +1,3 @@
-huh:
-    encore:
-        entries:
-            - { name: contao-media-library-bundle, file: "vendor/heimrichhannot/contao-media-library-bundle/src/Resources/assets/js/jquery.media-library-bundle.js" }
+huh_encore:
+    js_entries:
+       - { name: contao-media-library-bundle, file: "vendor/heimrichhannot/contao-media-library-bundle/src/Resources/assets/js/jquery.media-library-bundle.js", requires_css: true }
