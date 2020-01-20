@@ -11,28 +11,26 @@ namespace HeimrichHannot\MediaLibraryBundle\Item;
 use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
+use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
+use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 
 class MediaLibraryListItem extends DefaultItem
 {
     public function getDownloadLink()
     {
-        if (ProductModel::ITEM_LICENCE_TYPE_LOCKED === $this->getRawValue('licence')) {
-            return;
-        }
-
         if (!$this->checkPermission()) {
-            return;
+            return null;
         }
 
         list($downloads, $hasOptions) = $this->getDownloadItems();
 
         if (empty($downloads)) {
-            return;
+            return null;
         }
 
         System::loadLanguageFile('tl_ml_product');
@@ -64,7 +62,7 @@ class MediaLibraryListItem extends DefaultItem
 
 
                 $items[] = [
-                    'label' => htmlentities($download->title),
+                    'label' => urlencode($download->title),
                     'file' => System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false),
                     'uuid' => StringUtil::binToUuid($uuid)
                 ];
@@ -104,16 +102,34 @@ class MediaLibraryListItem extends DefaultItem
         return $options;
     }
 
-    protected function checkPermission()
+    /**
+     * @return bool
+     */
+    protected function checkPermission(): bool
     {
-        if (null === ($archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid')))) {
+        if (null === ($archive = $this->getProductArchive())) {
             return false;
         }
 
-        if (!$archive->protected) {
-            return true;
+        $permitted = true;
+
+        if($archive->protected) {
+            $permitted = $this->checkUserPermission($archive);
         }
 
+        if($archive->preventLockedProductsFromDownload) {
+            $permitted = false;
+        }
+
+        return $permitted;
+    }
+
+    /**
+     * @param ProductArchiveModel $archive
+     * @return bool
+     */
+    protected function checkUserPermission(ProductArchiveModel $archive): bool
+    {
         if (null === ($user = FrontendUser::getInstance())) {
             return false;
         }
@@ -124,4 +140,32 @@ class MediaLibraryListItem extends DefaultItem
 
         return true;
     }
+
+
+    /**
+     * @return Model|null
+     */
+    public function getProductArchive(): ?Model
+    {
+        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLocked(): bool
+    {
+        return ProductModel::ITEM_LICENCE_TYPE_LOCKED == $this->getRawValue('licence');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLockedText(): ?string
+    {
+        $archive = $this->getProductArchive();
+
+        return System::getContainer()->get('translator')->trans($archive->lockedProductText ? : 'huh.mediaLibrary.locked.default');
+    }
+
 }

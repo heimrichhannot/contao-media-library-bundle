@@ -10,8 +10,10 @@ namespace HeimrichHannot\MediaLibraryBundle\Item;
 
 use Contao\Controller;
 use Contao\Environment;
+use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
+use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\ReaderBundle\Item\DefaultItem;
 
 class MediaLibraryReaderItem extends DefaultItem
@@ -79,5 +81,31 @@ class MediaLibraryReaderItem extends DefaultItem
         }
 
         return $value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLocked(): bool
+    {
+        return ProductModel::ITEM_LICENCE_TYPE_LOCKED == $this->getRawValue('licence');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLockedText(): ?string
+    {
+        $archive = $this->getProductArchive();
+
+        return System::getContainer()->get('translator')->trans($archive->lockedProductText ? : 'huh.mediaLibrary.locked.default');
+    }
+
+    /**
+     * @return Model|null
+     */
+    public function getProductArchive(): ?Model
+    {
+        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
     }
 }

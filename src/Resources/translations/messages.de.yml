@@ -7,3 +7,5 @@ huh.mediaLibrary.alert.download.title: 'Option wählen'
 
 huh.mediaLibrary.downloadTitle.original: 'Originalgröße'
 huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '%s (%s)'
+
+huh.mediaLibrary.locked.default: 'Dieser Artikel ist lizenzpflichtig. Bitte nehmen Sie Kontakt zum Urheber auf.'
