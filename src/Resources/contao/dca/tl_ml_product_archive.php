@@ -75,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected', 'published'],
+        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected', 'published','useExifDataForTags'],
         'default'      => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected,preventLockedProductsFromDownload;{publish_legend},published;'
     ],
     'subpalettes' => [
@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'addProductPatternToUploadFolder'                                                             => 'uploadFolderProductPattern',
         'protected'                                                                                   => 'groups',
         'published'                                                                                   => 'start,stop',
-        'preventLockedProductsFromDownload'                                                           => 'lockedProductText'
+        'preventLockedProductsFromDownload'                                                           => 'lockedProductText',
     ],
     'fields'      => [
         'id'                              => [

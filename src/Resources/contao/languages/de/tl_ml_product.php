@@ -22,6 +22,7 @@ $lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Opti
 $lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
 
+
 /**
  * Legends
  */

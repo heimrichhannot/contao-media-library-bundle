@@ -28,6 +28,7 @@ use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use League\Uri\Schemes\Data;
 
 class Product
 {
@@ -98,7 +99,7 @@ class Product
 
     public function addAdditionalFields(DataContainer $dc)
     {
-        if (null === ($product = $this->productRegistry->findByPk($dc->id))) {
+        if (null === ($product = $this->getProduct($dc->id))) {
             return;
         }
 
@@ -196,7 +197,7 @@ class Product
 
     public function doDeleteDownloads(int $id, array $currentFiles = [], array $options = [])
     {
-        if (null === ($product = $this->productRegistry->findByPk($id))) {
+        if (null === ($product = $this->getProduct($id))) {
             return;
         }
 
@@ -501,9 +502,14 @@ class Product
         $objVersions->create();
     }
 
+    /**
+     * @param DataContainer $dc
+     * @return null
+     * @throws \Exception
+     */
     public function generateAlias(DataContainer $dc)
     {
-        if (null === ($product = System::getContainer()->get('huh.media_library.product_registry')->findByPk($dc->activeRecord->id))) {
+        if (null === ($product = $this->getProduct($dc->id))) {
             return null;
         }
 
@@ -515,6 +521,28 @@ class Product
         );
         $product->save();
     }
+
+    /**
+     * @param DataContainer $dc
+     * @return Model
+     */
+    protected function getProduct(int $id): Model
+    {
+        return $this->productRegistry->findByPk($id);
+    }
+
+    /**
+     * @param Model $archive
+     * @param DataContainer $dc
+     * @return array
+     */
+    protected function getExifConfiguration(Model $archive, DataContainer $dc): array
+    {
+        $exifData = $dc->activeRecord->overrideExifData ? $dc->activeRecord->exifData : $archive->exifData;
+
+        return StringUtil::deserialize($exifData, true);
+    }
+
 
     /**
      * create download items.
@@ -633,7 +661,7 @@ class Product
      */
     protected function getProductArchive(int $id)
     {
-        if (null === ($product = $this->productRegistry->findByPk($id))) {
+        if (null === ($product = $this->getProduct($id))) {
             return null;
         }
 

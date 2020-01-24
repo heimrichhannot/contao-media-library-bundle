@@ -32,7 +32,7 @@ $lang['keepProductTitleForDownloadItems'][1]  = 'Wählen Sie diese Option, wenn 
 $lang['preventLockedProductsFromDownload'][0] = 'Download von lizenzpflichtigen Produkten verbieten';
 $lang['preventLockedProductsFromDownload'][1] = 'Wählen Sie diese Option, wenn lizenzpflichtige Produkte vom Download ausgeschlossen werden sollen.';
 $lang['lockedProductText'][0]                 = 'Text bei lizenzpflichtigen Produkten';
-$lang['lockedProductText'][1]                 = 'Wählen Sie hier den Text der angezeigt werden soll, wenn es sich um ein lizenzpflichtiges Produkt handelt';
+$lang['lockedProductText'][1]                 = 'Wählen Sie hier den Text der angezeigt werden soll, wenn es sich um ein lizenzpflichtiges Produkt handelt.';
 
 
 /**

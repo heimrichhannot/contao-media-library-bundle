@@ -90,10 +90,10 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         '__selector__' => ['type', 'published'],
         \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
         \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags,overrideImageSizes;{additional_fields_legend};{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text,tags;{additional_fields_legend};{publish_legend},published;',
     ],
     'subpalettes' => [
-        'published' => 'start,stop'
+        'published' => 'start,stop',
     ],
     'fields' => [
         'id' => [
