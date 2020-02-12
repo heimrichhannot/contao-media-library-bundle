@@ -523,10 +523,10 @@ class Product
     }
 
     /**
-     * @param DataContainer $dc
-     * @return Model
+     * @param int $id
+     * @return Model|null
      */
-    protected function getProduct(int $id): Model
+    protected function getProduct(int $id): ?Model
     {
         return $this->productRegistry->findByPk($id);
     }
