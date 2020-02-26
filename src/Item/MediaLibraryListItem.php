@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
+use Contao\Controller;
 use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
@@ -41,7 +42,7 @@ class MediaLibraryListItem extends DefaultItem
         $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->getRawValue('title'));
 
         if (!$hasOptions) {
-            $template->file = $downloads;
+            $template->file = Controller::replaceInsertTags('{{env::url}}') . '?file=' . $downloads;
 
             return $template->parse();
         }
