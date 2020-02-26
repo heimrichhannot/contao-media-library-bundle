@@ -72,7 +72,7 @@ class MediaLibraryListItem extends DefaultItem
                 return [$items[0]['file'],false];
             }
 
-            return [json_encode($items), true];
+            return [json_encode($items, JSON_UNESCAPED_SLASHES), true];
         }
 
         $downloads = StringUtil::deserialize($this->getRawValue($fileField), true);
