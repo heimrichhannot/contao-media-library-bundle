@@ -25,6 +25,7 @@ use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
+use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
@@ -66,6 +67,10 @@ class Product
      * @var FileUtil
      */
     protected $fileUtil;
+    /**
+     * @var DatabaseUtil
+     */
+    private $databaseUtil;
 
     public function __construct(
         ContaoFrameworkInterface $framework,
@@ -74,7 +79,8 @@ class Product
         DownloadRegistry $downloadRegistry,
         ModelUtil $modelUtil,
         DcaUtil $dcaUtil,
-        FileUtil $fileUtil
+        FileUtil $fileUtil,
+        DatabaseUtil $databaseUtil
     ) {
         $this->framework = $framework;
         $this->productArchiveRegistry = $productArchiveRegistry;
@@ -83,6 +89,7 @@ class Product
         $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
         $this->fileUtil = $fileUtil;
+        $this->databaseUtil = $databaseUtil;
     }
 
     public function listChildren($row)
@@ -268,11 +275,11 @@ class Product
      */
     public function copyFile($insertId, DataContainer $dc)
     {
-        if (null === ($oldProduct = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $dc->id))) {
+        if (null === ($oldProduct = $this->databaseUtil->findResultByPk('tl_ml_product', $dc->id))) {
             return;
         }
 
-        if (null === ($newProduct = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $insertId))) {
+        if (null === ($newProduct = $this->databaseUtil->findResultByPk('tl_ml_product', $insertId))) {
             return;
         }
 
@@ -297,8 +304,7 @@ class Product
             return;
         }
 
-        $newProduct->file = $newFileModel->uuid;
-        $newProduct->save();
+        Database::getInstance()->prepare('UPDATE tl_ml_product SET tl_ml_product.file=? WHERE id=?')->execute($newFileModel->uuid, $newProduct->id);
     }
 
     public function checkPermission()
@@ -513,13 +519,14 @@ class Product
             return null;
         }
 
-        $product->alias = System::getContainer()->get('huh.utils.dca')->generateAlias(
+        $alias = System::getContainer()->get('huh.utils.dca')->generateAlias(
             $dc->activeRecord->alias,
             $dc->activeRecord->id,
             'tl_ml_product',
             $dc->activeRecord->title
         );
-        $product->save();
+
+        Database::getInstance()->prepare('UPDATE tl_ml_product SET tl_ml_product.alias=? WHERE tl_ml_product.id=?')->execute($alias, $dc->id);
     }
 
     /**
@@ -683,7 +690,7 @@ class Product
      */
     protected function createDownloadItem(string $path, DataContainer $dc, bool $keepProductName = false, ImageSizeModel $size = null)
     {
-        $downloadItem = new DownloadModel();
+        $data = [];
 
         $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR, '', $path);
 
@@ -692,18 +699,27 @@ class Product
         }
 
         if (null !== $size) {
-            $downloadItem->imageSize = $size->id;
+            $data['imageSize'] = $size->id;
         }
 
-        $downloadItem->tstamp = $downloadItem->dateAdded = time();
+        $data['tstamp'] = $data['dateAdded'] = time();
 
-        $downloadItem->title = $this->getDownloadTitle($dc, $keepProductName, $size);
-        $downloadItem->pid = $dc->id;
-        $downloadItem->file = $file->uuid;
+        $data['title'] = $this->getDownloadTitle($dc, $keepProductName, $size);
+        $data['pid'] = $dc->id;
+        $data['file'] = $file->uuid;
 
-        $downloadItem->published = true;
+        $data['published'] = true;
 
-        $downloadItem->save();
+        Database::getInstance()->prepare('INSERT INTO tl_ml_download (imageSize, tstamp, dateAdded, title, pid, file, published)' .
+            'VALUES (?, ?, ?, ?, ?, ?, ?);')->execute(
+            $data['imageSize'] ?? 0,
+            $data['tstamp'],
+            $data['dateAdded'],
+            $data['title'],
+            $data['pid'],
+            $data['file'],
+            $data['published']
+        );
     }
 
     /**
