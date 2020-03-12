@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes'    => [
         '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected', 'published','useExifDataForTags'],
-        'default'      => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected,preventLockedProductsFromDownload;{publish_legend},published;'
+        'default'      => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected;{publish_legend},published;'
     ],
     'subpalettes' => [
         'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes',
@@ -89,7 +89,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'addProductPatternToUploadFolder'                                                             => 'uploadFolderProductPattern',
         'protected'                                                                                   => 'groups',
         'published'                                                                                   => 'start,stop',
-        'preventLockedProductsFromDownload'                                                           => 'lockedProductText',
     ],
     'fields'      => [
         'id'                              => [
@@ -242,25 +241,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'default'   => true,
             'eval'      => ['tl_class' => 'clr'],
             'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'preventLockedProductsFromDownload' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['preventLockedProductsFromDownload'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'checkbox',
-            'eval'      => ['tl_class' => 'clr', 'submitOnChange'],
-            'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'lockedProductText'                => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['lockedProductText'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'select',
-            'options_callback'   => function (\DataContainer $dc) {
-                return \Contao\System::getContainer()->get('huh.utils.choice.message')->getCachedChoices('huh.mediaLibrary.locked.default');
-            },
-            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
-            'sql'       => "varchar(64) NOT NULL default ''"
         ],
     ]
 ];

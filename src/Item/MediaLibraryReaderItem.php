@@ -83,23 +83,7 @@ class MediaLibraryReaderItem extends DefaultItem
         return $value;
     }
 
-    /**
-     * @return bool
-     */
-    public function getLocked(): bool
-    {
-        return ProductModel::ITEM_LICENCE_TYPE_LOCKED == $this->getRawValue('licence');
-    }
 
-    /**
-     * @return string|null
-     */
-    public function getLockedText(): ?string
-    {
-        $archive = $this->getProductArchive();
-
-        return System::getContainer()->get('translator')->trans($archive->lockedProductText ? : 'huh.mediaLibrary.locked.default');
-    }
 
     /**
      * @return Model|null

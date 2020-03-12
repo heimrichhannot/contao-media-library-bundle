@@ -42,8 +42,7 @@ class MediaLibraryListItem extends DefaultItem
         $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->getRawValue('title'));
 
         if (!$hasOptions) {
-            $template->file = Controller::replaceInsertTags('{{env::url}}') . '?file=' . $downloads;
-
+            $template->file = System::getContainer()->get('huh.utils.url')->addQueryString('file=' . $downloads);
             return $template->parse();
         }
 
@@ -118,10 +117,6 @@ class MediaLibraryListItem extends DefaultItem
             $permitted = $this->checkUserPermission($archive);
         }
 
-        if($archive->preventLockedProductsFromDownload) {
-            $permitted = false;
-        }
-
         return $permitted;
     }
 
@@ -151,22 +146,6 @@ class MediaLibraryListItem extends DefaultItem
         return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
     }
 
-    /**
-     * @return bool
-     */
-    public function getLocked(): bool
-    {
-        return ProductModel::ITEM_LICENCE_TYPE_LOCKED == $this->getRawValue('licence');
-    }
 
-    /**
-     * @return string|null
-     */
-    public function getLockedText(): ?string
-    {
-        $archive = $this->getProductArchive();
-
-        return System::getContainer()->get('translator')->trans($archive->lockedProductText ? : 'huh.mediaLibrary.locked.default');
-    }
 
 }

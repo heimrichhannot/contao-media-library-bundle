@@ -29,10 +29,6 @@ $lang['protected'][0]                         = 'Downloadelemente schützen';
 $lang['protected'][1]                         = 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.';
 $lang['keepProductTitleForDownloadItems'][0]  = 'Produktnamen im Downloadtitel behalten';
 $lang['keepProductTitleForDownloadItems'][1]  = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
-$lang['preventLockedProductsFromDownload'][0] = 'Download von lizenzpflichtigen Produkten verbieten';
-$lang['preventLockedProductsFromDownload'][1] = 'Wählen Sie diese Option, wenn lizenzpflichtige Produkte vom Download ausgeschlossen werden sollen.';
-$lang['lockedProductText'][0]                 = 'Text bei lizenzpflichtigen Produkten';
-$lang['lockedProductText'][1]                 = 'Wählen Sie hier den Text der angezeigt werden soll, wenn es sich um ein lizenzpflichtiges Produkt handelt.';
 
 
 /**

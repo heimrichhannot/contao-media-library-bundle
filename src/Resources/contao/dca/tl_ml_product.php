@@ -15,13 +15,15 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             ['huh.media_library.backend.product', 'generateDownloadItems'],
             ['huh.media_library.backend.product', 'generateAlias'],
             ['huh.media_library.backend.product', 'setCopyright'],
+            ['huh.media_library.backend.product', 'updateTagAssociations'],
         ],
         'oncopy_callback' => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
             ['huh.media_library.backend.product', 'copyFile'],
         ],
         'ondelete_callback' => [
-            ['huh.media_library.backend.product', 'deleteDownloads']
+            ['huh.media_library.backend.product', 'deleteDownloads'],
+            ['huh.media_library.backend.product', 'deleteTagAssociations']
         ],
         'sql' => [
             'keys' => [
