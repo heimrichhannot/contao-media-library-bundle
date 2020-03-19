@@ -33,7 +33,7 @@ class MediaLibraryReaderItem extends DefaultItem
 
             $options[] = [
                 'label' => html_entity_decode($downloadItem->title),
-                'file' => Environment::get('url') . '?file=' . $file,
+                'file' => Environment::get('uri') . '?file=' . $file,
                 'uuid' => $downloadItem->file
             ];
         }
