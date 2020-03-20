@@ -1,19 +1,17 @@
 <?php
 
 /*
- * Copyright (c) 2019 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
-use Contao\Controller;
 use Contao\Environment;
 use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\ReaderBundle\Item\DefaultItem;
 
 class MediaLibraryReaderItem extends DefaultItem
@@ -33,8 +31,8 @@ class MediaLibraryReaderItem extends DefaultItem
 
             $options[] = [
                 'label' => html_entity_decode($downloadItem->title),
-                'file' => Environment::get('uri') . '?file=' . $file,
-                'uuid' => $downloadItem->file
+                'file' => Environment::get('uri').'?file='.$file,
+                'uuid' => $downloadItem->file,
             ];
         }
 
@@ -82,8 +80,6 @@ class MediaLibraryReaderItem extends DefaultItem
 
         return $value;
     }
-
-
 
     /**
      * @return Model|null

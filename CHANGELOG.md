@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2020-03-20
+- added id to cfg tags table
+
 ## [0.10.0] - 2020-03-12
 - added callbacks to handle cfg-tags on delete and submit
 - fixed download file path for download action

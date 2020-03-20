@@ -1,15 +1,13 @@
 <?php
 
 /*
- * Copyright (c) 2019 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
-use Contao\Controller;
-use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
 use Contao\Model;
@@ -18,7 +16,6 @@ use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 
 class MediaLibraryListItem extends DefaultItem
 {
@@ -42,7 +39,8 @@ class MediaLibraryListItem extends DefaultItem
         $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->getRawValue('title'));
 
         if (!$hasOptions) {
-            $template->file = System::getContainer()->get('huh.utils.url')->addQueryString('file=' . $downloads);
+            $template->file = System::getContainer()->get('huh.utils.url')->addQueryString('file='.$downloads);
+
             return $template->parse();
         }
 
@@ -52,24 +50,31 @@ class MediaLibraryListItem extends DefaultItem
         return $template->parse();
     }
 
+    /**
+     * @return Model|null
+     */
+    public function getProductArchive(): ?Model
+    {
+        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
+    }
+
     protected function getDownloadItems(string $fileField = 'uploadedFiles')
     {
         if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->getRawValue('id')))) {
             $items = [];
 
-            foreach($downloads as $download) {
+            foreach ($downloads as $download) {
                 $uuid = Validator::isUuid($download->file) ? $download->file : reset(StringUtil::deserialize($download->file));
-
 
                 $items[] = [
                     'label' => urlencode($download->title),
                     'file' => System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid, false),
-                    'uuid' => StringUtil::binToUuid($uuid)
+                    'uuid' => StringUtil::binToUuid($uuid),
                 ];
             }
 
-            if(1 == count($items)) {
-                return [$items[0]['file'],false];
+            if (1 == \count($items)) {
+                return [$items[0]['file'], false];
             }
 
             return [json_encode($items, JSON_UNESCAPED_SLASHES), true];
@@ -87,7 +92,6 @@ class MediaLibraryListItem extends DefaultItem
 
         return [$this->getOptionsFromArray($downloads), true];
     }
-
 
     protected function getOptionsFromArray($downloadItems)
     {
@@ -113,7 +117,7 @@ class MediaLibraryListItem extends DefaultItem
 
         $permitted = true;
 
-        if($archive->protected) {
+        if ($archive->protected) {
             $permitted = $this->checkUserPermission($archive);
         }
 
@@ -122,6 +126,7 @@ class MediaLibraryListItem extends DefaultItem
 
     /**
      * @param ProductArchiveModel $archive
+     *
      * @return bool
      */
     protected function checkUserPermission(ProductArchiveModel $archive): bool
@@ -136,16 +141,4 @@ class MediaLibraryListItem extends DefaultItem
 
         return true;
     }
-
-
-    /**
-     * @return Model|null
-     */
-    public function getProductArchive(): ?Model
-    {
-        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
-    }
-
-
-
 }
