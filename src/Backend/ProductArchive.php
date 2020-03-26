@@ -9,27 +9,15 @@
 namespace HeimrichHannot\MediaLibraryBundle\Backend;
 
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\DataContainer;
 use Contao\System;
-use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class ProductArchive
 {
-    const UPLOAD_FOLDER_MODE_STATIC = 'static';
-    const UPLOAD_FOLDER_MODE_USER_HOME_DIR = 'user_home_dir';
-
-    const UPLOAD_FOLDER_MODES
-        = [
-            self::UPLOAD_FOLDER_MODE_STATIC,
-            self::UPLOAD_FOLDER_MODE_USER_HOME_DIR,
-        ];
-
     /**
      * @var ContaoFrameworkInterface
      */
@@ -73,84 +61,6 @@ class ProductArchive
         $imageSizes = System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser($user);
 
         return $imageSizes['image_sizes'];
-    }
-
-    public function getUploadFolderByProduct(DataContainer $dc)
-    {
-        return $this->doGetUploadFolder($dc->activeRecord);
-    }
-
-    public function getUploadFolderByDownload(DataContainer $dc)
-    {
-        if (null === ($download = $this->modelUtil->findModelInstanceByPk('tl_ml_download', $dc->id))) {
-            return \Contao\Config::get('uploadPath');
-        }
-
-        if (null === ($product = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $download->pid))) {
-            return \Contao\Config::get('uploadPath');
-        }
-
-        return $this->doGetUploadFolder($product);
-    }
-
-    /**
-     * get the upload folder.
-     *
-     * @param object $product
-     *
-     * @return string
-     */
-    public function doGetUploadFolder($product)
-    {
-        Controller::loadDataContainer('tl_md_product_archive');
-
-        $uploadPath = $GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['uploadFolder']['default'] ?? Config::get('uploadPath');
-
-        if (Validator::isUuid($uploadPath) && null === ($uploadPath = $this->fileUtil->getPathFromUuid($uploadPath))) {
-            $uploadPath = Config::get('uploadPath');
-        }
-
-        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive',
-                $product->pid))) {
-            return $uploadPath;
-        }
-
-        if (null === ($uploadFolder = $this->fileUtil->getPathFromUuid($productArchive->uploadFolder))) {
-            return $uploadPath;
-        }
-
-        switch ($productArchive->uploadFolderMode) {
-            case static::UPLOAD_FOLDER_MODE_USER_HOME_DIR:
-                if ($productArchive->uploadFolderUserPattern) {
-                    $backendUser = $this->framework->createInstance(BackendUser::class);
-
-                    if (null !== ($user = $this->modelUtil->findModelInstanceByPk('tl_user', $backendUser->id))) {
-                        $userPattern = $this->modelUtil->computeStringPattern(
-                            $productArchive->uploadFolderUserPattern,
-                            $user,
-                            'tl_user'
-                        );
-
-                        if ($userPattern) {
-                            $uploadFolder .= \DIRECTORY_SEPARATOR.System::getContainer()->get('huh.utils.file')->sanitizeFileName($userPattern);
-                        }
-                    }
-                }
-
-                break;
-        }
-
-        if ($productArchive->addProductPatternToUploadFolder && $productArchive->uploadFolderProductPattern) {
-            $productPattern = $this->modelUtil->computeStringPattern(
-                $productArchive->uploadFolderProductPattern,
-                $product,
-                'tl_ml_product'
-            );
-
-            $uploadFolder .= \DIRECTORY_SEPARATOR.$this->fileUtil->sanitizeFileName($productPattern);
-        }
-
-        return $uploadFolder;
     }
 
     public function checkPermission()
@@ -260,9 +170,7 @@ class ProductArchive
                             'contao_media_library_bundlep'
                         ))
                 ) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.');
                 }
                 break;
 
@@ -281,9 +189,7 @@ class ProductArchive
 
             default:
                 if (\strlen(\Contao\Input::get('act'))) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.');
                 }
                 break;
         }

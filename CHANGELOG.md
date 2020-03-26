@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta] - 2020-03-26
+- changed file fields from multifileupload to fileTree
+- added multilingual support
+
 ## [0.11.0] - 2020-03-20
 - added id to cfg tags table
 

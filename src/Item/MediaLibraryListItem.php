@@ -50,9 +50,6 @@ class MediaLibraryListItem extends DefaultItem
         return $template->parse();
     }
 
-    /**
-     * @return Model|null
-     */
     public function getProductArchive(): ?Model
     {
         return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
@@ -106,9 +103,6 @@ class MediaLibraryListItem extends DefaultItem
         return $options;
     }
 
-    /**
-     * @return bool
-     */
     protected function checkPermission(): bool
     {
         if (null === ($archive = $this->getProductArchive())) {
@@ -124,11 +118,6 @@ class MediaLibraryListItem extends DefaultItem
         return $permitted;
     }
 
-    /**
-     * @param ProductArchiveModel $archive
-     *
-     * @return bool
-     */
     protected function checkUserPermission(ProductArchiveModel $archive): bool
     {
         if (null === ($user = FrontendUser::getInstance())) {

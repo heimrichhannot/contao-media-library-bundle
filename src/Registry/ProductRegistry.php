@@ -31,7 +31,6 @@ class ProductRegistry
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductModel|null
      */
@@ -50,7 +49,6 @@ class ProductRegistry
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductModel|null
      */
@@ -68,7 +66,6 @@ class ProductRegistry
      * Adapter function for the model's findByPk method.
      *
      * @param mixed $pk
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductModel|null
      */

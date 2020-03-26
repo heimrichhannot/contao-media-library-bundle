@@ -31,7 +31,6 @@ class ProductArchiveRegistry
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductArchiveModel|null
      */
@@ -50,7 +49,6 @@ class ProductArchiveRegistry
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductArchiveModel|null
      */
@@ -68,7 +66,6 @@ class ProductArchiveRegistry
      * Adapter function for the model's findByPk method.
      *
      * @param mixed $pk
-     * @param array $options
      *
      * @return \Contao\Model\Collection|ProductArchiveModel|null
      */

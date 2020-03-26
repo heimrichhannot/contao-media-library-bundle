@@ -18,7 +18,6 @@ use Contao\Database\Result;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
-use Contao\Folder;
 use Contao\ImageSizeModel;
 use Contao\Model;
 use Contao\StringUtil;
@@ -31,6 +30,7 @@ use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use Model\Collection;
 
 class Product
 {
@@ -98,9 +98,6 @@ class Product
         $this->databaseUtil = $databaseUtil;
     }
 
-    /**
-     * @param DataContainer $dc
-     */
     public function updateTagAssociations(DataContainer $dc): void
     {
         $source = $GLOBALS['TL_DCA']['tl_ml_product']['fields']['tags']['eval']['tagsManager'];
@@ -119,10 +116,6 @@ class Product
         }
     }
 
-    /**
-     * @param DataContainer $dc
-     * @param int           $id
-     */
     public function deleteTagAssociations(DataContainer $dc, int $id): void
     {
         $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_product_id=?'],
@@ -151,9 +144,9 @@ class Product
 
     public function setType(DataContainer $dc)
     {
-        if ($dc->id && null !== ($productArchive = $this->getProductArchive($dc->id))) {
+        if ($dc->activeRecord->id && null !== ($productArchive = $this->getProductArchive($dc->activeRecord->id))) {
             Database::getInstance()->prepare('UPDATE tl_ml_product SET type=? WHERE id=?')->execute($productArchive->type,
-                $dc->id);
+                $dc->activeRecord->id);
         }
     }
 
@@ -231,8 +224,6 @@ class Product
     /**
      * Generate download.
      *
-     * @param DataContainer $dc
-     *
      * @throws \Exception
      */
     public function generateDownloadItems(DataContainer $dc)
@@ -241,9 +232,8 @@ class Product
             return;
         }
 
-        $this->doDeleteDownloads($dc->id, StringUtil::deserialize($dc->activeRecord->file, true), [
+        $this->doDeleteDownloads($dc, [
             'keepManuallyAdded' => true,
-            'keepFolder' => true,
             'keepOriginal' => true,
         ]);
 
@@ -252,114 +242,37 @@ class Product
 
     public function deleteDownloads(DataContainer $dc, int $undoId)
     {
-        $this->doDeleteDownloads($dc->id);
+        $this->doDeleteDownloads($dc);
     }
 
-    public function doDeleteDownloads(int $id, array $currentFiles = [], array $options = [])
+    public function doDeleteDownloads(DataContainer $dc, array $options = [])
     {
-        if (null === ($product = $this->getProduct($id))) {
+        if (null === ($downloads = $this->getDownloadItems($dc, $options))) {
             return;
         }
 
-        $originalFiles = StringUtil::deserialize($product->file, true);
-
-        $downloads = isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']
-            ? $this->downloadRegistry->findGeneratedImages($id)
-            : $this->downloadRegistry->findBy(
-                'pid',
-                $id
-            );
-
-        if (null === $downloads || (null === ($productArchive = $this->getProductArchive($id)))) {
+        if (null === ($product = $this->getProduct($dc->activeRecord->id))) {
             return;
         }
 
-        $folder = null;
-
-        $keepFiles = array_intersect($originalFiles, $currentFiles);
-
-        foreach ($keepFiles as $i => $keepFile) {
-            $keepFiles[$i] = $this->fileUtil->getFileFromUuid($keepFile);
-        }
+        $originalFile = $this->fileUtil->getFileFromUuid($product->file);
 
         foreach ($downloads as $i => $download) {
+            // get file model of download for later deletion
+            $downloadFile = $this->fileUtil->getFileFromUuid($download->file);
+
             // delete model
             $download->delete();
 
+            // keep the original file
+            if (System::getContainer()->get('huh.utils.string')->startsWith($originalFile->path,
+                ltrim($downloadFile->path, '/'))) {
+                continue;
+            }
+
             // delete file
-            $files = StringUtil::deserialize($download->file, true);
-
-            if (null !== ($file = $this->fileUtil->getFileFromUuid($files[0]))) {
-                // do not delete the current original file
-                foreach ($keepFiles as $keepFile) {
-                    if (System::getContainer()->get('huh.utils.string')->startsWith($keepFile->path,
-                        ltrim($file->path, '/'))) {
-                        continue 2;
-                    }
-                }
-
-                if (!$folder) {
-                    $folder = str_replace(
-                        System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR,
-                        '',
-                        $file->dirname
-                    );
-                }
-
-                $file->delete();
-            }
+            $downloadFile->delete();
         }
-
-        $canDeleteFolder = !(isset($options['keepFolder']) && $options['keepFolder']) && null !== $folder
-            && ($productArchive->uploadFolderUserPattern
-                || $productArchive->addProductPatternToUploadFolder
-                && $productArchive->uploadFolderProductPattern);
-
-        if ($canDeleteFolder) {
-            if (null !== ($folder = new Folder($folder))) {
-                $folder->delete();
-            }
-        }
-    }
-
-    /**
-     * Sets the current date as the date added -> usually used on submit.
-     *
-     * @param DataContainer $dc
-     */
-    public function copyFile($insertId, DataContainer $dc)
-    {
-        if (null === ($oldProduct = $this->databaseUtil->findResultByPk('tl_ml_product', $dc->id))) {
-            return;
-        }
-
-        if (null === ($newProduct = $this->databaseUtil->findResultByPk('tl_ml_product', $insertId))) {
-            return;
-        }
-
-        $file = StringUtil::deserialize($oldProduct->file, true);
-
-        if (empty($file)) {
-            return;
-        }
-
-        $file = $file[0];
-
-        if (null === ($fileObj = (System::getContainer()->get('huh.utils.file')->getFileFromUuid($file)))) {
-            return;
-        }
-
-        $newFilename = System::getContainer()->get('huh.media_library.backend.product_archive')->doGetUploadFolder($newProduct).'/'.$fileObj->name;
-
-        $fileObj->copyTo($newFilename);
-
-        if (null === ($newFileModel = ($this->modelUtil->findOneModelInstanceBy('tl_files', ['path=?'],
-                [$newFilename])))) {
-            return;
-        }
-
-        Database::getInstance()->prepare('UPDATE tl_ml_product SET tl_ml_product.file=? WHERE id=?')->execute($newFileModel->uuid,
-            $newProduct->id);
     }
 
     public function checkPermission()
@@ -388,19 +301,14 @@ class Product
 
             case 'create':
                 if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to create ml_product items in ml_product archive ID '.\Contao\Input::get('pid').'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_product items in ml_product archive ID '.\Contao\Input::get('pid').'.');
                 }
                 break;
 
             case 'cut':
             case 'copy':
                 if (!\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' to ml_product archive ID '
-                        .\Contao\Input::get('pid').'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' to ml_product archive ID '.\Contao\Input::get('pid').'.');
                 }
             // no break STATEMENT HERE
 
@@ -416,10 +324,7 @@ class Product
                 }
 
                 if (!\in_array($objArchive->pid, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '
-                        .$objArchive->pid.'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '.$objArchive->pid.'.');
                 }
                 break;
 
@@ -430,9 +335,7 @@ class Product
             case 'cutAll':
             case 'copyAll':
                 if (!\in_array($id, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to access ml_product archive ID '.$id.'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
                 }
 
                 $objArchive = $database->prepare('SELECT id FROM tl_ml_product WHERE pid=?')->execute($id);
@@ -453,9 +356,7 @@ class Product
                 if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid command "'.\Contao\Input::get('act').'".');
                 } elseif (!\in_array($id, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to access ml_product archive ID '.$id.'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
                 }
                 break;
         }
@@ -497,7 +398,7 @@ class Product
         \Contao\Input::setGet('act', 'toggle');
 
         if ($dc) {
-            $dc->id = $intId; // see #8043
+            $dc->activeRecord->id = $intId; // see #8043
         }
 
         // Trigger the onload_callback
@@ -513,9 +414,7 @@ class Product
 
         // Check the field access
         if (!$user->hasAccess('tl_ml_product::published', 'alexf')) {
-            throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                'Not enough permissions to publish/unpublish ml_product item ID '.$intId.'.'
-            );
+            throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to publish/unpublish ml_product item ID '.$intId.'.');
         }
 
         // Set the current record
@@ -566,14 +465,16 @@ class Product
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @throws \Exception
      */
     public function generateAlias(DataContainer $dc)
     {
-        if (null === ($product = $this->getProduct($dc->id))) {
-            return null;
+        if (null === ($product = $this->getProduct($dc->activeRecord->id))) {
+            return;
+        }
+
+        if ($product->alias) {
+            return;
         }
 
         $alias = System::getContainer()->get('huh.utils.dca')->generateAlias(
@@ -584,14 +485,9 @@ class Product
         );
 
         Database::getInstance()->prepare('UPDATE tl_ml_product SET tl_ml_product.alias=? WHERE tl_ml_product.id=?')->execute($alias,
-            $dc->id);
+            $dc->activeRecord->id);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return int
-     */
     protected function tagIsInUse(int $id): int
     {
         $associations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, [self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?'], [$id]);
@@ -599,9 +495,6 @@ class Product
         return $associations->numRows;
     }
 
-    /**
-     * @param Result $tagAssociations
-     */
     protected function modifyTagAssociations(string $table, Result $tagAssociations): void
     {
         $source = $GLOBALS['TL_DCA']['tl_ml_product']['fields']['tags']['eval']['tagManager'];
@@ -619,21 +512,26 @@ class Product
     }
 
     /**
-     * @param int $id
-     *
-     * @return Model|null
+     * @return Collection|Model|null
      */
+    protected function getDownloadItems(DataContainer $dc, array $options = [])
+    {
+        $columns = ['pid=?'];
+        $values = [$dc->activeRecord->id];
+
+        if (isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']) {
+            $columns[] = 'author=?';
+            $values[] = 0;
+        }
+
+        return $this->downloadRegistry->findBy($columns, $values);
+    }
+
     protected function getProduct(int $id): ?Model
     {
         return $this->productRegistry->findByPk($id);
     }
 
-    /**
-     * @param Model         $archive
-     * @param DataContainer $dc
-     *
-     * @return array
-     */
     protected function getExifConfiguration(Model $archive, DataContainer $dc): array
     {
         $exifData = $dc->activeRecord->overrideExifData ? $dc->activeRecord->exifData : $archive->exifData;
@@ -644,20 +542,18 @@ class Product
     /**
      * create download items.
      *
-     * @param DataContainer $dc
-     *
      * @throws \Exception
      */
     protected function createDownloadItems(DataContainer $dc)
     {
-        $uuid = reset(StringUtil::deserialize($dc->activeRecord->file, true));
+        $uuid = $dc->activeRecord->file;
 
         if (null === ($file = $this->fileUtil->getFileFromUuid($uuid))) {
             return;
         }
 
         $fileModel = $file->getModel();
-        if (null === ($archiveModel = $this->getProductArchive($dc->id))) {
+        if (null === ($archiveModel = $this->getProductArchive($dc->activeRecord->id))) {
             return;
         }
 
@@ -671,9 +567,6 @@ class Product
 
     /**
      * Create image download items that will be resized.
-     *
-     * @param FilesModel    $file
-     * @param DataContainer $dc
      *
      * @throws \Exception
      */
@@ -714,9 +607,6 @@ class Product
     }
 
     /**
-     * @param Model         $archiveModel
-     * @param DataContainer $dc
-     *
      * @return array
      */
     protected function getSizes(Model $archiveModel, DataContainer $dc)
@@ -736,9 +626,6 @@ class Product
     /**
      * check if the size of the image is bigger than the resize measures.
      *
-     * @param FilesModel     $file
-     * @param ImageSizeModel $size
-     *
      * @return bool
      */
     protected function isResizable(FilesModel $file, ImageSizeModel $size)
@@ -754,8 +641,6 @@ class Product
 
     /**
      * get Model for product.
-     *
-     * @param int $id
      *
      * @return \Contao\Model\Collection|Model|null
      */
@@ -775,8 +660,6 @@ class Product
     /**
      * create the DownloadModel for the image size.
      *
-     * @param string         $path
-     * @param DataContainer  $dc
      * @param ImageSizeModel $size
      *
      * @throws \Exception
@@ -803,7 +686,7 @@ class Product
         $data['tstamp'] = $data['dateAdded'] = time();
 
         $data['title'] = $this->getDownloadTitle($dc, $keepProductName, $size);
-        $data['pid'] = $dc->id;
+        $data['pid'] = $dc->activeRecord->id;
         $data['file'] = $file->uuid;
 
         $data['published'] = true;
@@ -820,13 +703,6 @@ class Product
         );
     }
 
-    /**
-     * @param DataContainer       $dc
-     * @param bool                $keepProductName
-     * @param ImageSizeModel|null $size
-     *
-     * @return string
-     */
     protected function getDownloadTitle(
         DataContainer $dc,
         bool $keepProductName = false,

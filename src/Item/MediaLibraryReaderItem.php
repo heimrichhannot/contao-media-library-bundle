@@ -81,9 +81,6 @@ class MediaLibraryReaderItem extends DefaultItem
         return $value;
     }
 
-    /**
-     * @return Model|null
-     */
     public function getProductArchive(): ?Model
     {
         return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));

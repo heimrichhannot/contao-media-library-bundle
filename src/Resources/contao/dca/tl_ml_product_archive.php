@@ -75,18 +75,11 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ]
     ],
     'palettes'    => [
-        '__selector__' => ['type', 'uploadFolderMode', 'addProductPatternToUploadFolder', 'protected', 'published','useExifDataForTags'],
+        '__selector__' => ['type', 'protected', 'published','useExifDataForTags'],
         'default'      => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected;{publish_legend},published;'
     ],
     'subpalettes' => [
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'uploadFolderMode,imageSizes',
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE                       => 'uploadFolderMode',
-        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO                      => 'uploadFolderMode',
-        'uploadFolderMode_'
-        . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC        => 'uploadFolder,addProductPatternToUploadFolder',
-        'uploadFolderMode_'
-        . \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR => 'uploadFolder,uploadFolderUserPattern,addProductPatternToUploadFolder',
-        'addProductPatternToUploadFolder'                                                             => 'uploadFolderProductPattern',
+        'type_' . \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE                      => 'imageSizes',
         'protected'                                                                                   => 'groups',
         'published'                                                                                   => 'start,stop',
     ],
@@ -141,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                     ]
                 );
             },
-            'eval'             => ['tl_class' => 'w50 autoheight', 'multiple' => true],
+            'eval'             => ['tl_class' => 'clr w50 autoheight', 'multiple' => true],
             'sql'              => "blob NULL"
         ],
         // image
@@ -151,49 +144,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'flag'             => 1,
             'inputType'        => 'checkboxWizard',
             'options_callback' => ['huh.media_library.backend.product_archive', 'getImageSizes'],
-            'eval'             => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'w50 autoheight'],
+            'eval'             => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'clr w50 autoheight'],
             'sql'              => "blob NULL"
-        ],
-        // config
-        'uploadFolderMode'                => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderMode'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'select',
-            'options'   => \HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODES,
-            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['reference'],
-            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
-            'sql'       => "varchar(64) NOT NULL default ''"
-        ],
-        'uploadFolder'                    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolder'],
-            'exclude'   => true,
-            'inputType' => 'fileTree',
-            'eval'      => ['fieldType' => 'radio', 'tl_class' => 'w50 autoheight', 'mandatory' => true],
-            'sql'       => "binary(16) NULL",
-        ],
-        'uploadFolderUserPattern'         => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderUserPattern'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50', 'mandatory' => true],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'addProductPatternToUploadFolder' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['addProductPatternToUploadFolder'],
-            'exclude'   => true,
-            'inputType' => 'checkbox',
-            'eval'      => ['tl_class' => 'w50', 'submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'uploadFolderProductPattern'      => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['uploadFolderProductPattern'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50 clr', 'mandatory' => true],
-            'sql'       => "varchar(255) NOT NULL default ''"
         ],
         'protected'                       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['protected'],

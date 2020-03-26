@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ],
         'oncopy_callback' => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
-            ['huh.media_library.backend.product', 'copyFile'],
         ],
         'ondelete_callback' => [
             ['huh.media_library.backend.product', 'deleteDownloads'],
@@ -156,39 +155,25 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'file' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['file'],
             'exclude' => true,
-            'inputType' => 'multifileupload',
+            'inputType' => 'fileTree',
             'eval' => [
-                'tl_class' => 'long clr',
+                'tl_class' => 'clr',
                 'filesOnly' => true,
                 'fieldType' => 'radio',
-                'maxImageWidth' => \Config::get('gdMaxImgWidth'),
-                'maxImageHeight' => \Config::get('gdMaxImgHeight'),
-                'uploadFolder' => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
-                'addRemoveLinks' => true,
-                'maxFiles' => 1,
-                'maxUploadSize' => \Config::get('maxFileSize'),
-                'mandatory' => true,
-                'skipDeleteAfterSubmit' => true
+                'mandatory' => true
             ],
             'sql' => "blob NULL",
         ],
         'videoPosterImage' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['videoPosterImage'],
             'exclude' => true,
-            'inputType' => 'multifileupload',
+            'inputType' => 'fileTree',
             'eval' => [
-                'tl_class' => 'long clr',
+                'tl_class' => 'clr',
                 'filesOnly' => true,
                 'fieldType' => 'radio',
                 'extensions'    => Config::get('validImageTypes'),
-                'maxImageWidth' => \Config::get('gdMaxImgWidth'),
-                'maxImageHeight' => \Config::get('gdMaxImgHeight'),
-                'uploadFolder' => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
-                'addRemoveLinks' => true,
-                'maxFiles' => 1,
-                'maxUploadSize' => \Config::get('maxFileSize'),
                 'mandatory' => true,
-                'skipDeleteAfterSubmit' => true
             ],
             'sql' => "blob NULL",
         ],

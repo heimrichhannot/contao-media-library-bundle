@@ -12,6 +12,7 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Model;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use Model\Collection;
 
 class DownloadRegistry
 {
@@ -28,20 +29,18 @@ class DownloadRegistry
     }
 
     /**
-     * Adapter function for the model's findBy method.
-     *
-     * @param mixed $column
-     * @param mixed $value
-     * @param array $options
-     *
-     * @return \Contao\Model\Collection|DownloadModel|null
+     * @return Collection|Model|null
      */
-    public function findBy($column, $value, array $options = [])
+    public function findBy(array $columns, array $values, array $options = [])
     {
+        foreach ($columns as &$column) {
+            $column = 'tl_ml_download.'.$column;
+        }
+
         return $this->modelUtil->findModelInstancesBy(
             'tl_ml_download',
-            $column,
-            $value,
+            $columns,
+            $values,
             $options
         );
     }
@@ -51,7 +50,6 @@ class DownloadRegistry
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|DownloadModel|null
      */
@@ -69,7 +67,6 @@ class DownloadRegistry
      * Adapter function for the model's findByPk method.
      *
      * @param mixed $pk
-     * @param array $options
      *
      * @return \Contao\Model\Collection|DownloadModel|null
      */
@@ -84,9 +81,6 @@ class DownloadRegistry
 
     /**
      * Adapter function for the model's findByPk method.
-     *
-     * @param int   $pid
-     * @param array $options
      *
      * @return \Contao\Model\Collection|DownloadModel|null
      */
@@ -104,7 +98,6 @@ class DownloadRegistry
      * Adapter function for the model's findByPk method.
      *
      * @param mixed $pid
-     * @param array $options
      *
      * @return \Contao\Model\Collection|DownloadModel|null
      */

@@ -113,16 +113,11 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
         'file' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['file'],
             'exclude'   => true,
-            'inputType' => 'multifileupload',
+            'inputType' => 'fileTree',
             'eval'      => [
                 'tl_class'           => 'clr',
                 'filesOnly'          => true,
                 'fieldType'          => 'radio',
-                'skipPrepareForSave' => true,
-                'uploadFolder'       => ['huh.media_library.backend.product_archive', 'getUploadFolderByDownload'],
-                'addRemoveLinks'     => true,
-                'maxFiles'           => 1,
-                'maxUploadSize'      => \Config::get('maxFileSize'),
                 'mandatory'          => true
             ],
             'sql'       => "blob NULL",

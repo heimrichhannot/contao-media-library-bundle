@@ -15,27 +15,12 @@ $lang['additionalFields'][0]                  = 'Zusätzliche Produktfelder';
 $lang['additionalFields'][1]                  = 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.';
 $lang['imageSizes'][0]                        = 'Bildgrößen';
 $lang['imageSizes'][1]                        = 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.';
-$lang['uploadFolderMode'][0]                  = 'Uploadverzeichnis-Modus';
-$lang['uploadFolderMode'][1]                  = 'Wählen Sie hier aus, wo Dateien abgelegt werden, die ';
-$lang['uploadFolder'][0]                      = 'Uploadverzeichnis';
-$lang['uploadFolder'][1]                      = 'Wählen Sie hier den Ordner, der als Basisordner für die hochgeladenen Dateien genutzt werden soll. (In diesem Ordner werden Unterverzeichnisse anhand des Produktnamens angelegt. In diesem werden dann wiederum die Dateien abgelegt.)';
-$lang['uploadFolderUserPattern'][0]           = 'Verzeichnismuster (aktueller Benutzer)';
-$lang['uploadFolderUserPattern'][1]           = 'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch den akuellen Backend-Benutzer generiert werden soll (Beispiel "%name%-%id%").';
-$lang['addProductPatternToUploadFolder'][0]   = 'Aktuelles Produkt zum Uploadverzeichnispfad hinzufügen';
-$lang['addProductPatternToUploadFolder'][1]   = 'Wählen Sie diese Option, wenn der Uploadverzeichnispfad auch durch das aktuelle Produkt bestimmt werden soll.';
-$lang['uploadFolderProductPattern'][0]        = 'Verzeichnismuster (aktuelles Produkt)';
-$lang['uploadFolderProductPattern'][1]        = 'Geben Sie hier ein Muster für den Teil des Uploadverzeichnispfads ein, der durch das akuelle Produkt generiert werden soll (Beispiel "%title%-%id%").';
 $lang['protected'][0]                         = 'Downloadelemente schützen';
 $lang['protected'][1]                         = 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.';
 $lang['keepProductTitleForDownloadItems'][0]  = 'Produktnamen im Downloadtitel behalten';
 $lang['keepProductTitleForDownloadItems'][1]  = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
 
 
-/**
- * Reference
- */
-$lang['reference'][\HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_STATIC]        = 'Statisch';
-$lang['reference'][\HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive::UPLOAD_FOLDER_MODE_USER_HOME_DIR] = 'Benutzerverzeichnis';
 
 /**
  * Legends
