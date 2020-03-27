@@ -9,7 +9,6 @@
     "symfony/framework-bundle": "^3.4",
     "heimrichhannot/contao-categories-bundle": "^1.0",
     "heimrichhannot/contao-filecredits": "^3.0",
-    "heimrichhannot/contao-multifileupload-bundle": "^1.0",
     "heimrichhannot/contao-utils-bundle": "^2.5",
     "codefog/tags-bundle": "^2.1",
     "heimrichhannot-contao-components/alertifyjs": "1.11.2"

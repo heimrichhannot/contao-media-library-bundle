@@ -142,11 +142,11 @@ class Product
         return '<div class="tl_content_left">'.($row['title'] ?: $row['id']).'</div>';
     }
 
-    public function setType(DataContainer $dc)
+    public function setType($table, $insertID, $set, DataContainer $dc)
     {
-        if ($dc->activeRecord->id && null !== ($productArchive = $this->getProductArchive($dc->activeRecord->id))) {
+        if ($insertID && null !== ($productArchive = $this->getProductArchive($insertID))) {
             Database::getInstance()->prepare('UPDATE tl_ml_product SET type=? WHERE id=?')->execute($productArchive->type,
-                $dc->activeRecord->id);
+                $insertID);
         }
     }
 

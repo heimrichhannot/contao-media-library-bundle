@@ -6,8 +6,10 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'ptable' => 'tl_ml_product_archive',
         'ctable' => 'tl_ml_download',
         'enableVersioning' => true,
-        'onload_callback' => [
+        'oncreate_callback' => [
             ['huh.media_library.backend.product', 'setType'],
+        ],
+        'onload_callback' => [
             ['huh.media_library.backend.product', 'addAdditionalFields'],
         ],
         'onsubmit_callback' => [
