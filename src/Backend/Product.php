@@ -251,7 +251,7 @@ class Product
             return;
         }
 
-        if (null === ($product = $this->getProduct($dc->activeRecord->id))) {
+        if (null === ($product = $this->getProduct($dc->id))) {
             return;
         }
 
@@ -469,7 +469,7 @@ class Product
      */
     public function generateAlias(DataContainer $dc)
     {
-        if (null === ($product = $this->getProduct($dc->activeRecord->id))) {
+        if (null === ($product = $this->getProduct($dc->id))) {
             return;
         }
 
@@ -517,7 +517,7 @@ class Product
     protected function getDownloadItems(DataContainer $dc, array $options = [])
     {
         $columns = ['pid=?'];
-        $values = [$dc->activeRecord->id];
+        $values = [$dc->id];
 
         if (isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']) {
             $columns[] = 'author=?';

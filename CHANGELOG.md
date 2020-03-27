@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta3] - 2020-03-27
+
+- fixed dc->id
+
 ## [1.0.0-beta2] - 2020-03-27
 
 - removed multifileupload dep from composer.json
