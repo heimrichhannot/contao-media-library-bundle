@@ -35,9 +35,9 @@ $lang['publish_legend']           = 'Veröffentlichung';
  * Reference
  */
 $lang['reference'] = [
-    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_IMAGE => 'Bild',
-    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_FILE  => 'Datei',
-    \HeimrichHannot\MediaLibraryBundle\Backend\Product::TYPE_VIDEO => 'Video',
+    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => 'Bild',
+    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_FILE  => 'Datei',
+    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_VIDEO => 'Video',
 ];
 
 /**

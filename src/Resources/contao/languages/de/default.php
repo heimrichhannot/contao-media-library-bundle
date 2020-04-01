@@ -1,9 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mkunitzsch
- * Date: 18.04.18
- * Time: 09:03
- */
 
-$GLOBALS['TL_LANG']['addToWatchlist'] = 'merken';
+$GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle'] = [
+    'messageOriginalFileKept' => 'Das Produkt wurde erfolgreich gelöscht. Achtung: die Originaldatei ist immer noch in der Dateiverwaltung vorhanden, um Datenverlust zu vermeiden.'
+];

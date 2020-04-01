@@ -6,32 +6,20 @@
  * @license LGPL-3.0-or-later
  */
 
-namespace HeimrichHannot\MediaLibraryBundle\Backend;
+namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\BackendUser;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\System;
-use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
-class ProductArchive
+class ProductArchiveContainer
 {
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    protected $framework;
-
     /**
      * @var FileUtil
      */
     protected $fileUtil;
-
-    /**
-     * @var ProductArchiveRegistry
-     */
-    protected $archiveRegistry;
 
     /**
      * @var ModelUtil
@@ -39,14 +27,10 @@ class ProductArchive
     protected $modelUtil;
 
     public function __construct(
-        ContaoFrameworkInterface $framework,
         FileUtil $fileUtil,
-        ModelUtil $modelUtil,
-        ProductArchiveRegistry $archiveRegistry
+        ModelUtil $modelUtil
     ) {
-        $this->framework = $framework;
         $this->fileUtil = $fileUtil;
-        $this->archiveRegistry = $archiveRegistry;
         $this->modelUtil = $modelUtil;
     }
 
@@ -172,12 +156,14 @@ class ProductArchive
                 ) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.');
                 }
+
                 break;
 
             case 'editAll':
             case 'deleteAll':
             case 'overrideAll':
                 $session = $objSession->all();
+
                 if ('deleteAll' == \Contao\Input::get('act') && !$user->hasAccess('delete',
                         'contao_media_library_bundlep')) {
                     $session['CURRENT']['IDS'] = [];
@@ -185,12 +171,14 @@ class ProductArchive
                     $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
                 }
                 $objSession->replace($session);
+
                 break;
 
             default:
                 if (\strlen(\Contao\Input::get('act'))) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.');
                 }
+
                 break;
         }
     }

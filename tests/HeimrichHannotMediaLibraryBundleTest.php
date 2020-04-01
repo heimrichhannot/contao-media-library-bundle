@@ -8,11 +8,10 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Tests;
 
-use HeimrichHannot\MediaLibraryBundle\DependencyInjection\HeimrichHannotContaoMediaLibraryExtension;
 use HeimrichHannot\MediaLibraryBundle\HeimrichHannotContaoMediaLibraryBundle;
 use PHPUnit\Framework\TestCase;
 
-class HeimrichHannotContaoMediaLibraryBundleTest extends TestCase
+class HeimrichHannotMediaLibraryBundleTest extends TestCase
 {
     /**
      * test instantiation.
@@ -22,14 +21,5 @@ class HeimrichHannotContaoMediaLibraryBundleTest extends TestCase
         $bundle = new HeimrichHannotContaoMediaLibraryBundle();
 
         $this->assertInstanceOf(HeimrichHannotContaoMediaLibraryBundle::class, $bundle);
-    }
-
-    public function getContainerExtension()
-    {
-        $bundle = new HeimrichHannotContaoMediaLibraryBundle();
-
-        $extension = $bundle->getContainerExtension();
-
-        $this->assertInstanceOf(HeimrichHannotContaoMediaLibraryExtension::class, $extension);
     }
 }

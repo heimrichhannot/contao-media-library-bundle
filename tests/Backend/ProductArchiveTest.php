@@ -11,7 +11,6 @@ namespace HeimrichHannot\MediaLibraryBundle\Test\Backend;
 use Contao\CoreBundle\Image\ImageSizes;
 use Contao\System;
 use Contao\TestCase\ContaoTestCase;
-use HeimrichHannot\MediaLibraryBundle\Backend\ProductArchive;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 
 class ProductArchiveTest extends ContaoTestCase

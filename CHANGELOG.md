@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta4] - 2020-04-01
+
+- refactoring (DataContainer classes, removed registry since it's unnecessary, autowiring, ...)
+- fixed deletion of non original files linked to an image product
+- fixed php_cs fixer style
+
 ## [1.0.0-beta3] - 2020-03-27
 
 - fixed dc->id

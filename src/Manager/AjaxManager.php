@@ -95,6 +95,7 @@ class AjaxManager
     protected function getPathsFromOptions(array $options)
     {
         $files = [];
+
         foreach ($options as $option) {
             if (null === ($path = $this->fileUtil->getPathFromUuid($option->uuid))) {
                 continue;

@@ -6,7 +6,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
         'ptable'            => 'tl_ml_product',
         'enableVersioning'  => true,
         'onload_callback'   => [
-            ['huh.media_library.backend.download', 'checkPermission'],
+            [\HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadContainer::class, 'checkPermission'],
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
@@ -46,11 +46,6 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif'
             ],
-            'copy'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['copy'],
-                'href'  => 'act=copy',
-                'icon'  => 'copy.gif'
-            ],
             'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_ml_download']['delete'],
                 'href'       => 'act=delete',
@@ -62,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
                 'label'           => &$GLOBALS['TL_LANG']['tl_ml_download']['toggle'],
                 'icon'            => 'visible.gif',
                 'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['huh.media_library.backend.download', 'toggleIcon']
+                'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadContainer::class, 'toggleIcon']
             ],
             'show'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['show'],
@@ -127,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'exclude'          => true,
             'inputType'        => 'select',
             'eval'             => ['tl_class' => 'w50', 'readonly' => true, 'includeBlankOption' => true],
-            'options_callback' => ['huh.media_library.backend.product_archive', 'getImageSizes'],
+            'options_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'getImageSizes'],
             'sql'              => "int(10) unsigned NOT NULL default '0'"
         ],
         'published'    => [
@@ -155,5 +150,4 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
     ]
 ];
 
-$containerUtil = \Contao\System::getContainer()->get('huh.utils.dca');
-$containerUtil->addAuthorFieldAndCallback('tl_ml_download');
+\Contao\System::getContainer()->get('huh.utils.dca')->addAuthorFieldAndCallback('tl_ml_download');

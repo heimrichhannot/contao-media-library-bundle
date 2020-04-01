@@ -6,33 +6,31 @@
  * @license LGPL-3.0-or-later
  */
 
-namespace HeimrichHannot\MediaLibraryBundle\Backend;
+namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Codefog\TagsBundle\Model\TagModel;
-use Codefog\TagsBundle\Tag;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Contao\Database\Result;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\ImageSizeModel;
+use Contao\Message;
 use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
-use HeimrichHannot\MediaLibraryBundle\Registry\DownloadRegistry;
-use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
-use HeimrichHannot\MediaLibraryBundle\Registry\ProductRegistry;
+use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use Model\Collection;
+use Symfony\Component\Translation\Translator;
 
-class Product
+class ProductContainer
 {
     const TYPE_FILE = 'file';
     const TYPE_IMAGE = 'image';
@@ -48,16 +46,6 @@ class Product
     const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_product';
     const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
     const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
-
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    protected $framework;
-
-    /**
-     * @var ProductArchiveRegistry
-     */
-    protected $productArchiveRegistry;
 
     /**
      * @var ModelUtil
@@ -77,25 +65,35 @@ class Product
      * @var DatabaseUtil
      */
     private $databaseUtil;
+    /**
+     * @var \HeimrichHannot\UtilsBundle\String\StringUtil
+     */
+    private $stringUtil;
+    /**
+     * @var ContainerUtil
+     */
+    private $containerUtil;
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     public function __construct(
-        ContaoFrameworkInterface $framework,
-        ProductArchiveRegistry $productArchiveRegistry,
-        ProductRegistry $productRegistry,
-        DownloadRegistry $downloadRegistry,
+        Translator $translator,
         ModelUtil $modelUtil,
         DcaUtil $dcaUtil,
         FileUtil $fileUtil,
-        DatabaseUtil $databaseUtil
+        DatabaseUtil $databaseUtil,
+        \HeimrichHannot\UtilsBundle\String\StringUtil $stringUtil,
+        ContainerUtil $containerUtil
     ) {
-        $this->framework = $framework;
-        $this->productArchiveRegistry = $productArchiveRegistry;
-        $this->productRegistry = $productRegistry;
-        $this->downloadRegistry = $downloadRegistry;
         $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
         $this->fileUtil = $fileUtil;
         $this->databaseUtil = $databaseUtil;
+        $this->stringUtil = $stringUtil;
+        $this->containerUtil = $containerUtil;
+        $this->translator = $translator;
     }
 
     public function updateTagAssociations(DataContainer $dc): void
@@ -110,7 +108,7 @@ class Product
         while ($tags->next()) {
             $tagId = (int) $tags->id;
 
-            if (!$this->tagisInUse($tagId)) {
+            if (!$this->tagIsInUse($tagId)) {
                 $this->databaseUtil->delete(TagModel::getTable(), 'id=?', [$tagId]);
             }
         }
@@ -156,7 +154,7 @@ class Product
             return;
         }
 
-        if (null === ($productArchive = $this->productArchiveRegistry->findByPk($product->pid))) {
+        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
             return;
         }
 
@@ -234,7 +232,6 @@ class Product
 
         $this->doDeleteDownloads($dc, [
             'keepManuallyAdded' => true,
-            'keepOriginal' => true,
         ]);
 
         $this->createDownloadItems($dc);
@@ -265,8 +262,9 @@ class Product
             $download->delete();
 
             // keep the original file
-            if (System::getContainer()->get('huh.utils.string')->startsWith($originalFile->path,
-                ltrim($downloadFile->path, '/'))) {
+            if ($originalFile->path === $downloadFile->path) {
+                Message::addConfirmation($GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['messageOriginalFileKept']);
+
                 continue;
             }
 
@@ -303,6 +301,7 @@ class Product
                 if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_product items in ml_product archive ID '.\Contao\Input::get('pid').'.');
                 }
+
                 break;
 
             case 'cut':
@@ -326,6 +325,7 @@ class Product
                 if (!\in_array($objArchive->pid, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '.$objArchive->pid.'.');
                 }
+
                 break;
 
             case 'select':
@@ -350,6 +350,7 @@ class Product
                 $session = $session->all();
                 $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $objArchive->fetchEach('id'));
                 $session->replace($session);
+
                 break;
 
             default:
@@ -358,6 +359,7 @@ class Product
                 } elseif (!\in_array($id, $root, true)) {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
                 }
+
                 break;
         }
     }
@@ -477,7 +479,7 @@ class Product
             return;
         }
 
-        $alias = System::getContainer()->get('huh.utils.dca')->generateAlias(
+        $alias = $this->dcaUtil->generateAlias(
             $dc->activeRecord->alias,
             $dc->activeRecord->id,
             'tl_ml_product',
@@ -503,11 +505,12 @@ class Product
             // delete tag if not in use by another entity
             $associationsFromOtherEntities = $this->databaseUtil->findResultsBy($table, ['cfg_tag_id=?'],
                 [$tagAssociations->cfg_tag_id]);
+
             if ($associationsFromOtherEntities->numRows) {
                 continue;
             }
 
-            $this->databaseUtil->delete('tl_cfg_tag', ['id=? AND source=?'], [$tagAssociations->cfg_tag_id, $source]);
+            $this->databaseUtil->delete('tl_cfg_tag', 'tl_cfg_tag.id=? AND tl_cfg_tag.source=?', [$tagAssociations->cfg_tag_id, $source]);
         }
     }
 
@@ -516,7 +519,7 @@ class Product
      */
     protected function getDownloadItems(DataContainer $dc, array $options = [])
     {
-        $columns = ['pid=?'];
+        $columns = ['tl_ml_download.pid=?'];
         $values = [$dc->id];
 
         if (isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']) {
@@ -524,12 +527,12 @@ class Product
             $values[] = 0;
         }
 
-        return $this->downloadRegistry->findBy($columns, $values);
+        return $this->modelUtil->findModelInstancesBy('tl_ml_download', $columns, $values);
     }
 
     protected function getProduct(int $id): ?Model
     {
-        return $this->productRegistry->findByPk($id);
+        return $this->modelUtil->findModelInstanceByPk('tl_ml_product', $id);
     }
 
     protected function getExifConfiguration(Model $archive, DataContainer $dc): array
@@ -553,6 +556,7 @@ class Product
         }
 
         $fileModel = $file->getModel();
+
         if (null === ($archiveModel = $this->getProductArchive($dc->activeRecord->id))) {
             return;
         }
@@ -576,12 +580,10 @@ class Product
             return;
         }
 
-        $stringUtil = System::getContainer()->get('huh.utils.string');
-        $containerUtil = System::getContainer()->get('huh.utils.container');
         $imageFactory = System::getContainer()->get('contao.image.image_factory');
 
         foreach ($sizes as $size) {
-            if (null === ($sizeModel = $this->framework->getAdapter(ImageSizeModel::class)->findByPk($size))) {
+            if (null === ($sizeModel = $this->modelUtil->findModelInstanceByPk('tl_image_size', $size))) {
                 continue;
             }
 
@@ -592,13 +594,13 @@ class Product
             // compose filename
             $sizeName = $this->fileUtil->sanitizeFileName($sizeModel->name);
 
-            $targetFilename = $stringUtil->removeTrailingString('\.'.$file->extension,
+            $targetFilename = $this->stringUtil->removeTrailingString('\.'.$file->extension,
                     $file->name).'_'.$sizeName.'.'.$file->extension;
 
             // compose path
-            $targetFile = $containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
+            $targetFile = $this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
 
-            $resizeImage = $imageFactory->create($containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
+            $resizeImage = $imageFactory->create($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
                 $size, $targetFile);
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $archiveModel->keepProductTitleForDownloadItems,
@@ -630,7 +632,7 @@ class Product
      */
     protected function isResizable(FilesModel $file, ImageSizeModel $size)
     {
-        $imageSize = getimagesize(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR.$file->path);
+        $imageSize = getimagesize($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path);
 
         if ($size->width > $imageSize[0] && $size->height > $imageSize[1]) {
             return false;
@@ -650,7 +652,7 @@ class Product
             return null;
         }
 
-        if (null === ($productArchive = $this->productArchiveRegistry->findByPk($product->pid))) {
+        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
             return null;
         }
 
@@ -672,7 +674,7 @@ class Product
     ) {
         $data = [];
 
-        $path = str_replace(System::getContainer()->get('huh.utils.container')->getProjectDir().\DIRECTORY_SEPARATOR,
+        $path = str_replace($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR,
             '', $path);
 
         if (null === ($file = FilesModel::findByPath($path))) {
@@ -709,13 +711,12 @@ class Product
         ImageSizeModel $size = null
     ): string {
         $title = $dc->activeRecord->title;
-        $translator = System::getContainer()->get('translator');
 
         if (null === $size) {
-            return $keepProductName ? $title : $translator->trans('huh.mediaLibrary.downloadTitle.original');
+            return $keepProductName ? $title : $this->translator->trans('huh.mediaLibrary.downloadTitle.original');
         }
 
-        return $keepProductName ? $translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', $title,
+        return $keepProductName ? $this->translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', $title,
             $size->name) : $size->name;
     }
 }

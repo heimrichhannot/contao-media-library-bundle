@@ -5,21 +5,22 @@ $lang = &$GLOBALS['TL_LANG']['tl_ml_product_archive'];
 /**
  * Fields
  */
-$lang['tstamp'][0]                            = 'Änderungsdatum';
-$lang['tstamp'][1]                            = '';
-$lang['title'][0]                             = 'Titel';
-$lang['title'][0]                             = 'Geben Sie hier bitte den Titel ein.';
-$lang['type'][0]                              = 'Typ';
-$lang['type'][1]                              = 'Wählen Sie hier den Typ aus, den Produkte dieses Archivs erhalten sollen.';
-$lang['additionalFields'][0]                  = 'Zusätzliche Produktfelder';
-$lang['additionalFields'][1]                  = 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.';
-$lang['imageSizes'][0]                        = 'Bildgrößen';
-$lang['imageSizes'][1]                        = 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.';
-$lang['protected'][0]                         = 'Downloadelemente schützen';
-$lang['protected'][1]                         = 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.';
-$lang['keepProductTitleForDownloadItems'][0]  = 'Produktnamen im Downloadtitel behalten';
-$lang['keepProductTitleForDownloadItems'][1]  = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
-
+$lang['tstamp'][0]                           = 'Änderungsdatum';
+$lang['tstamp'][1]                           = '';
+$lang['title'][0]                            = 'Titel';
+$lang['title'][0]                            = 'Geben Sie hier bitte den Titel ein.';
+$lang['type'][0]                             = 'Typ';
+$lang['type'][1]                             = 'Wählen Sie hier den Typ aus, den Produkte dieses Archivs erhalten sollen.';
+$lang['additionalFields'][0]                 = 'Zusätzliche Produktfelder';
+$lang['additionalFields'][1]                 = 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.';
+$lang['imageSizes'][0]                       = 'Bildgrößen';
+$lang['imageSizes'][1]                       = 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.';
+$lang['protected'][0]                        = 'Downloadelemente schützen';
+$lang['protected'][1]                        = 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.';
+$lang['groups'][0]                           = 'Mitgliedergruppen';
+$lang['groups'][1]                           = 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.';
+$lang['keepProductTitleForDownloadItems'][0] = 'Produktnamen im Downloadtitel behalten';
+$lang['keepProductTitleForDownloadItems'][1] = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
 
 
 /**
@@ -28,6 +29,7 @@ $lang['keepProductTitleForDownloadItems'][1]  = 'Wählen Sie diese Option, wenn 
 $lang['general_legend']   = 'Allgemeine Einstellungen';
 $lang['config_legend']    = 'Konfiguration';
 $lang['protected_legend'] = 'Zugriffsschutz';
+$lang['publish_legend']   = 'Veröffentlichung';
 
 /**
  * Buttons

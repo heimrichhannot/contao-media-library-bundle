@@ -15,7 +15,6 @@ use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 
 class MediaLibraryListItem extends DefaultItem
 {
@@ -52,12 +51,12 @@ class MediaLibraryListItem extends DefaultItem
 
     public function getProductArchive(): ?Model
     {
-        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
+        return $archive = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_ml_product_archive', $this->getRawValue('pid'));
     }
 
     protected function getDownloadItems(string $fileField = 'uploadedFiles')
     {
-        if (null !== ($downloads = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->getRawValue('id')))) {
+        if (null !== ($downloads = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_ml_download', ['tl_ml_download.pid=?'], [$this->getRawValue('id')]))) {
             $items = [];
 
             foreach ($downloads as $download) {
@@ -93,6 +92,7 @@ class MediaLibraryListItem extends DefaultItem
     protected function getOptionsFromArray($downloadItems)
     {
         $options = [];
+
         foreach ($downloadItems as $item) {
             $options[] = [
                 'title' => $this->getRawValue('title'),
@@ -118,7 +118,7 @@ class MediaLibraryListItem extends DefaultItem
         return $permitted;
     }
 
-    protected function checkUserPermission(ProductArchiveModel $archive): bool
+    protected function checkUserPermission(Model $archive): bool
     {
         if (null === ($user = FrontendUser::getInstance())) {
             return false;

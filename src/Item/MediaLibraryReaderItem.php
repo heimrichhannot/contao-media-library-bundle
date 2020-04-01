@@ -20,11 +20,11 @@ class MediaLibraryReaderItem extends DefaultItem
     {
         $options = [];
 
-        if (null === ($downloadItems = System::getContainer()->get('huh.media_library.download_registry')->findByPid($this->_raw['id']))) {
+        if (null === ($downloads = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_ml_download', ['tl_ml_download.pid=?'], [$this->_raw['id']]))) {
             return $options;
         }
 
-        foreach ($downloadItems as $downloadItem) {
+        foreach ($downloads as $downloadItem) {
             if (null === ($file = System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloadItem->file))) {
                 continue;
             }
@@ -46,7 +46,7 @@ class MediaLibraryReaderItem extends DefaultItem
      */
     public function getAdditionalData()
     {
-        if (null === ($archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->_raw['pid']))) {
+        if (null === ($archive = $this->getProductArchive())) {
             return;
         }
 
@@ -55,6 +55,7 @@ class MediaLibraryReaderItem extends DefaultItem
         }
 
         $additionalData = [];
+
         foreach ($additionalFields as $field) {
             if ('' == ($value = System::getContainer()->get('huh.utils.form')->prepareSpecialValueForOutput($field, $this->_raw[$field], $this->dc))) {
                 continue;
@@ -83,6 +84,7 @@ class MediaLibraryReaderItem extends DefaultItem
 
     public function getProductArchive(): ?Model
     {
-        return $archive = System::getContainer()->get('huh.media_library.product_archive_registry')->findByPk($this->getRawValue('pid'));
+        return System::getContainer()->get('huh.utils.model')->findModelInstanceByPk(
+            'tl_ml_product_archive', ['tl_ml_product_archive.pid=?'], [$this->_raw['pid']]);
     }
 }
