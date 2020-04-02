@@ -10,6 +10,7 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\System;
+use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class DownloadContainer
@@ -18,16 +19,27 @@ class DownloadContainer
      * @var ModelUtil
      */
     private $modelUtil;
+    /**
+     * @var FileUtil
+     */
+    private $fileUtil;
 
-    public function __construct(ModelUtil $modelUtil)
+    public function __construct(ModelUtil $modelUtil, FileUtil $fileUtil)
     {
         $this->modelUtil = $modelUtil;
+        $this->fileUtil = $fileUtil;
     }
 
-    public function listChildren($arrRow)
+    public function listChildren($row)
     {
-        return '<div class="tl_content_left">'.($arrRow['title'] ?: $arrRow['id']).' <span style="color:#b3b3b3; padding-left:3px">['.
-               \Date::parse(\Contao\Config::get('datimFormat'), trim($arrRow['dateAdded'])).']</span></div>';
+        $data = [$this->fileUtil->getPathFromUuid($row['file'])];
+
+        if ($row['isAdditional']) {
+            $data[] = $GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['additional'];
+        }
+
+        return '<div class="tl_content_left">'.($row['title'] ?: $row['id']).' <span style="color:#b3b3b3; padding-left:3px">['.
+            implode(', ', $data).']</span></div>';
     }
 
     public function checkPermission()

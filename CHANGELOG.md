@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta6] - 2020-04-02
+
+- fixed download deletion
+- refactored item classes to have correct names
+- added download list item
+- added originalDownload field to tl_ml_download
+
 ## [1.0.0-beta5] - 2020-04-02
 
 - added `additionalFiles` field

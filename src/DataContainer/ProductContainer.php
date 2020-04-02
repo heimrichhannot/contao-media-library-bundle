@@ -25,6 +25,7 @@ use Contao\Versions;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
+use HeimrichHannot\UtilsBundle\Driver\DC_Table_Utils;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use Model\Collection;
@@ -256,8 +257,6 @@ class ProductContainer
             return;
         }
 
-        $originalFile = $this->fileUtil->getFileFromUuid($product->file);
-
         foreach ($downloads as $i => $download) {
             // get file model of download for later deletion
             $downloadFile = $this->fileUtil->getFileFromUuid($download->file);
@@ -265,8 +264,8 @@ class ProductContainer
             // delete model
             $download->delete();
 
-            // keep the original file
-            if ($originalFile->path === $downloadFile->path) {
+            // keep the original files
+            if (!$download->imageSize) {
                 if ($addConfirmationMessage) {
                     Message::addConfirmation($GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['messageOriginalFileKept']);
                 }
@@ -529,7 +528,7 @@ class ProductContainer
         $values = [$dc->id];
 
         if (isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']) {
-            $columns[] = 'author=?';
+            $columns[] = 'tl_ml_download.author=?';
             $values[] = 0;
         }
 
@@ -553,7 +552,7 @@ class ProductContainer
      *
      * @throws \Exception
      */
-    protected function createDownloadItems(DataContainer $dc)
+    protected function createDownloadItems(DataContainer $dc, bool $isAdditional = false)
     {
         $uuid = $dc->activeRecord->file;
 
@@ -568,10 +567,25 @@ class ProductContainer
         }
 
         // create a download for the original file
-        $this->createDownloadItem($fileModel->path, $dc, $archiveModel->keepProductTitleForDownloadItems);
+        $downloadId = $this->createDownloadItem($fileModel->path, $dc, 0, $archiveModel->keepProductTitleForDownloadItems, null, $isAdditional);
 
+        // create image size-based downloads
         if (\in_array($fileModel->extension, explode(',', Config::get('validImageTypes')), true)) {
-            $this->createImageDownloadItems($fileModel, $dc, $archiveModel);
+            $this->createImageDownloadItems($fileModel, $dc, $archiveModel, $downloadId, $isAdditional);
+        }
+
+        // create image size-based downloads for the additional files, as well
+        if ($dc->activeRecord->addAdditionalFiles && !$isAdditional) {
+            // create a new dc using DC_Table_Utils so that no callbacks are called
+            $newDc = new DC_Table_Utils('tl_ml_product');
+            $newDc->id = $dc->id;
+            $newDc->activeRecord = $dc->activeRecord;
+
+            foreach (StringUtil::deserialize($dc->activeRecord->additionalFiles, true) as $file) {
+                $newDc->activeRecord->file = $file;
+
+                $this->createDownloadItems($dc, true);
+            }
         }
     }
 
@@ -580,7 +594,7 @@ class ProductContainer
      *
      * @throws \Exception
      */
-    protected function createImageDownloadItems(FilesModel $file, DataContainer $dc, Model $archiveModel)
+    protected function createImageDownloadItems(FilesModel $file, DataContainer $dc, Model $archiveModel, int $originalDownload = 0, bool $isAdditional = false)
     {
         if (empty($sizes = $this->getSizes($archiveModel, $dc))) {
             return;
@@ -609,8 +623,8 @@ class ProductContainer
             $resizeImage = $imageFactory->create($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
                 $size, $targetFile);
 
-            $this->createDownloadItem($resizeImage->getPath(), $dc, $archiveModel->keepProductTitleForDownloadItems,
-                $sizeModel);
+            $this->createDownloadItem($resizeImage->getPath(), $dc, $originalDownload, $archiveModel->keepProductTitleForDownloadItems,
+                $sizeModel, $isAdditional);
         }
     }
 
@@ -675,8 +689,10 @@ class ProductContainer
     protected function createDownloadItem(
         string $path,
         DataContainer $dc,
+        int $originalDownload = 0,
         bool $keepProductName = false,
-        ImageSizeModel $size = null
+        ImageSizeModel $size = null,
+        bool $isAdditional = false
     ) {
         $data = [];
 
@@ -699,16 +715,25 @@ class ProductContainer
 
         $data['published'] = true;
 
-        Database::getInstance()->prepare('INSERT INTO tl_ml_download (imageSize, tstamp, dateAdded, title, pid, file, published)'.
-            'VALUES (?, ?, ?, ?, ?, ?, ?);')->execute(
-            $data['imageSize'] ?? 0,
-            $data['tstamp'],
-            $data['dateAdded'],
-            $data['title'],
-            $data['pid'],
-            $data['file'],
-            $data['published']
-        );
+        $this->databaseUtil->insert('tl_ml_download', [
+            'imageSize' => $data['imageSize'] ?? 0,
+            'originalDownload' => $originalDownload,
+            'tstamp' => $data['tstamp'],
+            'dateAdded' => $data['dateAdded'],
+            'title' => $data['title'],
+            'pid' => $data['pid'],
+            'file' => $data['file'],
+            'isAdditional' => $isAdditional ? 1 : '',
+            'published' => $data['published'],
+        ]);
+
+        // return download id
+        $download = Database::getInstance()->prepare('SELECT id FROM tl_ml_download WHERE pid=? AND imageSize=? AND file=UNHEX(?)')
+            ->limit(1)->execute(
+                $data['pid'], $data['imageSize'] ?? 0, bin2hex($data['file'])
+            );
+
+        return $download->id;
     }
 
     protected function getDownloadTitle(

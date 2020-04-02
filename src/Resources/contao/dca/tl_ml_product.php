@@ -283,6 +283,17 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ]
 ];
 
+\HeimrichHannot\CategoriesBundle\Backend\Category::addMultipleCategoriesFieldToDca(
+    'tl_ml_product',
+    'categories',
+    [
+        'addPrimaryCategory'  => false,
+        'mandatory'           => false,
+        'parentsUnselectable' => true,
+        'isAdditionalField' => true
+    ]
+);
+
 System::getContainer()->get('huh.utils.dca')->addOverridableFields(
     ['imageSizes'],
     'tl_ml_product_archive',

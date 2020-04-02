@@ -14,7 +14,7 @@ use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\ReaderBundle\Item\DefaultItem;
 
-class MediaLibraryReaderItem extends DefaultItem
+class DefaultProductReaderItem extends DefaultItem
 {
     public function getDownloadItems()
     {
@@ -33,6 +33,7 @@ class MediaLibraryReaderItem extends DefaultItem
                 'label' => html_entity_decode($downloadItem->title),
                 'file' => Environment::get('uri').'?file='.$file,
                 'uuid' => $downloadItem->file,
+                'data' => $downloadItem->row(),
             ];
         }
 

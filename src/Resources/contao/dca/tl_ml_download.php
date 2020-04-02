@@ -27,9 +27,11 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'format' => '%s'
         ],
         'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['title'],
-            'panelLayout' => 'filter;sort,search,limit',
+            'mode'                  => 4,
+            'fields'                => ['title'],
+            'headerFields'          => ['title'],
+            'panelLayout'           => 'filter;sort,search,limit',
+            'child_record_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadContainer::class, 'listChildren'],
 
         ],
         'global_operations' => [
@@ -68,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
     ],
     'palettes'    => [
         '__selector__' => ['published'],
-        'default'      => '{general_legend},title,imageSize,file;{publish_legend},published;'
+        'default'      => '{general_legend},title,imageSize,isAdditional,file;{publish_legend},published;'
     ],
     'subpalettes' => [
         'published' => 'start,stop'
@@ -82,6 +84,9 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'exclude'   => true,
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager']
+        ],
+        'originalDownload' => [
+            'sql'                     => "int(10) unsigned NOT NULL default '0'"
         ],
         'tstamp'       => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['tstamp'],
@@ -110,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'exclude'   => true,
             'inputType' => 'fileTree',
             'eval'      => [
-                'tl_class'           => 'clr',
+                'tl_class'           => 'long autoheight clr',
                 'filesOnly'          => true,
                 'fieldType'          => 'radio',
                 'mandatory'          => true
@@ -121,9 +126,16 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'label'            => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],
             'exclude'          => true,
             'inputType'        => 'select',
-            'eval'             => ['tl_class' => 'w50', 'readonly' => true, 'includeBlankOption' => true],
+            'eval'             => ['tl_class' => 'w50 clr', 'readonly' => true, 'includeBlankOption' => true],
             'options_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'getImageSizes'],
             'sql'              => "int(10) unsigned NOT NULL default '0'"
+        ],
+        'isAdditional' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_ml_download']['isAdditional'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => ['tl_class' => 'w50', 'disabled' => true],
+            'sql'                     => "char(1) NOT NULL default ''"
         ],
         'published'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_ml_download']['published'],

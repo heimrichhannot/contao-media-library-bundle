@@ -16,7 +16,7 @@ use Contao\System;
 use HeimrichHannot\FileCredit\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
 
-class MediaLibraryListItem extends DefaultItem
+class DefaultProductListItem extends DefaultItem
 {
     public function getDownloadLink()
     {

@@ -1,7 +1,5 @@
 huh:
-    list:
-        items:
-          - { name: media-library-list-default, class: HeimrichHannot\MediaLibraryBundle\Item\MediaLibraryListItem }
-        templates:
-            item:
-                - { name: media-library-list-item, template: "@HeimrichHannotContaoMediaLibrary/list_item_media_library.html.twig" }
+  list:
+    items:
+      - { name: ml_product_default, class: HeimrichHannot\MediaLibraryBundle\Item\DefaultProductListItem }
+      - { name: ml_download_default, class: HeimrichHannot\MediaLibraryBundle\Item\DefaultDownloadListItem }
