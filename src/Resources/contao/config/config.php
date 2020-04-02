@@ -18,13 +18,17 @@ array_insert($GLOBALS['BE_MOD']['content'], count($GLOBALS['BE_MOD']['content'])
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['huh.media_library.ajax_manager', 'ajaxActions'];
 
 /**
- * JavaScipt
+ * Assets
  */
 if(\Contao\System::getContainer()->get('huh.utils.container')->isFrontend() && !class_exists('HeimrichHannot\EncoreBundle\DependencyInjection\EncoreExtension'))
 {
-    $GLOBALS['TL_JAVASCRIPT']['contao-media-library-bundle'] = 'bundles/heimrichhannotcontaomedialibrary/js/contao-media-library.min.js|static';
+    $GLOBALS['TL_JAVASCRIPT']['contao-media-library-bundle'] = 'bundles/heimrichhannotcontaomedialibrary/js/contao-media-library-bundle.js|static';
 }
 
+if(\Contao\System::getContainer()->get('huh.utils.container')->isBackend())
+{
+    $GLOBALS['TL_CSS']['contao-media-library-bundle-be'] = 'bundles/heimrichhannotcontaomedialibrary/css/contao-media-library-bundle-be.css';
+}
 
 /**
  * Models

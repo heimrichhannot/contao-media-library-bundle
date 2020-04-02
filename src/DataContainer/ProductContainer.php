@@ -239,11 +239,15 @@ class ProductContainer
 
     public function deleteDownloads(DataContainer $dc, int $undoId)
     {
-        $this->doDeleteDownloads($dc);
+        $this->doDeleteDownloads($dc, [
+            'addConfirmationMessage' => true,
+        ]);
     }
 
     public function doDeleteDownloads(DataContainer $dc, array $options = [])
     {
+        $addConfirmationMessage = $options['addConfirmationMessage'] ?? false;
+
         if (null === ($downloads = $this->getDownloadItems($dc, $options))) {
             return;
         }
@@ -263,7 +267,9 @@ class ProductContainer
 
             // keep the original file
             if ($originalFile->path === $downloadFile->path) {
-                Message::addConfirmation($GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['messageOriginalFileKept']);
+                if ($addConfirmationMessage) {
+                    Message::addConfirmation($GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['messageOriginalFileKept']);
+                }
 
                 continue;
             }

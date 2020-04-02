@@ -18,6 +18,8 @@ $lang['doNotCreateDownloadItems'] = [
     'Keine Download-Items erzeugen',
     'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.'
 ];
+$lang['addAdditionalFiles']       = ['Zusätzliche Dateien hinzufügen', 'Wählen Sie diese Option, um dem Produkt weitere Dateien hinzuzufügen (bspw. für Bildergallerien).'];
+$lang['additionalFiles']          = ['Zusätzliche Dateien', 'Wählen Sie hier die gewünschten Bilder aus.'];
 $lang['published']                = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start']                    = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop']                     = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];

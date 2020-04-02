@@ -5,3 +5,4 @@ Thumbs.db
 vendor
 component
 composer.lock
+yarn.lock

@@ -12,8 +12,9 @@ This bundle offers the archive based handling of media library products of diffe
 - in case of image products, images sizes for the creation of downloads according to the downloads can be specified
 - manually add download items for products
 - configurable dca field palettes for products
-- `codefog/tags-bundle` integration for tagging products
-- `heimrichhannot/contao-categories-bundle` integration for categorizing products
+- add additional fields differently for each product archive
+- optional: `codefog/tags-bundle` integration for tagging products (activate in product archive)
+- optional: `heimrichhannot/contao-categories-bundle` integration for categorizing products (activate in product archive)
 
 ## Usage
 

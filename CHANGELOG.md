@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta5] - 2020-04-02
+
+- added `additionalFiles` field
+
 ## [1.0.0-beta4] - 2020-04-01
 
 - refactoring (DataContainer classes, removed registry since it's unnecessary, autowiring, ...)
