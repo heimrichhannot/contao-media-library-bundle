@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta7] - 2020-04-14
+
+- added retrieve of original and all download items in `DefaultDownloadListItem`
+
 ## [1.0.0-beta6] - 2020-04-02
 
 - fixed download deletion

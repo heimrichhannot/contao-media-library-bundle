@@ -40,4 +40,33 @@ class DefaultDownloadListItem extends DefaultItem
 
         return $options;
     }
+
+    public function getOriginalDownload()
+    {
+        if (null === ($uuid = $this->getRawValue('file'))) {
+            return [];
+        }
+
+        if (null === ($file = System::getContainer()->get('huh.utils.file')->getPathFromUuid($uuid))) {
+            return [];
+        }
+
+        return [
+            'label' => html_entity_decode($this->getRawValue('title')),
+            'file' => Environment::get('uri').'?file='.$file,
+            'uuid' => $this->getRawValue('file'),
+            'data' => $this->getRaw(),
+        ];
+    }
+
+    public function getDownloadItems()
+    {
+        $original = $this->getOriginalDownload();
+
+        if (!$original) {
+            return $this->getSizedDownloads();
+        }
+
+        return array_merge([$original], $this->getSizedDownloads());
+    }
 }
