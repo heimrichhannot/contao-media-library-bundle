@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta8] - 2020-04-30
+
+- made file field unique in order to avoid deletion of image-size-based download elements
+- added `BeforeCreateImageDownloadEvent`
+
 ## [1.0.0-beta7] - 2020-04-14
 
 - added retrieve of original and all download items in `DefaultDownloadListItem`

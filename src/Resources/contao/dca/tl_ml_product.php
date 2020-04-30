@@ -164,7 +164,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'filesOnly' => true,
                 'fieldType' => 'radio',
                 'mandatory' => true,
-                'doNotCopy' => true
+                'doNotCopy' => true,
+                'unique' => true
             ],
             'sql'       => "blob NULL",
         ],

@@ -22,6 +22,7 @@ use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
+use HeimrichHannot\MediaLibraryBundle\Event\BeforeCreateImageDownloadEvent;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
@@ -29,6 +30,7 @@ use HeimrichHannot\UtilsBundle\Driver\DC_Table_Utils;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use Model\Collection;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Translator;
 
 class ProductContainer
@@ -79,6 +81,11 @@ class ProductContainer
      */
     private $translator;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct(
         Translator $translator,
         ModelUtil $modelUtil,
@@ -86,7 +93,8 @@ class ProductContainer
         FileUtil $fileUtil,
         DatabaseUtil $databaseUtil,
         \HeimrichHannot\UtilsBundle\String\StringUtil $stringUtil,
-        ContainerUtil $containerUtil
+        ContainerUtil $containerUtil,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
@@ -95,6 +103,7 @@ class ProductContainer
         $this->stringUtil = $stringUtil;
         $this->containerUtil = $containerUtil;
         $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function updateTagAssociations(DataContainer $dc): void
@@ -262,7 +271,9 @@ class ProductContainer
             $downloadFile = $this->fileUtil->getFileFromUuid($download->file);
 
             // delete model
-            $download->delete();
+            if (null !== $download) {
+                $download->delete();
+            }
 
             // keep the original files
             if (!$download->imageSize) {
@@ -274,7 +285,9 @@ class ProductContainer
             }
 
             // delete file
-            $downloadFile->delete();
+            if (null !== $downloadFile) {
+                $downloadFile->delete();
+            }
         }
     }
 
@@ -622,6 +635,10 @@ class ProductContainer
 
             $resizeImage = $imageFactory->create($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
                 $size, $targetFile);
+
+            $this->eventDispatcher->dispatch(BeforeCreateImageDownloadEvent::NAME, new BeforeCreateImageDownloadEvent(
+                $resizeImage, $file, $targetFilename, $size
+            ));
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $originalDownload, $archiveModel->keepProductTitleForDownloadItems,
                 $sizeModel, $isAdditional);
