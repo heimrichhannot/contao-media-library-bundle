@@ -32,7 +32,7 @@ class DefaultDownloadListItem extends DefaultItem
 
             $options[] = [
                 'label' => html_entity_decode($downloadItem->title),
-                'file' => Environment::get('uri').'?file='.$file,
+                'file' => System::getContainer()->get('huh.utils.url')->addQueryString('file='.$file, Environment::get('uri')),
                 'uuid' => $downloadItem->file,
                 'data' => $downloadItem->row(),
             ];
@@ -53,7 +53,7 @@ class DefaultDownloadListItem extends DefaultItem
 
         return [
             'label' => html_entity_decode($this->getRawValue('title')),
-            'file' => Environment::get('uri').'?file='.$file,
+            'file' => System::getContainer()->get('huh.utils.url')->addQueryString('file='.$file, Environment::get('uri')),
             'uuid' => $this->getRawValue('file'),
             'data' => $this->getRaw(),
         ];

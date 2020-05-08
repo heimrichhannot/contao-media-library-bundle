@@ -24,14 +24,18 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
 {
     public function getBundles(ParserInterface $parser)
     {
+        $loadAfter = [
+            ContaoCoreBundle::class,
+            HeimrichHannotContaoAjaxBundle::class,
+            'filecredits',
+        ];
+
+        if (class_exists('HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle')) {
+            $loadAfter[] = \HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle::class;
+        }
+
         return [
-            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter(
-                [
-                    ContaoCoreBundle::class,
-                    HeimrichHannotContaoAjaxBundle::class,
-                    'filecredits',
-                ]
-            ),
+            BundleConfig::create(HeimrichHannotContaoMediaLibraryBundle::class)->setLoadAfter($loadAfter),
         ];
     }
 
@@ -42,6 +46,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
     {
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/services.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/datacontainers.yml');
+        $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/listeners.yml');
     }
 
     public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)

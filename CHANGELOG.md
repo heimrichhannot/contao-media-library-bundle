@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta9] - 2020-05-08
+
+- added (optional) sorting mode for additional files in a `heimrichhannot/contao-list-bundle`-based download list
+- fixed url generation
+
 ## [1.0.0-beta8] - 2020-04-30
 
 - made file field unique in order to avoid deletion of image-size-based download elements
