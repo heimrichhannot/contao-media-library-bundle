@@ -25,7 +25,9 @@ class DefaultProductReaderItem extends DefaultItem
             Controller::sendFileToBrowser(System::getContainer()->get('huh.request')->getGet('file'));
         }
 
-        if (null === ($downloads = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_ml_download', ['tl_ml_download.pid=?'], [$this->_raw['id']]))) {
+        if (null === ($downloads = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_ml_download', ['tl_ml_download.pid=?'], [$this->_raw['id']], [
+            'order' => 'imageSize ASC',
+            ]))) {
             return $options;
         }
 

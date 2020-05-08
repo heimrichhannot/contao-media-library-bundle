@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta10] - 2020-05-08
+
+- changed default download order so that the original file is always first
+
 ## [1.0.0-beta9] - 2020-05-08
 
 - added (optional) sorting mode for additional files in a `heimrichhannot/contao-list-bundle`-based download list
