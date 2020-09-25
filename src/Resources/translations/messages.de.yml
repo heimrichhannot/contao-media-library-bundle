@@ -6,4 +6,4 @@ huh.mediaLibrary.btn.abort.label: 'abbrechen'
 huh.mediaLibrary.alert.download.title: 'Option wählen'
 
 huh.mediaLibrary.downloadTitle.original: 'Originalgröße'
-huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '%s (%s)'
+huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '{title} ({size})'

@@ -764,7 +764,6 @@ class ProductContainer
             return $keepProductName ? $title : $this->translator->trans('huh.mediaLibrary.downloadTitle.original');
         }
 
-        return $keepProductName ? $this->translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', $title,
-            $size->name) : $size->name;
+        return $keepProductName ? $this->translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', ['{title}' => $title, '{size}' => $size->name]) : $size->name;
     }
 }

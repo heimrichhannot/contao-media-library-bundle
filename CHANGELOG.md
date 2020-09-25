@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta11] - 2020-09-25
+
+- fixed translation for title of download elements
+
 ## [1.0.0-beta10] - 2020-05-08
 
 - changed default download order so that the original file is always first
