@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2021 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -13,7 +13,7 @@ use Contao\FrontendUser;
 use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
-use HeimrichHannot\FileCredit\Validator;
+use Contao\Validator;
 use HeimrichHannot\ListBundle\Item\DefaultItem;
 
 class DefaultProductListItem extends DefaultItem
@@ -24,7 +24,7 @@ class DefaultProductListItem extends DefaultItem
             return null;
         }
 
-        list($downloads, $hasOptions) = $this->getDownloadItems();
+        [$downloads, $hasOptions] = $this->getDownloadItems();
 
         if (empty($downloads)) {
             return null;
@@ -60,7 +60,9 @@ class DefaultProductListItem extends DefaultItem
             $items = [];
 
             foreach ($downloads as $download) {
-                $uuid = Validator::isUuid($download->file) ? $download->file : reset(StringUtil::deserialize($download->file));
+                $deserializedFile = StringUtil::deserialize($download->file);
+
+                $uuid = Validator::isUuid($download->file) ? $download->file : reset($deserializedFile);
 
                 $items[] = [
                     'label' => urlencode($download->title),
