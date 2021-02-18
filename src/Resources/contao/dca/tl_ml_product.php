@@ -220,6 +220,25 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'tl_class' => 'clr',
             ],
         ],
+        'copyright' => [
+            'label' => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
+            'inputType' => 'tagsinput',
+            'exclude' => true,
+            'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
+            'eval' => [
+                'maxlength' => 255,
+                'decodeEntities' => true,
+                'tl_class' => 'long clr',
+                'freeInput' => true,
+                'multiple' => true,
+                'doNotSaveEmpty' => true,
+            ],
+            'reference' => &$GLOBALS['TL_LANG']['tl_files'],
+            'load_callback' => [
+                ['huh.media_library.backend.product', 'getCopyright'],
+            ],
+            'sql' => 'blob NULL',
+        ],
         'published' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],
             'exclude' => true,
@@ -254,29 +273,29 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
 
 //$GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['mandatory'] = true;
 
-if (class_exists('HeimrichHannot\FileCredit\FileCredit')) {
-    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright'] = [
-        'label' => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
-        'inputType' => 'tagsinput',
-        'exclude' => true,
-        'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
-        'eval' => [
-            'maxlength' => 255,
-            'decodeEntities' => true,
-            'tl_class' => 'long clr',
-            'freeInput' => true,
-            'multiple' => true,
-            'doNotSaveEmpty' => true,
-        ],
-        'reference' => &$GLOBALS['TL_LANG']['tl_files'],
-        'load_callback' => [
-            ['huh.media_library.backend.product', 'getCopyright'],
-        ],
-        'sql' => 'blob NULL',
-    ];
-} elseif (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
-    \Contao\System::getContainer()->get(\HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer::class)
-        ->addCopyrightFieldToDca('tl_ml_product', 'copyright', 'file');
+//'copyright' => [
+//    'label' => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
+//    'inputType' => 'tagsinput',
+//    'exclude' => true,
+//    'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
+//    'eval' => [
+//        'maxlength' => 255,
+//        'decodeEntities' => true,
+//        'tl_class' => 'long clr',
+//        'freeInput' => true,
+//        'multiple' => true,
+//        'doNotSaveEmpty' => true
+//    ],
+//    'reference' => &$GLOBALS['TL_LANG']['tl_files'],
+//    'load_callback' => [
+//        ['huh.media_library.backend.product', 'getCopyright'],
+//    ],
+//    'sql' => "blob NULL"
+//],
 
-    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['label'] = &$GLOBALS['TL_LANG']['tl_ml_product']['copyright'];
+if (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
+    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['options_callback'] =
+        [\HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer::class, 'getFileCreditOptions'];
+
+    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['fileField'] = 'file';
 }
