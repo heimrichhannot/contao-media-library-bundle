@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2019 Heimrich & Hannot GmbH
+ * Copyright (c) 2021 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -14,7 +14,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
 use Contao\System;
-use HeimrichHannot\FileCredit\Validator;
+use Contao\Validator;
 use HeimrichHannot\MediaLibraryBundle\Registry\ProductArchiveRegistry;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
@@ -260,9 +260,7 @@ class ProductArchive
                             'contao_media_library_bundlep'
                         ))
                 ) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archive ID '.\Contao\Input::get('id').'.');
                 }
                 break;
 
@@ -281,9 +279,7 @@ class ProductArchive
 
             default:
                 if (\strlen(\Contao\Input::get('act'))) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException(
-                        'Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.'
-                    );
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product_archives.');
                 }
                 break;
         }

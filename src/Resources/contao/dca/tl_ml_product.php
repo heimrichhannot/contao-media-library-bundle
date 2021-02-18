@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * Copyright (c) 2021 Heimrich & Hannot GmbH
+ *
+ * @license LGPL-3.0-or-later
+ */
+
 $GLOBALS['TL_DCA']['tl_ml_product'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -21,26 +27,26 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             ['huh.media_library.backend.product', 'copyFile'],
         ],
         'ondelete_callback' => [
-            ['huh.media_library.backend.product', 'deleteDownloads']
+            ['huh.media_library.backend.product', 'deleteDownloads'],
         ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'pid' => 'index'
-            ]
-        ]
+                'pid' => 'index',
+            ],
+        ],
     ],
     'list' => [
         'label' => [
             'fields' => ['title'],
-            'format' => '%s'
+            'format' => '%s',
         ],
         'sorting' => [
             'mode' => 4,
             'fields' => ['title'],
             'headerFields' => ['title', 'tstamp'],
             'panelLayout' => 'filter;sort,search,limit',
-            'child_record_callback' => ['huh.media_library.backend.product', 'listChildren']
+            'child_record_callback' => ['huh.media_library.backend.product', 'listChildren'],
         ],
         'global_operations' => [
             'all' => [
@@ -54,37 +60,37 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['edit'],
                 'href' => 'act=edit',
-                'icon' => 'edit.svg'
+                'icon' => 'edit.svg',
             ],
             'downloads' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['downloads'],
                 'href' => 'table=tl_ml_download',
-                'icon' => 'bundles/heimrichhannotcontaomedialibrary/img/icon-download.png'
+                'icon' => 'bundles/heimrichhannotcontaomedialibrary/img/icon-download.png',
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['copy'],
                 'href' => 'act=copy',
-                'icon' => 'copy.svg'
+                'icon' => 'copy.svg',
             ],
             'delete' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm']
-                    . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm']
+                    .'\'))return false;Backend.getScrollOffset()"',
             ],
             'toggle' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['toggle'],
                 'icon' => 'visible.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['huh.media_library.backend.product', 'toggleIcon']
+                'button_callback' => ['huh.media_library.backend.product', 'toggleIcon'],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['show'],
                 'href' => 'act=show',
-                'icon' => 'show.svg'
+                'icon' => 'show.svg',
             ],
-        ]
+        ],
     ],
     'palettes' => [
         '__selector__' => ['type', 'published'],
@@ -97,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'pid' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['pid'],
@@ -106,25 +112,25 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'search' => true,
             'sorting' => true,
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => ['type' => 'belongsTo', 'load' => 'eager']
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['tstamp'],
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'alias' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['alias'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['tl_class' => 'w50', 'doNotCopy' => true],
-            'sql' => "varchar(255) NOT NULL default ''"
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'dateAdded' => [
             'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
             'sorting' => true,
             'flag' => 6,
             'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'type' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['type'],
@@ -137,9 +143,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'tl_class' => 'w50',
                 'mandatory' => true,
                 'includeBlankOption' => true,
-                'submitOnChange' => true
+                'submitOnChange' => true,
             ],
-            'sql' => "varchar(64) NOT NULL default ''"
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
         'title' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['title'],
@@ -149,7 +155,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'flag' => 1,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'file' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['file'],
@@ -166,9 +172,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxFiles' => 1,
                 'maxUploadSize' => \Config::get('maxFileSize'),
                 'mandatory' => true,
-                'skipDeleteAfterSubmit' => true
+                'skipDeleteAfterSubmit' => true,
             ],
-            'sql' => "blob NULL",
+            'sql' => 'blob NULL',
         ],
         'videoPosterImage' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['videoPosterImage'],
@@ -178,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'tl_class' => 'long clr',
                 'filesOnly' => true,
                 'fieldType' => 'radio',
-                'extensions'    => Config::get('validImageTypes'),
+                'extensions' => Config::get('validImageTypes'),
                 'maxImageWidth' => \Config::get('gdMaxImgWidth'),
                 'maxImageHeight' => \Config::get('gdMaxImgHeight'),
                 'uploadFolder' => ['huh.media_library.backend.product_archive', 'getUploadFolderByProduct'],
@@ -186,9 +192,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'maxFiles' => 1,
                 'maxUploadSize' => \Config::get('maxFileSize'),
                 'mandatory' => true,
-                'skipDeleteAfterSubmit' => true
+                'skipDeleteAfterSubmit' => true,
             ],
-            'sql' => "blob NULL",
+            'sql' => 'blob NULL',
         ],
         'doNotCreateDownloadItems' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['doNotCreateDownloadItems'],
@@ -203,7 +209,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'search' => true,
             'inputType' => 'textarea',
             'eval' => ['tl_class' => 'clr', 'rte' => 'tinyMCE'],
-            'sql' => "text NULL",
+            'sql' => 'text NULL',
         ],
         'tags' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['tags'],
@@ -211,27 +217,8 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'cfgTags',
             'eval' => [
                 'tagsManager' => 'huh.media_library.tags.product',
-                'tl_class' => 'clr'
+                'tl_class' => 'clr',
             ],
-        ],
-        'copyright' => [
-            'label' => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
-            'inputType' => 'tagsinput',
-            'exclude' => true,
-            'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
-            'eval' => [
-                'maxlength' => 255,
-                'decodeEntities' => true,
-                'tl_class' => 'long clr',
-                'freeInput' => true,
-                'multiple' => true,
-                'doNotSaveEmpty' => true
-            ],
-            'reference' => &$GLOBALS['TL_LANG']['tl_files'],
-            'load_callback' => [
-                ['huh.media_library.backend.product', 'getCopyright'],
-            ],
-            'sql' => "blob NULL"
         ],
         'published' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['published'],
@@ -240,23 +227,23 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'checkbox',
             'default' => true,
             'eval' => ['doNotCopy' => true, 'submitOnChange' => true, 'tl_class' => 'clr'],
-            'sql' => "char(1) NOT NULL default ''"
+            'sql' => "char(1) NOT NULL default ''",
         ],
         'start' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['start'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
         'stop' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['stop'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
-        ]
-    ]
+            'sql' => "varchar(10) NOT NULL default ''",
+        ],
+    ],
 ];
 
 System::getContainer()->get('huh.utils.dca')->addOverridableFields(
@@ -266,3 +253,30 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
 );
 
 //$GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['mandatory'] = true;
+
+if (class_exists('HeimrichHannot\FileCredit\FileCredit')) {
+    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright'] = [
+        'label' => $GLOBALS['TL_LANG']['tl_ml_product']['copyright'],
+        'inputType' => 'tagsinput',
+        'exclude' => true,
+        'options_callback' => ['HeimrichHannot\FileCredit\Backend\FileCredit', 'getFileCreditOptions'],
+        'eval' => [
+            'maxlength' => 255,
+            'decodeEntities' => true,
+            'tl_class' => 'long clr',
+            'freeInput' => true,
+            'multiple' => true,
+            'doNotSaveEmpty' => true,
+        ],
+        'reference' => &$GLOBALS['TL_LANG']['tl_files'],
+        'load_callback' => [
+            ['huh.media_library.backend.product', 'getCopyright'],
+        ],
+        'sql' => 'blob NULL',
+    ];
+} elseif (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
+    \Contao\System::getContainer()->get(\HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer::class)
+        ->addCopyrightFieldToDca('tl_ml_product', 'copyright', 'file');
+
+    $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['label'] = &$GLOBALS['TL_LANG']['tl_ml_product']['copyright'];
+}
