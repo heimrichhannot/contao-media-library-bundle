@@ -1,5 +1,6 @@
 services:
   huh.media_library.ajax_manager:
+    public: true
     class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
     arguments:
       - "@contao.framework"

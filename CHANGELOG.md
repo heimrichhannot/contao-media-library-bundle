@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta13] - 2021-03-04
+- used TranslatorInterface (for Contao 4.9 compatibility)
+- fixed ctable is not an array
+- made AjaxManager public
+
 ## [1.0.0-beta12] - 2021-01-11
 
 - fixes for filecredits

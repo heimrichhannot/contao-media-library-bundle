@@ -31,7 +31,7 @@ use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use Model\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ProductContainer
 {
@@ -77,7 +77,7 @@ class ProductContainer
      */
     private $containerUtil;
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -87,7 +87,7 @@ class ProductContainer
     private $eventDispatcher;
 
     public function __construct(
-        Translator $translator,
+        TranslatorInterface $translator,
         ModelUtil $modelUtil,
         DcaUtil $dcaUtil,
         FileUtil $fileUtil,
