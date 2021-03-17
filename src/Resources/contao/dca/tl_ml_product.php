@@ -96,14 +96,15 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => ['type', 'addAdditionalFiles', 'published'],
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{publish_legend},published;',
+        '__selector__' => ['type', 'addAdditionalFiles', 'protected', 'published'],
+        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
     ],
     'subpalettes' => [
         'addAdditionalFiles' => 'additionalFiles',
         'published' => 'start,stop',
+        'protected' => 'groups',
     ],
     'fields' => [
         'id' => [
@@ -173,7 +174,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'doNotCopy' => true,
                 'unique' => true,
             ],
-            'sql' => 'blob NULL',
+            'sql' => 'binary(16) NULL',
         ],
         'addAdditionalFiles' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['addAdditionalFiles'],
@@ -267,6 +268,21 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
+        ],
+        'protected' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['protected'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'groups' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['groups'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'foreignKey' => 'tl_member_group.name',
+            'eval' => ['mandatory' => true, 'multiple' => true],
+            'sql' => 'blob NULL',
         ],
     ],
 ];
