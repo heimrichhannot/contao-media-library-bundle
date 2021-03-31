@@ -304,9 +304,7 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
     'tl_ml_product'
 );
 
-if (class_exists('HeimrichHannot\FileCredit\FileCredit')) {
-    \HeimrichHannot\FileCredit\FileCredit::addCopyrightFieldToDca('tl_ml_product', 'copyright', 'file');
-} elseif (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
+if (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
     \Contao\System::getContainer()->get(\HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer::class)->addCopyrightFieldToDca(
         'tl_ml_product', 'copyright', 'file'
     );

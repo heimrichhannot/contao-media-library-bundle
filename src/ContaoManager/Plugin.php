@@ -27,11 +27,14 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
         $loadAfter = [
             ContaoCoreBundle::class,
             HeimrichHannotContaoAjaxBundle::class,
-            'filecredits',
         ];
 
         if (class_exists('HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle')) {
             $loadAfter[] = \HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle::class;
+        }
+
+        if (class_exists('HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle')) {
+            $loadAfter[] = \HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle::class;
         }
 
         return [
