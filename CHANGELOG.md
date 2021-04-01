@@ -1,11 +1,19 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta15] - 2021-03-*
+
+- removed filecredits (now loosely coupled dep)
+- upgraded tags to v3
+
 ## [1.0.0-beta14] - 2021-03-04
+
 - added new dca fields to tl_ml_product
 - changed file field to binary(16)
 
 ## [1.0.0-beta13] - 2021-03-04
+
 - used TranslatorInterface (for Contao 4.9 compatibility)
 - fixed ctable is not an array
 - made AjaxManager public
