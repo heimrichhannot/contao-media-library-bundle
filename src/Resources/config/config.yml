@@ -1,0 +1,4 @@
+codefog_tags:
+  managers:
+    huh_media_library_product:
+      source: 'tl_ml_product.tags'

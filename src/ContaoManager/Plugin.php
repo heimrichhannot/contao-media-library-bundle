@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\ContaoManager;
 
+use Codefog\TagsBundle\CodefogTagsBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
@@ -27,6 +28,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
         $loadAfter = [
             ContaoCoreBundle::class,
             HeimrichHannotContaoAjaxBundle::class,
+            CodefogTagsBundle::class,
         ];
 
         if (class_exists('HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle')) {
@@ -47,6 +49,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
      */
     public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig)
     {
+        $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/config.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/services.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/datacontainers.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/listeners.yml');
