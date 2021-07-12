@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta17] - 2021-07-12
+
+- added author field to tl_ml_product
+
 ## [1.0.0-beta16] - 2021-04-06
 
 - increase tl_cfg_tag name char length

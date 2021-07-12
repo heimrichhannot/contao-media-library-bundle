@@ -309,3 +309,5 @@ if (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditConta
         'tl_ml_product', 'copyright', 'file'
     );
 }
+
+\Contao\System::getContainer()->get(\HeimrichHannot\UtilsBundle\Dca\DcaUtil::class)->addAuthorFieldAndCallback('tl_ml_product');
