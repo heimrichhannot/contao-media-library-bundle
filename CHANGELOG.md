@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta18] - 2021-07-14
+
+- fixed ProductContainer::deleteTagAssociations to use actual id instead of undoId
+
 ## [1.0.0-beta17] - 2021-07-12
 
 - added author field to tl_ml_product
