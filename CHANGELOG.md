@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta20] - 2021-07-23
+
+- fixed publish bug
+
 ## [1.0.0-beta19] - 2021-07-23
 
 - fixed publish bug

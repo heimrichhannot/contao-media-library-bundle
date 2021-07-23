@@ -124,10 +124,10 @@ class ProductContainer
         }
     }
 
-    public function deleteTagAssociations(DataContainer $dc, int $id): void
+    public function deleteTagAssociations(DataContainer $dc, int $undoId): void
     {
         $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_product_id=?'],
-            [$id]);
+            [$dc->id]);
 
         if (!$tagAssociations->numRows) {
             return;
@@ -418,7 +418,7 @@ class ProductContainer
         \Contao\Input::setGet('act', 'toggle');
 
         if ($dc) {
-            $dc->activeRecord->id = $intId; // see #8043
+            $dc->id = $intId; // see #8043
         }
 
         // Trigger the onload_callback
