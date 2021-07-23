@@ -124,10 +124,10 @@ class ProductContainer
         }
     }
 
-    public function deleteTagAssociations(DataContainer $dc, int $undoId): void
+    public function deleteTagAssociations(DataContainer $dc, int $id): void
     {
         $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_product_id=?'],
-            [$dc->id]);
+            [$id]);
 
         if (!$tagAssociations->numRows) {
             return;
