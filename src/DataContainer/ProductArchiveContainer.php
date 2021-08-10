@@ -44,7 +44,19 @@ class ProductArchiveContainer
         $user = BackendUser::getInstance();
         $imageSizes = System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser($user);
 
-        return $imageSizes['image_sizes'];
+        $options = [];
+
+        foreach ($imageSizes as $key => $size) {
+            if (\in_array($key, ['image_sizes', 'relative', 'exact'])) {
+                continue;
+            }
+
+            foreach ($size as $id => $label) {
+                $options[$id] = "$label [ID $id]";
+            }
+        }
+
+        return $options;
     }
 
     public function checkPermission()

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta21] - 2021-08-10
+
+- Fixed: image sizes in product archives
+- Fixed: massively enhanced performance for tag handling in products
+
 ## [1.0.0-beta20] - 2021-07-23
 
 - fixed publish bug

@@ -115,12 +115,19 @@ class ProductContainer
             return;
         }
 
+        $ids = [];
+        $tagsInUse = $this->getTagsInUse();
+
         while ($tags->next()) {
             $tagId = (int) $tags->id;
 
-            if (!$this->tagIsInUse($tagId)) {
-                $this->databaseUtil->delete(TagModel::getTable(), 'id=?', [$tagId]);
+            if (!\in_array($tagId, $tagsInUse)) {
+                $ids[] = $tagId;
             }
+        }
+
+        if (!empty($ids)) {
+            $this->databaseUtil->delete(TagModel::getTable(), 'id IN ('.implode(',', $ids).')', []);
         }
     }
 
@@ -135,13 +142,23 @@ class ProductContainer
 
         while ($tagAssociations->next()) {
             $tagId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_TAG_FIELD};
-            $associationId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD};
+            $productId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD};
 
-            if (!$this->tagIsInUse($tagId)) {
+            $tagUsedByOtherRecord = $this->databaseUtil->findOneResultBy(self::CFG_TAG_ASSOCIATION_TABLE, [
+                self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?',
+                self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD.'!=?',
+            ], [
+                $tagId,
+                $dc->id,
+            ]);
+
+            if ($tagUsedByOtherRecord->numRows < 1) {
                 $this->databaseUtil->delete(TagModel::getTable(), 'id=?', [$tagId]);
             }
 
-            $this->databaseUtil->delete(self::CFG_TAG_ASSOCIATION_TABLE, self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=? AND '.self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD.'=?', [$tagId, $associationId]);
+            $this->databaseUtil->delete(self::CFG_TAG_ASSOCIATION_TABLE,
+                self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=? AND '.self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD.'=?', [$tagId, $productId]
+            );
         }
     }
 
@@ -513,6 +530,17 @@ class ProductContainer
         $associations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, [self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?'], [$id]);
 
         return $associations->numRows;
+    }
+
+    protected function getTagsInUse()
+    {
+        $records = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, null, null);
+
+        if ($records->numRows < 1) {
+            return [];
+        }
+
+        return $records->fetchEach('cfg_tag_id');
     }
 
     protected function modifyTagAssociations(string $table, Result $tagAssociations): void
