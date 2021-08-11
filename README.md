@@ -7,7 +7,7 @@ This bundle offers the archive based handling of media library products of diffe
 
 ## Features
 
-- organize your media (images, videos, ...) as products in archives
+- organize your media (images, videos, ...) as products in archives if a fully fledged shop system would be too much
 - predefined media library content types `image`, `video`, `file`
 - in case of image products, images sizes for the creation of downloads according to the downloads can be specified
 - manually add download items for products
@@ -33,6 +33,15 @@ Update database
 1. Create a media library archive and set configurations for its content.
 2. Create a product in the archive. Download items will be automatically generated on submit if not permitted manually.
 3. Optional: manually add download items
+
+### Configuration
+
+```yaml
+huh_media_library:
+
+  # If true, the filenames of the generated product downloads will be sanitized.
+  sanitize_download_filenames: false
+```
 
 ### Installation with frontend assets using webpack
 

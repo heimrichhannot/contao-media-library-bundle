@@ -8,8 +8,13 @@
 
 namespace HeimrichHannot\MediaLibraryBundle;
 
+use HeimrichHannot\MediaLibraryBundle\DependencyInjection\HeimrichHannotMediaLibraryExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class HeimrichHannotContaoMediaLibraryBundle extends Bundle
 {
+    public function getContainerExtension()
+    {
+        return new HeimrichHannotMediaLibraryExtension();
+    }
 }

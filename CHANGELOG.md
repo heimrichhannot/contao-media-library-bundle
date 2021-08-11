@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta22] - 2021-08-11
+
+- Added: config option for sanitizing download filenames
+
 ## [1.0.0-beta21] - 2021-08-10
 
 - Fixed: image sizes in product archives

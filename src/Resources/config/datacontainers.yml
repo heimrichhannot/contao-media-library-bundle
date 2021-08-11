@@ -2,6 +2,8 @@ services:
   _defaults:
     public: true
     autowire: true
+    bind:
+      $bundleConfig: "%huh_media_library%"
 
   HeimrichHannot\MediaLibraryBundle\DataContainer\:
     resource: '../../DataContainer/*'

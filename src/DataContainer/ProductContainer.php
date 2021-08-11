@@ -64,14 +64,15 @@ class ProductContainer
      * @var FileUtil
      */
     protected $fileUtil;
+
+    /**
+     * @var array
+     */
+    protected $bundleConfig;
     /**
      * @var DatabaseUtil
      */
     private $databaseUtil;
-    /**
-     * @var \HeimrichHannot\UtilsBundle\String\StringUtil
-     */
-    private $stringUtil;
     /**
      * @var ContainerUtil
      */
@@ -87,6 +88,7 @@ class ProductContainer
     private $eventDispatcher;
 
     public function __construct(
+        array $bundleConfig,
         TranslatorInterface $translator,
         ModelUtil $modelUtil,
         DcaUtil $dcaUtil,
@@ -96,11 +98,11 @@ class ProductContainer
         ContainerUtil $containerUtil,
         EventDispatcherInterface $eventDispatcher
     ) {
+        $this->bundleConfig = $bundleConfig;
         $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
         $this->fileUtil = $fileUtil;
         $this->databaseUtil = $databaseUtil;
-        $this->stringUtil = $stringUtil;
         $this->containerUtil = $containerUtil;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
@@ -653,10 +655,11 @@ class ProductContainer
             }
 
             // compose filename
-            $sizeName = $this->fileUtil->sanitizeFileName($sizeModel->name);
+            $targetFilename = $file->name.'_'.$sizeModel->name.'.'.$file->extension;
 
-            $targetFilename = $this->stringUtil->removeTrailingString('\.'.$file->extension,
-                    $file->name).'_'.$sizeName.'.'.$file->extension;
+            if ($this->bundleConfig['sanitize_download_filenames'] ?? false) {
+                $targetFilename = $this->fileUtil->sanitizeFileName($targetFilename);
+            }
 
             // compose path
             $targetFile = $this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
