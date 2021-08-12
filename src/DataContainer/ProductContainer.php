@@ -527,6 +527,48 @@ class ProductContainer
             $dc->activeRecord->id);
     }
 
+    /**
+     * create download items.
+     *
+     * @throws \Exception
+     */
+    public function createDownloadItems(DataContainer $dc, bool $isAdditional = false)
+    {
+        $uuid = $dc->activeRecord->file;
+
+        if (null === ($file = $this->fileUtil->getFileFromUuid($uuid))) {
+            return;
+        }
+
+        $fileModel = $file->getModel();
+
+        if (null === ($archiveModel = $this->getProductArchive($dc->activeRecord->id))) {
+            return;
+        }
+
+        // create a download for the original file
+        $downloadId = $this->createDownloadItem($fileModel->path, $dc, 0, $archiveModel->keepProductTitleForDownloadItems, null, $isAdditional);
+
+        // create image size-based downloads
+        if (\in_array($fileModel->extension, explode(',', Config::get('validImageTypes')), true)) {
+            $this->createImageDownloadItems($fileModel, $dc, $archiveModel, $downloadId, $isAdditional);
+        }
+
+        // create image size-based downloads for the additional files, as well
+        if ($dc->activeRecord->addAdditionalFiles && !$isAdditional) {
+            // create a new dc using DC_Table_Utils so that no callbacks are called
+            $newDc = new DC_Table_Utils('tl_ml_product');
+            $newDc->id = $dc->id;
+            $newDc->activeRecord = $dc->activeRecord;
+
+            foreach (StringUtil::deserialize($dc->activeRecord->additionalFiles, true) as $file) {
+                $newDc->activeRecord->file = $file;
+
+                $this->createDownloadItems($dc, true);
+            }
+        }
+    }
+
     protected function tagIsInUse(int $id): int
     {
         $associations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, [self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?'], [$id]);
@@ -588,48 +630,6 @@ class ProductContainer
         $exifData = $dc->activeRecord->overrideExifData ? $dc->activeRecord->exifData : $archive->exifData;
 
         return StringUtil::deserialize($exifData, true);
-    }
-
-    /**
-     * create download items.
-     *
-     * @throws \Exception
-     */
-    protected function createDownloadItems(DataContainer $dc, bool $isAdditional = false)
-    {
-        $uuid = $dc->activeRecord->file;
-
-        if (null === ($file = $this->fileUtil->getFileFromUuid($uuid))) {
-            return;
-        }
-
-        $fileModel = $file->getModel();
-
-        if (null === ($archiveModel = $this->getProductArchive($dc->activeRecord->id))) {
-            return;
-        }
-
-        // create a download for the original file
-        $downloadId = $this->createDownloadItem($fileModel->path, $dc, 0, $archiveModel->keepProductTitleForDownloadItems, null, $isAdditional);
-
-        // create image size-based downloads
-        if (\in_array($fileModel->extension, explode(',', Config::get('validImageTypes')), true)) {
-            $this->createImageDownloadItems($fileModel, $dc, $archiveModel, $downloadId, $isAdditional);
-        }
-
-        // create image size-based downloads for the additional files, as well
-        if ($dc->activeRecord->addAdditionalFiles && !$isAdditional) {
-            // create a new dc using DC_Table_Utils so that no callbacks are called
-            $newDc = new DC_Table_Utils('tl_ml_product');
-            $newDc->id = $dc->id;
-            $newDc->activeRecord = $dc->activeRecord;
-
-            foreach (StringUtil::deserialize($dc->activeRecord->additionalFiles, true) as $file) {
-                $newDc->activeRecord->file = $file;
-
-                $this->createDownloadItems($dc, true);
-            }
-        }
     }
 
     /**

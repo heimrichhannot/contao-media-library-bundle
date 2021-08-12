@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta23] - 2021-08-12
+
+- Changed: make createDownloadItems() public
+
 ## [1.0.0-beta22] - 2021-08-11
 
 - Added: config option for sanitizing download filenames
