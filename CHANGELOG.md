@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2022-05-05
+- Added: missing license file
+- Changed: minimum contao version is now 4.9
+- Fixed: symfony 5 compatiblity
+
 ## [1.0.0-beta23] - 2021-08-12
 
 - Changed: make createDownloadItems() public
