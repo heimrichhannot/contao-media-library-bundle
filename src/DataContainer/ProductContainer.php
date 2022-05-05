@@ -667,9 +667,10 @@ class ProductContainer
             $resizeImage = $imageFactory->create($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
                 $size, $targetFile);
 
-            $this->eventDispatcher->dispatch(BeforeCreateImageDownloadEvent::NAME, new BeforeCreateImageDownloadEvent(
-                $resizeImage, $file, $targetFilename, $size
-            ));
+            $this->eventDispatcher->dispatch(
+                new BeforeCreateImageDownloadEvent($resizeImage, $file, $targetFilename, $size),
+                BeforeCreateImageDownloadEvent::NAME
+            );
 
             $this->createDownloadItem($resizeImage->getPath(), $dc, $originalDownload, $archiveModel->keepProductTitleForDownloadItems,
                 $sizeModel, $isAdditional);
