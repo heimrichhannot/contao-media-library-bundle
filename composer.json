@@ -10,6 +10,7 @@
     "heimrichhannot/contao-categories-bundle": "^1.1",
     "heimrichhannot-contao-components/alertifyjs": "1.11.2",
     "symfony/config": "^4.4 || ^5.4",
+    "symfony/event-dispatcher-contracts": "^1.0 || ^2.0 || ^3.0",
     "symfony/translation-contracts": "^1.0 || ^2.0 || ^3.0"
   },
   "require-dev": {
