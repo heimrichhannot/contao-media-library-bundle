@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -14,7 +14,11 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ListConfigContainer;
 use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
 
+/**
+ * @ServiceTag("kernel.event_listener", event="huh.list.event.list_modify_query_builder")
+ */
 class ListModifyQueryBuilderEventListener
 {
     /**
@@ -37,7 +41,7 @@ class ListModifyQueryBuilderEventListener
         $this->databaseUtil = $databaseUtil;
     }
 
-    public function modifyQueryBuilder(ListModifyQueryBuilderEvent $event)
+    public function __invoke(ListModifyQueryBuilderEvent $event): void
     {
         $listConfig = $event->getListConfig();
 

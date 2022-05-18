@@ -11,11 +11,13 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 use Codefog\TagsBundle\Model\TagModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\Database\Result;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
+use Contao\Image;
 use Contao\ImageSizeModel;
 use Contao\Message;
 use Contao\Model;
@@ -106,6 +108,48 @@ class ProductContainer
         $this->containerUtil = $containerUtil;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @Callback(table="tl_ml_product", target="fields.file.wizard")
+     */
+    public function onCopyrightWizardCallback(DataContainer $dc = null): string
+    {
+        if (!$dc || !$dc->activeRecord) {
+            return '';
+        }
+
+        $uuid = $dc->activeRecord->file;
+
+        if (\is_array(StringUtil::deserialize($uuid))) {
+            $uuid = array_values(StringUtil::deserialize($uuid, true))[0] ?? null;
+        }
+
+        if (!$uuid) {
+            return '';
+        }
+
+        $fileModel = $this->modelUtil->callModelMethod('tl_files', 'findByUuid', $uuid);
+
+        if (!$fileModel) {
+            return '';
+        }
+
+        $title = sprintf($GLOBALS['TL_LANG']['tl_files']['editFile'], $dc->value);
+
+        $href = System::getContainer()->get('router')->generate(
+            'contao_backend',
+            ['do' => 'files', 'act' => 'edit', 'id' => $fileModel->id, 'popup' => '1', 'nb' => '1', 'rt' => REQUEST_TOKEN]
+        );
+
+        return ' <a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'" onclick="Backend.openModalIframe({\'title\':\''.StringUtil::specialchars(str_replace("'", "\\'", $title)).'\',\'url\':this.href});return false">'.Image::getHtml('alias.svg', $title).'</a>';
+//
+//
+//
+//        $url = sprintf('contao?do=files&picker=H4sIAAAAAAAAAzWLSw6DMBBD7-I1kYgEgXCJdtELpMNEiohCNXxUhLh7h0W98_PzCZrLyt8VA2LKjApaJCwYTgWcx9fxYR0ljGnW9ZaWR8mHMourAm0iXP7_Z6KJRb095O3-eR9iw641ljpnrGUy7zo6412taXzfUYvrB2MPp7CHAAAA&popup=1&act=edit&id=files%2Fmedia%2Fvmd%2Fdas-museum%2Fpresse%2Fbildmaterial%2Fgrosser-orionnebel_steffen-lamprecht.png&rt=b269c3ffb052.awOlcS2P86qM69ALj8lnyxGFs5ghJrCsYmWbKzGnOEA.JFf1O1jkp-zGhOV8_6Uy-iPG_8tuC__PNkj3XHT_aCYOdtY0VeSH29WgmQ&ref=InyFPkN3');
+//
+//
+//        return ' <a href="contao?do=list_configs&amp;act=edit&amp;id='.$dc->value.'&amp;popup=1&amp;nb=1&amp;rt='.REQUEST_TOKEN.'" title="'.sprintf(StringUtil::specialchars($GLOBALS['TL_LANG']['tl_list_config']['edit'][1]), $dc->value).'" onclick="Backend.openModalIframe({\'title\':\''.StringUtil::specialchars(str_replace("'", "\\'", sprintf($GLOBALS['TL_LANG']['tl_list_config']['edit'][1], $dc->value))).'\',\'url\':this.href});return false">'.$image->getHtml('alias.svg', $GLOBALS['TL_LANG']['tl_list_config']['edit'][0]).'</a>';
     }
 
     public function updateTagAssociations(DataContainer $dc): void
