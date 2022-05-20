@@ -33,4 +33,4 @@ $lang['delete'] = ['Delete product', 'Delete product ID %s'];
 $lang['toggle'] = ['Publish/unpublish product', 'Publish/unpublish product ID %s'];
 $lang['show'] = ['product details', 'Show the details of product ID %s'];
 
-$lang['closeModal'] = 'Schließen (Bei Änderungen speichern nicht vergessen!)';
+$lang['closeModal'] = 'Close (Please save your changes before close!)';
