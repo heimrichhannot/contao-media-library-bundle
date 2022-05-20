@@ -35,7 +35,6 @@ class LoadDataContainerListener implements ServiceSubscriberInterface
                 $this->container->get(FileCreditContainer::class)->addCopyrightFieldToDca(
                     'tl_ml_product', 'copyright', 'file'
                 );
-                $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['tl_class'] = 'wizard clr';
             }
         }
     }

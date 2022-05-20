@@ -103,7 +103,5 @@ class ParseWidgetListener
     </script>';
 
         return '<div class="wizard">'.$buffer.' <a href="'.StringUtil::specialcharsUrl($href).'" id="'.$linkId.'" title="'.StringUtil::specialchars($title).'" style="position:relative;top: -2px;vertical-align: middle;">'.Image::getHtml('alias.svg', $title).'</a></div>'.$script;
-
-//        return $buffer;
     }
 }
