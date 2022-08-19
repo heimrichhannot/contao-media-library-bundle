@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -31,7 +31,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
             CodefogTagsBundle::class,
         ];
 
-        if (class_exists('HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle')) {
+        if (class_exists(\HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle::class)) {
             $loadAfter[] = \HeimrichHannot\ListBundle\HeimrichHannotContaoListBundle::class;
         }
 

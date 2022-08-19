@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -75,7 +75,7 @@ class DefaultProductListItem extends DefaultItem
                 return [$items[0]['file'], false];
             }
 
-            return [json_encode($items, JSON_UNESCAPED_SLASHES), true];
+            return [json_encode($items, \JSON_UNESCAPED_SLASHES), true];
         }
 
         $downloads = StringUtil::deserialize($this->getRawValue($fileField), true);
@@ -84,7 +84,7 @@ class DefaultProductListItem extends DefaultItem
             return [];
         }
 
-        if (1 === \count($downloads)) {
+        if (1 === (\is_array($downloads) || $downloads instanceof \Countable ? \count($downloads) : 0)) {
             return [System::getContainer()->get('huh.utils.file')->getPathFromUuid($downloads[0]), false];
         }
 

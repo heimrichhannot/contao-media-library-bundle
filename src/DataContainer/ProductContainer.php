@@ -35,20 +35,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProductContainer
 {
-    const TYPE_FILE = 'file';
-    const TYPE_IMAGE = 'image';
-    const TYPE_VIDEO = 'video';
+    public const TYPE_FILE = 'file';
+    public const TYPE_IMAGE = 'image';
+    public const TYPE_VIDEO = 'video';
 
-    const TYPES
+    public const TYPES
         = [
             self::TYPE_FILE,
             self::TYPE_IMAGE,
             self::TYPE_VIDEO,
         ];
 
-    const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_product';
-    const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
-    const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
+    public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_product';
+    public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
+    public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
 
     /**
      * @var ModelUtil
@@ -245,7 +245,7 @@ class ProductContainer
             return $dc->activeRecord->copyright;
         }
 
-        return $dc->activeRecord->copyright ? $dc->activeRecord->copyright : $model->copyright;
+        return $dc->activeRecord->copyright ?: $model->copyright;
     }
 
     /**

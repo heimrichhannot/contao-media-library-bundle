@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -13,7 +13,7 @@ use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class ListConfigContainer
 {
-    const SORTING_MODE_ML_ADDITIONAL_FILES = 'ml_additional_files';
+    public const SORTING_MODE_ML_ADDITIONAL_FILES = 'ml_additional_files';
     /**
      * @var ModelUtil
      */

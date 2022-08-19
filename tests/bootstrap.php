@@ -1,12 +1,12 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
 
-error_reporting(E_ALL);
+error_reporting(\E_ALL);
 define('TL_MODE', 'FE'); // required by contao 3
 define('UNIT_TESTING', true);
 
@@ -23,8 +23,8 @@ if (false === ($loader = $include(__DIR__.'/../vendor/autoload.php'))
     && false === ($loader = $include(__DIR__.'/../../../../composer/vendor/autoload.php'))
     && false === ($loader = $include(__DIR__.'/../../../../autoload.php'))
     && false === ($loader = $include(__DIR__.'/../../../autoload.php'))
-    && false === ($loader = $include(dirname(dirname(getenv('PWD'))).'/autoload.php'))) {
-    echo 'You must set up the project dependencies, run the following commands:'.PHP_EOL.'curl -sS https://getcomposer.org/installer | php'.PHP_EOL.'php composer.phar install'.PHP_EOL;
+    && false === ($loader = $include(dirname(getenv('PWD'), 2).'/autoload.php'))) {
+    echo 'You must set up the project dependencies, run the following commands:'.\PHP_EOL.'curl -sS https://getcomposer.org/installer | php'.\PHP_EOL.'php composer.phar install'.\PHP_EOL;
 
     exit(1);
 }

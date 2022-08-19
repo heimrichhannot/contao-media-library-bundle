@@ -19,11 +19,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AjaxManager
 {
-    const MEDIA_LIBRARY_XHR_GROUP = 'mediaLibrary';
+    public const MEDIA_LIBRARY_XHR_GROUP = 'mediaLibrary';
 
-    const MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS = 'showOptionsModal';
+    public const MEDIA_LIBRARY_DOWNLOAD_SHOW_OPTIONS = 'showOptionsModal';
 
-    const MEDIA_LIBRARY_ARGUMENTS_OPTIONS = 'options';
+    public const MEDIA_LIBRARY_ARGUMENTS_OPTIONS = 'options';
 
     /**
      * @var ContaoFrameworkInterface
