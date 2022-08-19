@@ -30,7 +30,7 @@ class HuhMlWizard
             if (opt.callback) {
                 opt.callback(val);
             }
-            
+
             this.hide();
         });
         M.show({
