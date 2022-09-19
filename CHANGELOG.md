@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2022-09-19
+- Added: migration for CfgTag v3 (otherwise former tags get lost)
+- Fixed: array index issue in php 8
+
 ## [1.0.3] - 2022-08-23
 - Fixed: warnings with php 8
 

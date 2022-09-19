@@ -1,4 +1,9 @@
 services:
+  HeimrichHannot\MediaLibraryBundle\:
+    resource: '../../{Migration}/*'
+    autowire: true
+    autoconfigure: true
+
   huh.media_library.ajax_manager:
     public: true
     class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
