@@ -14,9 +14,9 @@ use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
+use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use HeimrichHannot\UtilsBundle\Util\Utils;
-use HeimrichHannot\VmdBundle\Model\MlProductModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -50,7 +50,7 @@ class ParseWidgetListener
             return $buffer;
         }
 
-        $product = MlProductModel::findByPk((int) $widget->currentRecord);
+        $product = ProductModel::findByPk((int) $widget->currentRecord);
 
         if (!$product) {
             return $buffer;

@@ -42,8 +42,12 @@ class LoadDataContainerListener implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return [
-            '?'.FileCreditContainer::class,
-        ];
+        $services = [];
+
+        if (class_exists(FileCreditContainer::class)) {
+            $services[] = '?'.FileCreditContainer::class;
+        }
+
+        return $services;
     }
 }
