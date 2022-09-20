@@ -2,7 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2022-09-19
+## [1.1.0] - 2022-09-20
+- Added: copyright wizard ([#1])
 - Added: migration for CfgTag v3 (otherwise former tags get lost)
 - Fixed: array index issue in php 8
 
