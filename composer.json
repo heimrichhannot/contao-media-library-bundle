@@ -8,6 +8,7 @@
     "contao/core-bundle": "^4.9",
     "codefog/tags-bundle": "^3.2",
     "heimrichhannot/contao-categories-bundle": "^1.1",
+    "heimrichhannot/contao-utils-bundle": "^2.220",
     "heimrichhannot-contao-components/alertifyjs": "1.11.2",
     "symfony/config": "^4.4 || ^5.4",
     "symfony/event-dispatcher-contracts": "^1.0 || ^2.0 || ^3.0",

@@ -52,7 +52,6 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface, ConfigP
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/config.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/services.yml');
         $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/datacontainers.yml');
-        $loader->load('@HeimrichHannotContaoMediaLibraryBundle/Resources/config/listeners.yml');
     }
 
     public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)

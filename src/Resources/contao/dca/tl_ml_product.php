@@ -6,6 +6,8 @@
  * @license LGPL-3.0-or-later
  */
 
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
+
 $GLOBALS['TL_DCA']['tl_ml_product'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -13,24 +15,24 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'ctable' => ['tl_ml_download'],
         'enableVersioning' => true,
         'oncreate_callback' => [
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'setType'],
+            [ProductContainer::class, 'setType'],
         ],
         'onload_callback' => [
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'addAdditionalFields'],
+            [ProductContainer::class, 'addAdditionalFields'],
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'generateDownloadItems'],
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'generateAlias'],
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'setCopyright'],
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'updateTagAssociations'],
+            [ProductContainer::class, 'generateDownloadItems'],
+            [ProductContainer::class, 'generateAlias'],
+            [ProductContainer::class, 'setCopyright'],
+            [ProductContainer::class, 'updateTagAssociations'],
         ],
         'oncopy_callback' => [
             ['huh.utils.dca', 'setDateAddedOnCopy'],
         ],
         'ondelete_callback' => [
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'deleteDownloads'],
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'deleteTagAssociations'],
+            [ProductContainer::class, 'deleteDownloads'],
+            [ProductContainer::class, 'deleteTagAssociations'],
         ],
         'sql' => [
             'keys' => [
@@ -49,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'fields' => ['title'],
             'headerFields' => ['title', 'tstamp'],
             'panelLayout' => 'filter;sort,search,limit',
-            'child_record_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'listChildren'],
+            'child_record_callback' => [ProductContainer::class, 'listChildren'],
         ],
         'global_operations' => [
             'all' => [
@@ -86,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['toggle'],
                 'icon' => 'visible.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::class, 'toggleIcon'],
+                'button_callback' => [ProductContainer::class, 'toggleIcon'],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['show'],
@@ -98,9 +100,9 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     'palettes' => [
         '__selector__' => ['type', 'addAdditionalFiles', 'protected', 'published'],
         'default' => 'type',
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
-        \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+    ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+        ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+        ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
     ],
     'subpalettes' => [
         'addAdditionalFiles' => 'additionalFiles',
@@ -143,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'options' => \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPES,
+            'options' => ProductContainer::TYPES,
             'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
             'eval' => [
                 'tl_class' => 'w50',
@@ -304,11 +306,5 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
     'tl_ml_product_archive',
     'tl_ml_product'
 );
-
-if (class_exists('HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer')) {
-    \Contao\System::getContainer()->get(\HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer::class)->addCopyrightFieldToDca(
-        'tl_ml_product', 'copyright', 'file'
-    );
-}
 
 \Contao\System::getContainer()->get(\HeimrichHannot\UtilsBundle\Dca\DcaUtil::class)->addAuthorFieldAndCallback('tl_ml_product');

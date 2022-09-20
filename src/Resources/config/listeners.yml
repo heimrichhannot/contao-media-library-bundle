@@ -1,7 +1,0 @@
-services:
-  _defaults:
-    autowire: true
-
-  HeimrichHannot\MediaLibraryBundle\EventListener\ListModifyQueryBuilderEventListener:
-    tags:
-      - { name: kernel.event_listener, event: huh.list.event.list_modify_query_builder, method: modifyQueryBuilder }
