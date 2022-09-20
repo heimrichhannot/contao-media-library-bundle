@@ -8,14 +8,13 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\EventListener\Contao;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\FilesModel;
 use Contao\Image;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Widget;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
-use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,19 +28,19 @@ class ParseWidgetListener
      */
     private $utils;
     /**
-     * @var ModelUtil
-     */
-    private $modelUtil;
-    /**
      * @var TranslatorInterface
      */
     private $translator;
+    /**
+     * @var ContaoFramework
+     */
+    private $contaoFramework;
 
-    public function __construct(Utils $utils, ModelUtil $modelUtil, TranslatorInterface $translator)
+    public function __construct(Utils $utils, ContaoFramework $contaoFramework, TranslatorInterface $translator)
     {
         $this->utils = $utils;
-        $this->modelUtil = $modelUtil;
         $this->translator = $translator;
+        $this->contaoFramework = $contaoFramework;
     }
 
     public function __invoke(string $buffer, Widget $widget): string
@@ -67,7 +66,7 @@ class ParseWidgetListener
         }
 
         /** @var FilesModel|null $fileModel */
-        $fileModel = $this->modelUtil->callModelMethod('tl_files', 'findByUuid', $uuid);
+        $fileModel = $this->contaoFramework->getAdapter(FilesModel::class)->findByUuid($uuid);
 
         if (!$fileModel) {
             return '';
@@ -75,9 +74,8 @@ class ParseWidgetListener
 
         $title = sprintf($GLOBALS['TL_LANG']['tl_files']['editFile'], $fileModel->name);
 
-        $href = System::getContainer()->get('router')->generate(
-            'contao_backend',
-            ['do' => 'files', 'table' => 'tl_files', 'act' => 'edit', 'id' => $fileModel->path, 'popup' => '1', 'nb' => '1', 'rt' => REQUEST_TOKEN]
+        $href = $this->utils->routing()->generateBackendRoute(
+            ['do' => 'files', 'table' => 'tl_files', 'act' => 'edit', 'id' => $fileModel->path, 'popup' => '1', 'nb' => '1']
         );
 
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/heimrichhannotcontaomedialibrary/backend/js/wizard.js';
