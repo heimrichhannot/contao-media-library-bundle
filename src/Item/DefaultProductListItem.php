@@ -8,8 +8,10 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Item;
 
+use Contao\Controller;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
+use Contao\Input;
 use Contao\Model;
 use Contao\StringUtil;
 use Contao\System;
@@ -38,7 +40,18 @@ class DefaultProductListItem extends DefaultItem
         $template->title = sprintf($GLOBALS['TL_LANG']['tl_ml_product']['downloadLink'], $this->getRawValue('title'));
 
         if (!$hasOptions) {
-            $template->file = System::getContainer()->get('huh.utils.url')->addQueryString('file='.$downloads);
+            $file = Input::get('file', true);
+
+            // Send the file to the browser (see #4632 and #8375)
+            if ($file && (!isset($_GET['lid']) || Input::get('lid') == $this->getIdOrAlias()))
+            {
+                if ($file == $downloads)
+                {
+                    Controller::sendFileToBrowser($file);
+                }
+            }
+
+            $template->file = System::getContainer()->get('huh.utils.url')->addQueryString('file='.$downloads.'&lid='.$this->getIdOrAlias());
 
             return $template->parse();
         }

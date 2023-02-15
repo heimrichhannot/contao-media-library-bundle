@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2023-02-15
+- Changed: implement encore contracts
+- Changed: removed outdated test setup
+- Fixed: download links in List item if no option set
+
 ## [1.1.0] - 2022-09-20
 - Added: copyright wizard ([#1])
 - Added: migration for CfgTag v3 (otherwise former tags get lost)

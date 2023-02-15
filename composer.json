@@ -8,39 +8,19 @@
     "contao/core-bundle": "^4.9",
     "codefog/tags-bundle": "^3.2",
     "heimrichhannot/contao-categories-bundle": "^1.1",
+    "heimrichhannot/contao-encore-contracts": "^1.0",
     "heimrichhannot/contao-utils-bundle": "^2.220",
     "heimrichhannot-contao-components/alertifyjs": "1.11.2",
     "symfony/config": "^4.4 || ^5.4",
     "symfony/event-dispatcher-contracts": "^1.0 || ^2.0 || ^3.0",
     "symfony/translation-contracts": "^1.0 || ^2.0 || ^3.0"
   },
-  "require-dev": {
-    "contao/test-case": "^1.1",
-    "contao/manager-plugin": "^2.0",
-    "friendsofphp/php-cs-fixer": "^2.2",
-    "phpunit/phpunit": ">=6.0 <6.5",
-    "php-http/guzzle6-adapter": "^1.1",
-    "php-http/message-factory": "^1.0.2",
-    "php-coveralls/php-coveralls": "^2.0",
-    "symfony/phpunit-bridge": "^3.2"
-  },
   "autoload": {
     "psr-4": {
       "HeimrichHannot\\MediaLibraryBundle\\": "src/"
     }
   },
-  "prefer-stable": true,
-  "minimum-stability": "dev",
-  "autoload-dev": {
-    "psr-4": {
-      "HeimrichHannot\\MediaLibraryBundle\\Test\\": "tests/"
-    }
-  },
-  "config": {
-    "preferred-install": "dist"
-  },
   "extra": {
-    "contao-manager-plugin": "HeimrichHannot\\MediaLibraryBundle\\ContaoManager\\Plugin",
-    "foxy": true
+    "contao-manager-plugin": "HeimrichHannot\\MediaLibraryBundle\\ContaoManager\\Plugin"
   }
 }
