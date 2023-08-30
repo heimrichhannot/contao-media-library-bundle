@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -32,7 +32,9 @@ class LoadDataContainerListener implements ServiceSubscriberInterface
     {
         if ('tl_ml_product' === $table) {
             if (class_exists(FileCreditContainer::class) && $this->container->has(FileCreditContainer::class)) {
-                $this->container->get(FileCreditContainer::class)->addCopyrightFieldToDca(
+                /** @var FileCreditContainer $fileCreditContainer */
+                $fileCreditContainer = $this->container->get(FileCreditContainer::class);
+                $fileCreditContainer->addCopyrightFieldToDca(
                     'tl_ml_product', 'copyright', 'file'
                 );
                 $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['tl_class'] = 'clr';

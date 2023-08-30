@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -465,7 +465,7 @@ class ProductContainer
             }
         }
 
-        $objVersions = new \Versions('tl_ml_product', $intId);
+        $objVersions = new Versions('tl_ml_product', $intId);
         $objVersions->initialize();
 
         // Trigger the save_callback
