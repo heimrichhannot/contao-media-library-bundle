@@ -18,3 +18,10 @@ $dca['fields']['ml_archive'] = [
     ],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
+$dca['fields']['ml_publish'] = [
+    'inputType' => 'checkbox',
+    'eval' => [
+        'tl_class' => 'w50 clr',
+    ],
+    'sql' => "char(1) NOT NULL default ''",
+];

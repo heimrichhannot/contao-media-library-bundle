@@ -16,7 +16,10 @@ use Contao\DataContainer;
 use Contao\Folder;
 use Contao\FormModel;
 use Contao\StringUtil;
+use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
+use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
 use HeimrichHannot\FormgeneratorTypeBundle\Event\PrepareFormDataEvent;
+use HeimrichHannot\FormgeneratorTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormgeneratorTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormgeneratorTypeBundle\FormgeneratorType\FormgeneratorTypeInterface;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
@@ -48,15 +51,20 @@ class MediathekType implements FormgeneratorTypeInterface
             ->removeField('storeValues')
             ->addLegend('huh_mediathek_legend', 'title_legend')
             ->addField('ml_archive', 'huh_mediathek_legend', PaletteManipulator::POSITION_APPEND)
+            ->addField('ml_publish', 'huh_mediathek_legend', PaletteManipulator::POSITION_APPEND)
             ->applyToPalette('default', 'tl_form');
     }
 
     public function getDefaultFields(FormModel $formModel): array
     {
+        if (!$formModel->ml_archive) {
+            return [];
+        }
+
         $folder = new Folder('files/media/mediathek');
         $uuid = $folder->getModel()->uuid;
 
-        return [
+        $fields = [
             [
                 'type' => 'text',
                 'name' => 'title',
@@ -73,16 +81,21 @@ class MediathekType implements FormgeneratorTypeInterface
                 'uploadFolder' => $uuid,
             ],
             [
-                'type' => 'text',
-                'name' => 'copyright',
-                'label' => $this->translator->trans('tl_ml_product.copyright.0', [], 'contao_tl_ml_product'),
-            ],
-            [
                 'type' => 'textarea',
                 'name' => 'text',
                 'label' => $this->translator->trans('tl_ml_product.text.0', [], 'contao_tl_ml_product'),
             ],
         ];
+
+        if (class_exists(HeimrichHannotFileCreditsBundle::class)) {
+            $fields[] = [
+                'type' => 'text',
+                'name' => 'copyright',
+                'label' => $this->translator->trans('tl_ml_product.copyright.0', [], 'contao_tl_ml_product'),
+            ];
+        }
+
+        return $fields;
     }
 
     public function onPrepareFormData(PrepareFormDataEvent $event): void
@@ -103,6 +116,10 @@ class MediathekType implements FormgeneratorTypeInterface
             $data['alias'] = $this->slug->generate($data['title']);
             $data['type'] = $archiveModel->type;
 
+            if ($event->getForm()->ml_publish) {
+                $data['published'] = '1';
+            }
+
             if (!empty($_SESSION['FILES'])) {
                 Controller::loadDataContainer(ProductModel::getTable());
 
@@ -121,5 +138,25 @@ class MediathekType implements FormgeneratorTypeInterface
 
             $event->setData($data);
         }
+    }
+
+    public function onProcessFormData(ProcessFormDataEvent $event): void
+    {
+        if (!class_exists(HeimrichHannotFileCreditsBundle::class)) {
+            return;
+        }
+
+        if (empty($event->getSubmittedData()['copyright']) || !isset($event->getFiles()['file']['uuid'])) {
+            return;
+        }
+
+        $fileModel = FilesModel::findByUuid($event->getFiles()['file']['uuid']);
+
+        if (!$fileModel) {
+            return;
+        }
+
+        $fileModel->copyright = $event->getSubmittedData()['copyright'];
+        $fileModel->save();
     }
 }
