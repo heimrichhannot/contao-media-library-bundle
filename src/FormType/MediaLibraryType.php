@@ -6,7 +6,7 @@
  * @license LGPL-3.0-or-later
  */
 
-namespace HeimrichHannot\MediaLibraryBundle\FormgeneratorType;
+namespace HeimrichHannot\MediaLibraryBundle\FormType;
 
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
@@ -18,16 +18,16 @@ use Contao\FormModel;
 use Contao\StringUtil;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
-use HeimrichHannot\FormgeneratorTypeBundle\Event\PrepareFormDataEvent;
-use HeimrichHannot\FormgeneratorTypeBundle\Event\ProcessFormDataEvent;
-use HeimrichHannot\FormgeneratorTypeBundle\Event\StoreFormDataEvent;
-use HeimrichHannot\FormgeneratorTypeBundle\FormgeneratorType\FormgeneratorTypeInterface;
+use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
+use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
+use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
+use HeimrichHannot\FormTypeBundle\FormType\FormTypeInterface;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MediathekType implements FormgeneratorTypeInterface
+class MediaLibraryType implements FormTypeInterface
 {
     private TranslatorInterface $translator;
     private Slug $slug;
@@ -42,16 +42,16 @@ class MediathekType implements FormgeneratorTypeInterface
 
     public function getType(): string
     {
-        return 'huh_mediathek';
+        return 'huh_media_library';
     }
 
     public function onload(DataContainer $dataContainer, FormModel $formModel): void
     {
         PaletteManipulator::create()
             ->removeField('storeValues')
-            ->addLegend('huh_mediathek_legend', 'title_legend')
-            ->addField('ml_archive', 'huh_mediathek_legend', PaletteManipulator::POSITION_APPEND)
-            ->addField('ml_publish', 'huh_mediathek_legend', PaletteManipulator::POSITION_APPEND)
+            ->addLegend('huh_media_library_legend', 'title_legend')
+            ->addField('ml_archive', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
+            ->addField('ml_publish', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
             ->applyToPalette('default', 'tl_form');
     }
 
