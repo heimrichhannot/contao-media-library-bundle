@@ -29,6 +29,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaLibraryType implements FormTypeInterface
 {
+    public const TYPE = 'huh_media_library';
+
     private TranslatorInterface $translator;
     private Slug $slug;
     private RequestStack $requestStack;
@@ -42,7 +44,7 @@ class MediaLibraryType implements FormTypeInterface
 
     public function getType(): string
     {
-        return 'huh_media_library';
+        return static::TYPE;
     }
 
     public function onload(DataContainer $dataContainer, FormModel $formModel): void
