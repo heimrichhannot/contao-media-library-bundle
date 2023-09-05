@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2023-09-05
+- Added: form type for frontend file uploads ([#2])
+- Changed: minimum php version is now 7.4 ([#2])
+- Fixed: issue in CfgTagMigration ([#2])
+
 ## [1.2.0] - 2023-02-15
 - Changed: implement encore contracts
 - Changed: removed outdated test setup
@@ -146,3 +151,5 @@ All notable changes to this project will be documented in this file.
 ## [0.9.0] - 2020-03-03
 
 - changed creating download entity and modifying product entity with `Database`
+
+[#2]: https://github.com/heimrichhannot/contao-media-library-bundle/pull/2
