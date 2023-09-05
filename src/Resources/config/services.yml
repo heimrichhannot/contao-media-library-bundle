@@ -1,6 +1,6 @@
 services:
   HeimrichHannot\MediaLibraryBundle\:
-    resource: '../../{Asset,Migration,EventListener}/*'
+    resource: '../../{Asset,Migration,EventListener,FormType}/*'
     autowire: true
     autoconfigure: true
 

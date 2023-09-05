@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -31,6 +31,9 @@ class CfgTagMigration implements MigrationInterface
 
     public function shouldRun(): bool
     {
+        if (!$this->connection->getSchemaManager()->tablesExist('tl_cfg_tag')) {
+            return false;
+        }
         $result = $this->connection->executeQuery(
             "SELECT id FROM tl_cfg_tag WHERE source='huh.media_library.tags.product'"
         );
