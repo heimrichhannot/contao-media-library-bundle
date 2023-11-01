@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2023-11-01
+- Fixed: issue with published field in tl_ml_product
+- Fixed: some code issues
+
+
 ## [1.3.0] - 2023-09-05
 - Added: form type for frontend file uploads ([#2])
 - Changed: minimum php version is now 7.4 ([#2])

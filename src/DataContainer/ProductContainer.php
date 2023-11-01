@@ -9,16 +9,21 @@
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Codefog\TagsBundle\Model\TagModel;
+use Contao\BackendUser;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\Database;
 use Contao\Database\Result;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
+use Contao\Image;
 use Contao\ImageSizeModel;
+use Contao\Input;
 use Contao\Message;
 use Contao\Model;
+use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
@@ -29,8 +34,12 @@ use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\Driver\DC_Table_Utils;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 use Model\Collection;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProductContainer
@@ -39,73 +48,46 @@ class ProductContainer
     public const TYPE_IMAGE = 'image';
     public const TYPE_VIDEO = 'video';
 
-    public const TYPES
-        = [
-            self::TYPE_FILE,
-            self::TYPE_IMAGE,
-            self::TYPE_VIDEO,
-        ];
+    public const TYPES = [
+        self::TYPE_FILE,
+        self::TYPE_IMAGE,
+        self::TYPE_VIDEO,
+    ];
 
     public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_product';
     public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
     public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
 
-    /**
-     * @var ModelUtil
-     */
-    protected $modelUtil;
-
-    /**
-     * @var DcaUtil
-     */
-    protected $dcaUtil;
-
-    /**
-     * @var FileUtil
-     */
-    protected $fileUtil;
-
-    /**
-     * @var array
-     */
-    protected $bundleConfig;
-    /**
-     * @var DatabaseUtil
-     */
-    private $databaseUtil;
-    /**
-     * @var ContainerUtil
-     */
-    private $containerUtil;
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    protected DcaUtil $dcaUtil;
+    protected FileUtil $fileUtil;
+    protected array $bundleConfig;
+    private DatabaseUtil $databaseUtil;
+    private TranslatorInterface $translator;
+    private EventDispatcherInterface $eventDispatcher;
+    private Utils $utils;
+    private ParameterBagInterface $parameterBag;
+    private Security $security;
 
     public function __construct(
         array $bundleConfig,
         TranslatorInterface $translator,
-        ModelUtil $modelUtil,
         DcaUtil $dcaUtil,
         FileUtil $fileUtil,
         DatabaseUtil $databaseUtil,
-        \HeimrichHannot\UtilsBundle\String\StringUtil $stringUtil,
-        ContainerUtil $containerUtil,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Utils $utils,
+        ParameterBagInterface $parameterBag,
+        Security $security
     ) {
         $this->bundleConfig = $bundleConfig;
-        $this->modelUtil = $modelUtil;
         $this->dcaUtil = $dcaUtil;
         $this->fileUtil = $fileUtil;
         $this->databaseUtil = $databaseUtil;
-        $this->containerUtil = $containerUtil;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
+        $this->utils = $utils;
+        $this->parameterBag = $parameterBag;
+        $this->security = $security;
     }
 
     public function updateTagAssociations(DataContainer $dc): void
@@ -183,7 +165,7 @@ class ProductContainer
             return;
         }
 
-        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+        if (null === ($productArchive = $this->utils->model()->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
             return;
         }
 
@@ -312,7 +294,11 @@ class ProductContainer
 
     public function checkPermission()
     {
-        $user = \Contao\BackendUser::getInstance();
+        /** @var BackendUser $user */
+        if (!($user = $this->security->getUser() instanceof BackendUser)) {
+            throw new AccessDeniedException('You have no permission to do this.');
+        }
+
         $database = \Contao\Database::getInstance();
 
         if ($user->isAdmin) {
@@ -326,25 +312,25 @@ class ProductContainer
             $root = $user->contao_media_library_bundles;
         }
 
-        $id = \strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
+        $id = \strlen(Input::get('id')) ? Input::get('id') : CURRENT_ID;
 
         // Check current action
-        switch (\Contao\Input::get('act')) {
+        switch (Input::get('act')) {
             case 'paste':
                 // Allow
                 break;
 
             case 'create':
-                if (!\strlen(\Contao\Input::get('pid')) || !\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to create ml_product items in ml_product archive ID '.\Contao\Input::get('pid').'.');
+                if (!\strlen(Input::get('pid')) || !\in_array(Input::get('pid'), $root, true)) {
+                    throw new AccessDeniedException('Not enough permissions to create ml_product items in ml_product archive ID '. Input::get('pid').'.');
                 }
 
                 break;
 
             case 'cut':
             case 'copy':
-                if (!\in_array(\Contao\Input::get('pid'), $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' to ml_product archive ID '.\Contao\Input::get('pid').'.');
+                if (!\in_array(Input::get('pid'), $root, true)) {
+                    throw new AccessDeniedException('Not enough permissions to '. Input::get('act').' ml_product item ID '.$id.' to ml_product archive ID '. Input::get('pid').'.');
                 }
             // no break STATEMENT HERE
 
@@ -356,11 +342,11 @@ class ProductContainer
                 $objArchive = $database->prepare('SELECT pid FROM tl_ml_product WHERE id=?')->limit(1)->execute($id);
 
                 if ($objArchive->numRows < 1) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid ml_product item ID '.$id.'.');
+                    throw new AccessDeniedException('Invalid ml_product item ID '.$id.'.');
                 }
 
                 if (!\in_array($objArchive->pid, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to '.\Contao\Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '.$objArchive->pid.'.');
+                    throw new AccessDeniedException('Not enough permissions to '. Input::get('act').' ml_product item ID '.$id.' of ml_product archive ID '.$objArchive->pid.'.');
                 }
 
                 break;
@@ -372,29 +358,29 @@ class ProductContainer
             case 'cutAll':
             case 'copyAll':
                 if (!\in_array($id, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
+                    throw new AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
                 }
 
                 $objArchive = $database->prepare('SELECT id FROM tl_ml_product WHERE pid=?')->execute($id);
 
                 if ($objArchive->numRows < 1) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid ml_product archive ID '.$id.'.');
+                    throw new AccessDeniedException('Invalid ml_product archive ID '.$id.'.');
                 }
 
-                /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
-                $session = \System::getContainer()->get('session');
+                /** @var SessionInterface $session */
+                $session = System::getContainer()->get('session');
 
-                $session = $session->all();
-                $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $objArchive->fetchEach('id'));
-                $session->replace($session);
+                $sessionData = $session->all();
+                $sessionData['CURRENT']['IDS'] = array_intersect($sessionData['CURRENT']['IDS'], $objArchive->fetchEach('id'));
+                $session->replace($sessionData);
 
                 break;
 
             default:
-                if (\strlen(\Contao\Input::get('act'))) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Invalid command "'.\Contao\Input::get('act').'".');
+                if (\strlen(Input::get('act'))) {
+                    throw new AccessDeniedException('Invalid command "'. Input::get('act').'".');
                 } elseif (!\in_array($id, $root, true)) {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
+                    throw new AccessDeniedException('Not enough permissions to access ml_product archive ID '.$id.'.');
                 }
 
                 break;
@@ -403,10 +389,11 @@ class ProductContainer
 
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        $user = \Contao\BackendUser::getInstance();
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
 
-        if (\strlen(\Contao\Input::get('tid'))) {
-            $this->toggleVisibility(\Contao\Input::get('tid'), ('1' === \Contao\Input::get('state')),
+        if (\strlen(Input::get('tid'))) {
+            $this->toggleVisibility(Input::get('tid'), ('1' === Input::get('state')),
                 (@func_get_arg(12) ?: null));
             Controller::redirect(System::getReferer());
         }
@@ -422,19 +409,20 @@ class ProductContainer
             $icon = 'invisible.svg';
         }
 
-        return '<a href="'.Controller::addToUrl($href).'&rt='.\RequestToken::get().'" title="'.\StringUtil::specialchars($title).'"'
-            .$attributes.'>'.\Image::getHtml($icon, $label,
+        return '<a href="'.Controller::addToUrl($href).'&rt='.RequestToken::get().'" title="'.StringUtil::specialchars($title).'"'
+            .$attributes.'>'.Image::getHtml($icon, $label,
                 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
     }
 
     public function toggleVisibility($intId, $blnVisible, \DataContainer $dc = null)
     {
-        $user = \Contao\BackendUser::getInstance();
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
         $database = \Contao\Database::getInstance();
 
         // Set the ID and action
-        \Contao\Input::setGet('id', $intId);
-        \Contao\Input::setGet('act', 'toggle');
+        Input::setGet('id', $intId);
+        Input::setGet('act', 'toggle');
 
         if ($dc) {
             $dc->id = $intId; // see #8043
@@ -453,7 +441,7 @@ class ProductContainer
 
         // Check the field access
         if (!$user->hasAccess('tl_ml_product::published', 'alexf')) {
-            throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to publish/unpublish ml_product item ID '.$intId.'.');
+            throw new AccessDeniedException('Not enough permissions to publish/unpublish ml_product item ID '.$intId.'.');
         }
 
         // Set the current record
@@ -482,7 +470,8 @@ class ProductContainer
         $time = time();
 
         // Update the database
-        $database->prepare("UPDATE tl_ml_product SET tstamp=$time, published='".($blnVisible ? '1' : "''")."' WHERE id=?")->execute($intId);
+        $database->prepare("UPDATE tl_ml_product SET tstamp=?, published=? WHERE id=?")
+            ->execute($time, $blnVisible ? '1' : '', $intId);
 
         if ($dc) {
             $dc->activeRecord->tstamp = $time;
@@ -617,12 +606,12 @@ class ProductContainer
             $values[] = 0;
         }
 
-        return $this->modelUtil->findModelInstancesBy('tl_ml_download', $columns, $values);
+        return $this->utils->model()->findModelInstancesBy('tl_ml_download', $columns, $values);
     }
 
     protected function getProduct(int $id): ?Model
     {
-        return $this->modelUtil->findModelInstanceByPk('tl_ml_product', $id);
+        return $this->utils->model()->findModelInstanceByPk('tl_ml_product', $id);
     }
 
     protected function getExifConfiguration(Model $archive, DataContainer $dc): array
@@ -646,7 +635,7 @@ class ProductContainer
         $imageFactory = System::getContainer()->get('contao.image.image_factory');
 
         foreach ($sizes as $size) {
-            if (null === ($sizeModel = $this->modelUtil->findModelInstanceByPk('tl_image_size', $size))) {
+            if (null === ($sizeModel = $this->utils->model()->findModelInstanceByPk('tl_image_size', $size))) {
                 continue;
             }
 
@@ -662,9 +651,10 @@ class ProductContainer
             }
 
             // compose path
-            $targetFile = $this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
+            $projectDir = $this->parameterBag->get('kernel.project_dir');
+            $targetFile = $projectDir .\DIRECTORY_SEPARATOR.\dirname($file->path).\DIRECTORY_SEPARATOR.$targetFilename;
 
-            $resizeImage = $imageFactory->create($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path,
+            $resizeImage = $imageFactory->create($projectDir.\DIRECTORY_SEPARATOR.$file->path,
                 $size, $targetFile);
 
             $this->eventDispatcher->dispatch(
@@ -701,7 +691,7 @@ class ProductContainer
      */
     protected function isResizable(FilesModel $file, ImageSizeModel $size)
     {
-        $imageSize = getimagesize($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR.$file->path);
+        $imageSize = getimagesize($this->parameterBag->get('kernel.project_dir').\DIRECTORY_SEPARATOR.$file->path);
 
         if ($size->width > $imageSize[0] && $size->height > $imageSize[1]) {
             return false;
@@ -721,7 +711,7 @@ class ProductContainer
             return null;
         }
 
-        if (null === ($productArchive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+        if (null === ($productArchive = $this->utils->model()->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
             return null;
         }
 
@@ -745,7 +735,7 @@ class ProductContainer
     ) {
         $data = [];
 
-        $path = str_replace($this->containerUtil->getProjectDir().\DIRECTORY_SEPARATOR,
+        $path = str_replace($this->parameterBag->get('kernel.project_dir').\DIRECTORY_SEPARATOR,
             '', $path);
 
         if (null === ($file = FilesModel::findByPath($path))) {
