@@ -21,13 +21,13 @@ use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
 use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
-use HeimrichHannot\FormTypeBundle\FormType\FormTypeInterface;
+use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MediaLibraryType implements FormTypeInterface
+class MediaLibraryType extends AbstractFormType
 {
     public const TYPE = 'huh_media_library';
 
