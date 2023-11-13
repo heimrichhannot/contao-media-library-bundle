@@ -14,6 +14,7 @@ The download items can be generated automatically.
 - manually add download items for products
 - configurable dca field palettes for products
 - add additional fields differently for each product archive
+- Unified dispatcher for Symfony `FieldOptionsEvent` and Contao callbacks
 - [Form Type](https://github.com/heimrichhannot/contao-form-type-bundle) integration 
 - [Encore Bundle](https://github.com/heimrichhannot/contao-encore-bundle) integration
 - optional: `codefog/tags-bundle` integration for tagging products (activate in product archive)
@@ -44,4 +45,29 @@ huh_media_library:
 
   # If true, the filenames of the generated product downloads will be sanitized.
   sanitize_download_filenames: false
+```
+
+### Unified Dispatcher for Field Options
+
+Use `FieldOptionsDispatcherTrait` to dispatch Symfony `FieldOptionsEvent` `huh.form_type.<MY_FORM_TYPE::TYPE>.<FIELD>.options` and Contao `fields.<FIELD>.options` callbacks alike.
+
+
+Example:
+```php
+use HeimrichHannot\MediaLibraryBundle\Trait\FieldOptionsDispatcherTrait;
+
+class MyContainerOrFormType
+{
+    use FieldOptionsDispatcherTrait;
+
+    #[AsCallback(table: 'tl_ml_product', target: 'fields.licence.options')]
+    #[AsEventListener('huh.form_type.huh_media_library.licence.options')]
+    public function getLicenceOptions(): array
+    {
+        return $this->dispatchFieldOptions([
+            'free' => 'Released for use under indication of copyright',
+            'locked' => 'Subject to license'
+        ]);
+    }
+}
 ```
