@@ -34,7 +34,7 @@ trait FieldOptionsDispatcherTrait
     protected function dispatchFieldOptions(array $options, ?array $funcArgs = null, bool $setEmptyOption = true): array
     {
         if ($funcArgs === null) {
-            $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $backtrace = debug_backtrace(0, 2);
             $funcArgs = $backtrace[1]['args'];
         }
 
