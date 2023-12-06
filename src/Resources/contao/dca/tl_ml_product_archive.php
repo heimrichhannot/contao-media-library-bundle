@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected;',
+        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,includeDelete,redirectAfterDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'.\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => 'imageSizes',
@@ -176,5 +176,27 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
+        'includeDelete' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['includeDelete'],
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'redirectAfterDelete' => [
+            'inputType' => 'pageTree',
+            'foreignKey' => 'tl_page.id',
+            'eval' => [
+                'fieldType' => 'radio',
+                'tl_class' => 'clr'
+            ],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'relation' => [
+                'type' => 'hasOne',
+                'load' => 'lazy'
+            ]
+        ]
     ],
 ];
