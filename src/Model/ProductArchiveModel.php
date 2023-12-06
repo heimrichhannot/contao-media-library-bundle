@@ -18,6 +18,8 @@ use Contao\Model;
  * @property string $type
  * @property string $additionalFields
  * @property bool   $keepProductTitleForDownloadItems
+ * @property bool   $includeDelete
+ * @property bool   $redirectAfterDelete
  * @property bool   $protected
  */
 class ProductArchiveModel extends Model
