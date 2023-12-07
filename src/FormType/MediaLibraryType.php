@@ -106,6 +106,8 @@ class MediaLibraryType extends AbstractFormType
             $event->getForm()->storeValues = '1';
             $event->getForm()->targetTable = ProductModel::getTable();
         }
+
+        parent::onPrepareFormData($event);
     }
 
     public function onStoreFormData(StoreFormDataEvent $event): void
@@ -144,6 +146,8 @@ class MediaLibraryType extends AbstractFormType
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
     {
+        parent::onProcessFormData($event);
+
         if (!class_exists(HeimrichHannotFileCreditsBundle::class)) {
             return;
         }
