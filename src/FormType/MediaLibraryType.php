@@ -112,7 +112,9 @@ class MediaLibraryType extends AbstractFormType
 
     public function onStoreFormData(StoreFormDataEvent $event): void
     {
-        if ($event->getForm()->ml_archive && ($archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive))) {
+        if ($event->getForm()->ml_archive
+            && ($archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive)))
+        {
             $data = $event->getData();
             $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
             $data['pid'] = $event->getForm()->ml_archive;
@@ -142,6 +144,8 @@ class MediaLibraryType extends AbstractFormType
 
             $event->setData($data);
         }
+
+        parent::onStoreFormData($event);
     }
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
