@@ -47,10 +47,6 @@ class DeleteProductListener
             throw new BadRequestHttpException('Invalid product id');
         }
 
-        if (!$product->delete()) {
-            throw new InternalServerErrorHttpException('Could not delete product');
-        }
-
         /** @var ProductArchiveModel|null $productArchive */
         $productArchive = $product->getRelated('pid');
 
@@ -60,6 +56,10 @@ class DeleteProductListener
 
         if (!$productArchive->includeDelete) {
             throw new MethodNotAllowedHttpException([Request::METHOD_DELETE], 'Delete not allowed');
+        }
+
+        if (!$product->delete()) {
+            throw new InternalServerErrorHttpException('Could not delete product');
         }
 
         $pageId = $productArchive->redirectAfterDelete;
