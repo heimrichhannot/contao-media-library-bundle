@@ -68,7 +68,10 @@ class DeleteProductListener
         }
 
         if (!$productArchive->includeDelete) {
-            throw new MethodNotAllowedHttpException([Request::METHOD_DELETE], 'Delete not allowed');
+            throw new MethodNotAllowedHttpException(
+                [Request::METHOD_GET, Request::METHOD_POST, Request::METHOD_HEAD],
+                'Delete not allowed'
+            );
         }
 
         if (!$product->delete()) {
