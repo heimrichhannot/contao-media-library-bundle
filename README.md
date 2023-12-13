@@ -45,3 +45,47 @@ huh_media_library:
   # If true, the filenames of the generated product downloads will be sanitized.
   sanitize_download_filenames: false
 ```
+
+### Delete ML Products
+
+Submit a `DELETE`-Request to the product's details URL. If the HTTP `DELETE` method is unavailable, use a hidden form field with a name of `_method` and the value `DELETE` instead.
+
+Example for use within a Bootstrap 5 modal:
+```html
+<form method="post">
+    <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+    <button type="submit" class="btn btn-primary">Löschen</button>
+</form>
+```
+
+#### More on creating a Delete Form
+
+Further, if you need to inject a request token into the respective `HeimrichHannot\ReaderBundle` reader template, you may want to implement an EventListener:
+
+```php
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use HeimrichHannot\ReaderBundle\Event\ReaderBeforeRenderEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class MLDeleteFormEventListener implements EventSubscriberInterface
+{
+    public function __construct(private readonly ContaoCsrfTokenManager $csrfTokenManager) {}
+
+    public static function getSubscribedEvents()
+    {
+        return [ReaderBeforeRenderEvent::NAME => 'onReaderBeforeRenderEvents'];
+    }
+
+    public function onReaderBeforeRenderEvents(ReaderBeforeRenderEvent $event): void
+    {
+        if ($item['dataContainer'] === 'tl_ml_product')
+        {
+            $item = $event->getTemplateData();
+            $item['request_token'] = $this->csrfTokenManager->getDefaultTokenValue();
+            $event->setTemplateData($item);
+        }
+    }
+}
+```

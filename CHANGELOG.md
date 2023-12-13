@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3] - 2023-12-13
+- Feature: delete ml products with frontend requests
+
 ## [1.3.2] - 2023-11-06
 - Fixed: support for heimrichhannot/contao-form-type-bundle v0.1.3
 
