@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.4] - 2023-12-13
+- Fixed: issue with disallowed delete method
+
 ## [1.3.3] - 2023-12-13
 - Feature: delete ml products with frontend requests
 
