@@ -12,15 +12,13 @@ use HeimrichHannot\ReaderBundle\Event\ReaderBeforeRenderEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DeleteProductListener
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private Session $session
+        private RequestStack $requestStack
     )
     {
     }
