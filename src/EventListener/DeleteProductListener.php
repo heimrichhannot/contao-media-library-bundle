@@ -12,15 +12,28 @@ use HeimrichHannot\ReaderBundle\Event\ReaderBeforeRenderEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeleteProductListener
 {
+    private RequestStack $requestStack;
+
+    private TranslatorInterface $translator;
+
+    private SessionInterface $session;
+
     public function __construct(
-        private RequestStack $requestStack
+        RequestStack $requestStack,
+        TranslatorInterface $translator,
+        SessionInterface $session
     )
     {
+        $this->requestStack = $requestStack;
+        $this->translator = $translator;
+        $this->session = $session;
     }
 
     #[AsEventListener('huh.reader.event.reader_before_render')]
@@ -69,9 +82,10 @@ class DeleteProductListener
             throw new InternalServerErrorHttpException('No redirect page found');
         }
 
-        # todo: translation
-        # $flashes = $this->session->getFlashBag();
-        # $flashes->add('success', 'Bild erfolgreich gelöscht!');
+        $this->session
+            ->getFlashBag()
+            ->add('success', $this->translator->trans('huh.mediaLibrary.product.delete.success', ['title' => $product->title]))
+        ;
 
         throw new RedirectResponseException($page->getAbsoluteUrl());
     }
