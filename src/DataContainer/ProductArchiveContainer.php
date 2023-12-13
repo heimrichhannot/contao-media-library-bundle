@@ -27,20 +27,11 @@ use Symfony\Component\Security\Core\Security;
 
 class ProductArchiveContainer
 {
-    /**
-     * @var FileUtil
-     */
-    protected $fileUtil;
+    protected FileUtil $fileUtil;
 
-    /**
-     * @var ModelUtil
-     */
-    protected $modelUtil;
+    protected ModelUtil $modelUtil;
 
-    /**
-     * @var Security
-     */
-    protected $security;
+    protected Security $security;
 
     public function __construct(
         FileUtil $fileUtil,
