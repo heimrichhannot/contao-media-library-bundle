@@ -106,11 +106,15 @@ class MediaLibraryType extends AbstractFormType
             $event->getForm()->storeValues = '1';
             $event->getForm()->targetTable = ProductModel::getTable();
         }
+
+        parent::onPrepareFormData($event);
     }
 
     public function onStoreFormData(StoreFormDataEvent $event): void
     {
-        if ($event->getForm()->ml_archive && ($archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive))) {
+        if ($event->getForm()->ml_archive
+            && ($archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive)))
+        {
             $data = $event->getData();
             $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
             $data['pid'] = $event->getForm()->ml_archive;
@@ -140,10 +144,14 @@ class MediaLibraryType extends AbstractFormType
 
             $event->setData($data);
         }
+
+        parent::onStoreFormData($event);
     }
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
     {
+        parent::onProcessFormData($event);
+
         if (!class_exists(HeimrichHannotFileCreditsBundle::class)) {
             return;
         }

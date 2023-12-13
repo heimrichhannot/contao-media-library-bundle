@@ -21,7 +21,10 @@ $lang['groups'][0]                           = 'Mitgliedergruppen';
 $lang['groups'][1]                           = 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.';
 $lang['keepProductTitleForDownloadItems'][0] = 'Produktnamen im Downloadtitel behalten';
 $lang['keepProductTitleForDownloadItems'][1] = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
-
+$lang['includeDelete'][0]                    = 'Produkte können gelöscht werden';
+$lang['includeDelete'][1]                    = 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.';
+$lang['redirectAfterDelete'][0]              = 'Weiterleitungsseite nach dem Löschen';
+$lang['redirectAfterDelete'][1]              = 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.';
 
 /**
  * Legends

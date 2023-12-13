@@ -7,3 +7,5 @@ huh.mediaLibrary.alert.download.title: 'Option wählen'
 
 huh.mediaLibrary.downloadTitle.original: 'Originalgröße'
 huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '{title} ({size})'
+
+huh.mediaLibrary.product.delete.success: 'Bild "{title}" wurde erfolgreich gelöscht'

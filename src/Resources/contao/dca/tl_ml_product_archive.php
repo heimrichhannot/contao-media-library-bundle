@@ -1,12 +1,16 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
 
-\Contao\System::loadLanguageFile('tl_ml_product');
+use Contao\System;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
+
+System::loadLanguageFile('tl_ml_product');
 
 $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     'config' => [
@@ -14,7 +18,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'ctable' => ['tl_ml_product'],
         'enableVersioning' => true,
         'onload_callback' => [
-            [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'checkPermission'],
+            [ProductArchiveContainer::class, 'checkPermission'],
+            [ProductArchiveContainer::class, 'checkIncludeDelete'],
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
@@ -57,13 +62,13 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.svg',
-                'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'editHeader'],
+                'button_callback' => [ProductArchiveContainer::class, 'editHeader'],
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.svg',
-                'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'copyArchive'],
+                'button_callback' => [ProductArchiveContainer::class, 'copyArchive'],
             ],
             'delete' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['delete'],
@@ -71,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
                     .'\'))return false;Backend.getScrollOffset()"',
-                'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'deleteArchive'],
+                'button_callback' => [ProductArchiveContainer::class, 'deleteArchive'],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['show'],
@@ -82,10 +87,10 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{protected_legend},protected;',
+        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,includeDelete,redirectAfterDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
-        'type_'.\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => 'imageSizes',
+        'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
         'protected' => 'groups',
     ],
     'fields' => [
@@ -119,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'options' => \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPES,
+            'options' => ProductContainer::TYPES,
             'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
             'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql' => "varchar(64) NOT NULL default ''",
@@ -130,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'filter' => true,
             'inputType' => 'checkboxWizard',
             'options_callback' => function (Contao\DataContainer $dc) {
-                return \Contao\System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
+                return System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
                     [
                         'dataContainer' => 'tl_ml_product',
                         'evalConditions' => [
@@ -148,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'exclude' => true,
             'flag' => 1,
             'inputType' => 'checkboxWizard',
-            'options_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer::class, 'getImageSizes'],
+            'options_callback' => [ProductArchiveContainer::class, 'getImageSizes'],
             'eval' => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'clr w50 autoheight'],
             'sql' => 'blob NULL',
         ],
@@ -176,5 +181,29 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
+        'includeDelete' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'eval' => [
+                'tl_class' => 'clr',
+                'submitOnChange' => true,
+            ],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'redirectAfterDelete' => [
+            'inputType' => 'pageTree',
+            'foreignKey' => 'tl_page.id',
+            'eval' => [
+                'fieldType' => 'radio',
+                'tl_class' => 'clr'
+            ],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'relation' => [
+                'type' => 'hasOne',
+                'load' => 'lazy'
+            ]
+        ]
     ],
 ];
