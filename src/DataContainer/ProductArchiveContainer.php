@@ -10,6 +10,8 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\BackendUser;
 use Contao\Controller;
+use Contao\Database;
+use Contao\DataContainer;
 use Contao\System;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
@@ -192,6 +194,25 @@ class ProductArchiveContainer
                 }
 
                 break;
+        }
+    }
+
+    public function checkIncludeDelete(DataContainer $dc)
+    {
+        $record = Database::getInstance()
+            ->prepare('SELECT * FROM tl_ml_product_archive WHERE id=?')
+            ->limit(1)
+            ->execute($dc->id)
+        ;
+
+        if (!$record->numRows) {
+            return;
+        }
+
+        if ($record->includeDelete ?? false) {
+            $GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['redirectAfterDelete']['eval']['mandatory'] = true;
+        } else {
+            unset($GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['redirectAfterDelete']);
         }
     }
 
