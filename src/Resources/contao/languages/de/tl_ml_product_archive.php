@@ -25,6 +25,10 @@ $lang['includeDelete'][0]                    = 'Produkte können gelöscht werde
 $lang['includeDelete'][1]                    = 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.';
 $lang['redirectAfterDelete'][0]              = 'Weiterleitungsseite nach dem Löschen';
 $lang['redirectAfterDelete'][1]              = 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.';
+$lang['groupsCanDeleteOwn'][0]               = 'Eigene Produkte löschen';
+$lang['groupsCanDeleteOwn'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.';
+$lang['groupsCanDeleteAll'][0]               = 'Alle Produkte löschen';
+$lang['groupsCanDeleteAll'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.';
 
 /**
  * Legends

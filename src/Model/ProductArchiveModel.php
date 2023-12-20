@@ -11,16 +11,18 @@ namespace HeimrichHannot\MediaLibraryBundle\Model;
 use Contao\Model;
 
 /**
- * @property int    $id
- * @property int    $tstamp
- * @property int    $dateAdded
- * @property string $title
- * @property string $type
- * @property string $additionalFields
- * @property bool   $keepProductTitleForDownloadItems
- * @property bool   $includeDelete
- * @property bool   $redirectAfterDelete
- * @property bool   $protected
+ * @property int          $id
+ * @property int          $tstamp
+ * @property int          $dateAdded
+ * @property string       $title
+ * @property string       $type
+ * @property string       $additionalFields
+ * @property bool         $keepProductTitleForDownloadItems
+ * @property bool         $includeDelete
+ * @property bool         $redirectAfterDelete
+ * @property string|array $groupsCanDeleteAll
+ * @property string|array $groupsCanDeleteOwn
+ * @property bool         $protected
  */
 class ProductArchiveModel extends Model
 {
