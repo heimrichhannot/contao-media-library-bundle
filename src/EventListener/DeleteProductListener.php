@@ -36,7 +36,7 @@ class DeleteProductListener
         RequestStack $requestStack,
         TranslatorInterface $translator,
         SessionInterface $session,
-        TokenChecker $tokenChecker,
+        TokenChecker $tokenChecker
     )
     {
         $this->requestStack = $requestStack;
