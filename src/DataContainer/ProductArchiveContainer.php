@@ -16,6 +16,7 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\Input;
+use Contao\MemberGroupModel;
 use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
@@ -214,7 +215,26 @@ class ProductArchiveContainer
             $GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['redirectAfterDelete']['eval']['mandatory'] = true;
         } else {
             unset($GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['redirectAfterDelete']);
+            unset($GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['groupsCanDeleteOwn']);
+            unset($GLOBALS['TL_DCA']['tl_ml_product_archive']['fields']['groupsCanDeleteAll']);
         }
+    }
+
+    public function getMemberGroupOptions(): array
+    {
+        $options = [];
+        $groups = MemberGroupModel::findAll();
+
+        if ($groups !== null)
+        {
+            while ($groups->next()) {
+                $options[$groups->id] = $groups->name;
+            }
+
+            asort($options);
+        }
+
+        return $options;
     }
 
     public function editHeader($row, $href, $label, $title, $icon, $attributes)

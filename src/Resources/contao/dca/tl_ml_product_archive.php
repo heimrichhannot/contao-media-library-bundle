@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,includeDelete,redirectAfterDelete;{protected_legend},protected;',
+        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,includeDelete,redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
@@ -204,6 +204,38 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'type' => 'hasOne',
                 'load' => 'lazy'
             ]
+        ],
+        'groupsCanDeleteAll' => [
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkboxWizard',
+            'foreignKey'              => 'tl_user_group.id',
+            'eval'                    => [
+                'multiple' => true,
+                'tl_class' => 'w50'
+            ],
+            'sql'                     => "blob NULL",
+            'relation'                => [
+                'type' => 'belongsToMany',
+                'load'=>'lazy'
+            ],
+            'options_callback' => [ProductArchiveContainer::class, 'getMemberGroupOptions']
+        ],
+        'groupsCanDeleteOwn' => [
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkboxWizard',
+            'foreignKey'              => 'tl_user_group.id',
+            'eval'                    => [
+                'multiple' => true,
+                'tl_class' => 'w50'
+            ],
+            'sql'                     => "blob NULL",
+            'relation'                => [
+                'type' => 'belongsToMany',
+                'load'=>'lazy'
+            ],
+            'options_callback' => [ProductArchiveContainer::class, 'getMemberGroupOptions']
         ]
     ],
 ];

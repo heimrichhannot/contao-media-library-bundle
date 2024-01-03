@@ -20,6 +20,8 @@ use Contao\Model;
  * @property bool   $keepProductTitleForDownloadItems
  * @property bool   $includeDelete
  * @property bool   $redirectAfterDelete
+ * @property string $groupsCanDeleteAll
+ * @property string $groupsCanDeleteOwn
  * @property bool   $protected
  */
 class ProductArchiveModel extends Model
