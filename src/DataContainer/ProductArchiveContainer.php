@@ -239,7 +239,11 @@ class ProductArchiveContainer
 
     public function editHeader($row, $href, $label, $title, $icon, $attributes)
     {
-        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELDS_OF_TABLE, 'tl_ml_product_archive'))
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
+
+//        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELDS_OF_TABLE, 'tl_ml_product_archive'))
+        if ($user->canEditFieldsOf('tl_ml_product_archive'))
         {
             $anchor = sprintf(
                 '<a href="%s&rt=%s" title="%s" %s>%s</a> ',

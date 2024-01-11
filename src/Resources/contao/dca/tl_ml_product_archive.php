@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,includeDelete,redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll;{protected_legend},protected;',
+        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,allowEdit,includeDelete,redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
@@ -181,9 +181,16 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
+        'allowEdit' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50 clr',
+            ],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
         'includeDelete' => [
             'exclude' => true,
-            'filter' => true,
             'inputType' => 'checkbox',
             'default' => true,
             'eval' => [

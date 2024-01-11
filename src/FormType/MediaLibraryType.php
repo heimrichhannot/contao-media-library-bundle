@@ -15,6 +15,7 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
 use Contao\FormModel;
+use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
@@ -22,24 +23,30 @@ use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
+use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaLibraryType extends AbstractFormType
 {
     public const TYPE = 'huh_media_library';
+    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
+    public const PARAMETER_EDIT = 'edit';
 
     private TranslatorInterface $translator;
     private Slug $slug;
     private RequestStack $requestStack;
+    private Security $security;
 
-    public function __construct(TranslatorInterface $translator, Slug $slug, RequestStack $requestStack)
+    public function __construct(TranslatorInterface $translator, Slug $slug, RequestStack $requestStack, Security $security)
     {
         $this->translator = $translator;
         $this->slug = $slug;
         $this->requestStack = $requestStack;
+        $this->security = $security;
     }
 
     public function getType(): string
@@ -169,4 +176,52 @@ class MediaLibraryType extends AbstractFormType
         $fileModel->copyright = $event->getSubmittedData()['copyright'];
         $fileModel->save();
     }
+
+    protected function evaluateFormContext(): FormContext
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        if (!$request->query->has(static::PARAMETER_EDIT)) {
+            return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
+        }
+
+        $id = $request->query->get(static::PARAMETER_EDIT);
+        if  (!$id || !is_numeric($id)) {
+            return FormContext::invalid('tl_md_product', 'Invalid product id.');
+        }
+        $productModel = ProductModel::findByPk($id);
+        if (!$productModel) {
+            return FormContext::invalid('tl_md_product', 'Could not find product.');
+        }
+
+        if ($this->security->isGranted())
+
+        $archiveModel = ProductArchiveModel::findByPk($productModel->pid);
+        if (!$archiveModel || !$archiveModel->allowEdit) {
+            return FormContext::invalid('tl_md_product', 'Archive does not allow editing.');
+        }
+
+        if (!$this->security->isGranted('edit', $archiveModel)) {
+            return FormContext::invalid('tl_md_product', 'You are not allowed to edit this archive.');
+        }
+
+
+
+        $editParameter = 'edit';
+
+        if ($modelPk = $request->query->get($editParameter))
+        {
+            /** @var class-string<Model> $modelClass */
+            $modelClass = Model::getClassFromTable(static::DEFAULT_FORM_CONTEXT_TABLE);
+            $modelInstance = $modelClass::findByPk($modelPk);
+            if ($modelInstance === null) {
+                return FormContext::invalid(static::DEFAULT_FORM_CONTEXT_TABLE, 'Could not find object.');
+            }
+            return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $modelInstance->row());
+        }
+
+        return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
+        return parent::evaluateFormContext();
+    }
+
+
 }
