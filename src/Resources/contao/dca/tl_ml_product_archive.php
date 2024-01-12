@@ -86,11 +86,12 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => ['type', 'protected', 'useExifDataForTags'],
+        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit'],
         'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,allowEdit,includeDelete,redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
+        'allowEdit' => 'editJumpTo',
         'protected' => 'groups',
     ],
     'fields' => [
@@ -186,8 +187,17 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'inputType' => 'checkbox',
             'eval' => [
                 'tl_class' => 'w50 clr',
+                'submitOnChange' => true,
             ],
             'sql' => "char(1) NOT NULL default ''",
+        ],
+        'editJumpTo' => [
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0",
+            'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
         ],
         'includeDelete' => [
             'exclude' => true,

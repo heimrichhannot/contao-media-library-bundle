@@ -10,6 +10,8 @@ namespace HeimrichHannot\MediaLibraryBundle\FormType;
 
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
@@ -26,6 +28,7 @@ use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -38,14 +41,12 @@ class MediaLibraryType extends AbstractFormType
 
     private TranslatorInterface $translator;
     private Slug $slug;
-    private RequestStack $requestStack;
     private Security $security;
 
-    public function __construct(TranslatorInterface $translator, Slug $slug, RequestStack $requestStack, Security $security)
+    public function __construct(TranslatorInterface $translator, Slug $slug, Security $security)
     {
         $this->translator = $translator;
         $this->slug = $slug;
-        $this->requestStack = $requestStack;
         $this->security = $security;
     }
 
@@ -185,42 +186,22 @@ class MediaLibraryType extends AbstractFormType
         }
 
         $id = $request->query->get(static::PARAMETER_EDIT);
-        if  (!$id || !is_numeric($id)) {
-            return FormContext::invalid('tl_md_product', 'Invalid product id.');
-        }
-        $productModel = ProductModel::findByPk($id);
-        if (!$productModel) {
-            return FormContext::invalid('tl_md_product', 'Could not find product.');
+        if  (!$id || !is_numeric($id) || !($productModel = ProductModel::findByPk($id))) {
+            throw new PageNotFoundException('Product not found!');
         }
 
-        if ($this->security->isGranted())
-
-        $archiveModel = ProductArchiveModel::findByPk($productModel->pid);
-        if (!$archiveModel || !$archiveModel->allowEdit) {
-            return FormContext::invalid('tl_md_product', 'Archive does not allow editing.');
+        if ($this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+            return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $productModel->row());
         }
 
-        if (!$this->security->isGranted('edit', $archiveModel)) {
-            return FormContext::invalid('tl_md_product', 'You are not allowed to edit this archive.');
-        }
+        throw new AccessDeniedException('No permission to edit product.');
+    }
 
-
-
-        $editParameter = 'edit';
-
-        if ($modelPk = $request->query->get($editParameter))
-        {
-            /** @var class-string<Model> $modelClass */
-            $modelClass = Model::getClassFromTable(static::DEFAULT_FORM_CONTEXT_TABLE);
-            $modelInstance = $modelClass::findByPk($modelPk);
-            if ($modelInstance === null) {
-                return FormContext::invalid(static::DEFAULT_FORM_CONTEXT_TABLE, 'Could not find object.');
-            }
-            return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $modelInstance->row());
-        }
-
-        return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
-        return parent::evaluateFormContext();
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'request_stack' => '?request_stack',
+        ]);
     }
 
 

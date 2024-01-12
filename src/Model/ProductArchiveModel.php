@@ -19,6 +19,7 @@ use Contao\Model;
  * @property string $additionalFields
  * @property bool   $keepProductTitleForDownloadItems
  * @property bool   $allowEdit
+ * @property int   $editJumpTo
  * @property bool   $includeDelete
  * @property bool   $redirectAfterDelete
  * @property string $groupsCanDeleteAll

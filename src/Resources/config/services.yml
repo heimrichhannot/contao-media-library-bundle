@@ -1,6 +1,7 @@
 services:
   HeimrichHannot\MediaLibraryBundle\:
-    resource: '../../{Asset,Migration,EventListener,FormType}/*'
+    resource: '../../{Asset,Controller,EventListener,FormType,Migration,Product,Security}/*'
+    exclude: '../../Product/Product.php'
     autowire: true
     autoconfigure: true
 
