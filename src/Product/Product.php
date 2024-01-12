@@ -12,7 +12,8 @@ use HeimrichHannot\UtilsBundle\Util\Utils;
  */
 class Product
 {
-    private string $editLink;
+    private ?string $editLink;
+    private ?string $deleteLink;
 
     /**
      * @internal Do initialize this class directly. Use the ProductFactory instead.
@@ -38,19 +39,29 @@ class Product
     {
         if (!isset($this->editLink)) {
             $archive = ProductArchiveModel::findByPk($this->productModel->pid);
-            if (!$archive) {
+            if (!$archive || !$archive->allowEdit || !($page = PageModel::findByPk($archive->editJumpTo))) {
+                $this->editLink = null;
                 return null;
             }
-            if (!$archive->allowEdit) {
-                return null;
-            }
-            $page = PageModel::findByPk($archive->editJumpTo);
-            if (!$page) {
-                return null;
-            }
+
             $this->editLink = $this->utils->url()->addQueryStringParameterToUrl('edit='.$this->productModel->id, $page->getFrontendUrl());
         }
 
         return $this->editLink;
+    }
+
+    public function deleteLink(): ?string
+    {
+        if (!isset($this->deleteLink)) {
+            $archive = ProductArchiveModel::findByPk($this->productModel->pid);
+            if (!$archive || !$archive->includeDelete) {
+                $this->deleteLink = null;
+                return null;
+            }
+
+            $this->deleteLink = $this->utils->url()->addQueryStringParameterToUrl('delete='.$this->productModel->id);
+        }
+
+        return $this->deleteLink;
     }
 }

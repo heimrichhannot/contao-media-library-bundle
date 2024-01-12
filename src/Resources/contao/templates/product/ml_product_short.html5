@@ -3,4 +3,7 @@
     <?php if ($this->editLink): ?>
         <a href="<?= $this->editLink ?>" class="product-edit-link">Edit</a>
     <?php endif; ?>
+    <?php if ($this->deleteLink): ?>
+        <a href="<?= $this->deleteLink ?>" class="product-delete-link">Delete</a>
+    <?php endif; ?>
 </div>

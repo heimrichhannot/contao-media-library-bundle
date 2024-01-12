@@ -3,6 +3,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\FrontendTemplate;
 use Contao\ModuleModel;
@@ -11,7 +12,9 @@ use Contao\Template;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\MediaLibraryBundle\Product\ProductFactory;
+use HeimrichHannot\MediaLibraryBundle\Product\ProductHelper;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,13 +28,18 @@ class ProductListModuleController extends AbstractFrontendModuleController
     public const TYPE = 'ml_product_list';
 
     public function __construct(
-        private Security $security,
-        private ProductFactory $productFactory
+        private ProductFactory $productFactory,
+        private ProductHelper $productHelper,
+        private Utils $utils,
     ){}
 
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        if ($this->productHelper->runIfDeleteAction()) {
+            throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl('delete'));
+        }
+
         $archives = ProductArchiveModel::findMultipleByIds(StringUtil::deserialize($model->ml_archives, true));
         if (!$archives) {
             return $template->getResponse();
@@ -67,6 +75,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
             $template->title = $product->title;
             $template->product = $product;
             $template->editLink = $product->editLink();
+            $template->deleteLink = $product->deleteLink();
             $products[] = $template->parse();
         }
 

@@ -4,7 +4,6 @@ namespace HeimrichHannot\MediaLibraryBundle\Security;
 
 use Contao\FrontendUser;
 use Contao\MemberGroupModel;
-use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
@@ -13,12 +12,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ProductVoter extends Voter
 {
-    public const PERMISSION_CREATE = 'create_product';
+//    public const PERMISSION_CREATE = 'create_product';
     public const PERMISSION_EDIT = 'edit_product';
     public const PERMISSION_DELETE = 'delete_product';
 
     public const PERMISSIONS = [
-        self::PERMISSION_CREATE,
+//        self::PERMISSION_CREATE,
         self::PERMISSION_EDIT,
         self::PERMISSION_DELETE
     ];
@@ -40,24 +39,35 @@ class ProductVoter extends Voter
      * @param string $attribute
      * @param ProductModel $subject
      * @param TokenInterface $token
-     * @return void
+     * @return bool
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        $token->getAttributes();
+        $user = $token->getUser();
 
-        $archiveModel = ProductArchiveModel::findByPk($subject->pid);
-        if (!$archiveModel || !$archiveModel->allowEdit) {
+        if (!$user instanceof FrontendUser) {
             return false;
         }
 
-        $user = $token->getUser();
-
-        if ($user instanceof FrontendUser) {
-            return $this->voteForFrontendUser($attribute, $subject, $user, $archiveModel);
+        $archiveModel = ProductArchiveModel::findByPk($subject->pid);
+        if (!$archiveModel) {
+            return false;
         }
 
-        return false;
+        switch ($attribute) {
+            // @todo implement create permission
+//            case self::PERMISSION_CREATE:
+//                break;
+            case self::PERMISSION_EDIT:
+                if (!$archiveModel->allowEdit) {
+                    return false;
+                }
+                break;
+            case self::PERMISSION_DELETE:
+                return $this->voteOnDelete($archiveModel, $user, $subject);
+        }
+
+        return $this->voteForFrontendUser($attribute, $subject, $user, $archiveModel);
     }
 
     private function voteForFrontendUser(string $attribute, ProductModel $subject, FrontendUser $user, ProductArchiveModel $archiveModel): bool
@@ -87,6 +97,20 @@ class ProductVoter extends Voter
         }
 
         return false;
+    }
+
+    private function voteOnDelete(ProductArchiveModel $archiveModel, FrontendUser $user, ProductModel $productModel): bool
+    {
+        if (!$archiveModel->includeDelete) {
+            return false;
+        }
+
+        if (!empty(array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteAll, true)))) {
+            return true;
+        }
+
+        return !empty(array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteOwn, true)))
+            && $productModel->author == $user->id;
     }
 
     public static function createAccessRightFields(array &$dca): void
