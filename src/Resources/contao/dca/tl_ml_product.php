@@ -23,7 +23,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
             [ProductContainer::class, 'generateDownloadItems'],
-            [ProductContainer::class, 'generateAlias'],
             [ProductContainer::class, 'setCopyright'],
             [ProductContainer::class, 'updateTagAssociations'],
         ],

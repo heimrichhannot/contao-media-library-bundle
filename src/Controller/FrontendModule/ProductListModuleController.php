@@ -2,6 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Controller\FrontendModule;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
