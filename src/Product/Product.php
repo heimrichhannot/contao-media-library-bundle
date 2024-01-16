@@ -12,6 +12,9 @@ use HeimrichHannot\UtilsBundle\Util\Utils;
  */
 class Product
 {
+    public const PARAMETER_EDIT = 'edit';
+    public const PARAMETER_DELETE = 'deleteProduct';
+
     private ?string $editLink;
     private ?string $deleteLink;
 
@@ -44,7 +47,7 @@ class Product
                 return null;
             }
 
-            $this->editLink = $this->utils->url()->addQueryStringParameterToUrl('edit='.$this->productModel->id, $page->getFrontendUrl());
+            $this->editLink = $this->utils->url()->addQueryStringParameterToUrl(static::PARAMETER_EDIT.'='.$this->productModel->id, $page->getFrontendUrl());
         }
 
         return $this->editLink;
@@ -59,7 +62,7 @@ class Product
                 return null;
             }
 
-            $this->deleteLink = $this->utils->url()->addQueryStringParameterToUrl('delete='.$this->productModel->id);
+            $this->deleteLink = $this->utils->url()->addQueryStringParameterToUrl(static::PARAMETER_DELETE.'='.$this->productModel->id);
         }
 
         return $this->deleteLink;

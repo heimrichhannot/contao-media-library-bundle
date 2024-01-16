@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Security;
 
 /**
  * @FrontendModule(ProductListModuleController::TYPE, category="media_library")
+ * @internal This class was create for testing purpose and may change in future versions.
  */
 class ProductListModuleController extends AbstractFrontendModuleController
 {
@@ -45,7 +46,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         if ($this->productFactory->getProductHelper()->runIfDeleteAction()) {
-            throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl('delete'));
+            throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl(Product::PARAMETER_DELETE));
         }
 
         $archives = ProductArchiveModel::findMultipleByIds(StringUtil::deserialize($model->ml_archives, true));

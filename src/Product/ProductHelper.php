@@ -2,6 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Product;
 
+use Contao\Input;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,11 +22,11 @@ class ProductHelper
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request || !$request->query->has('delete') || !($product = ProductModel::findByPk($request->query->get('delete')))) {
-            return false;
+        if ($request && $request->query->has('delete') && ($product = ProductModel::findByPk($request->query->get('delete')))) {
+            return $this->deleteProduct($product);
         }
 
-        return $this->deleteProduct($product);
+        return false;
     }
 
     public function deleteProduct(ProductModel $product): bool

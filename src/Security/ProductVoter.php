@@ -59,19 +59,20 @@ class ProductVoter extends Voter
 //            case self::PERMISSION_CREATE:
 //                break;
             case self::PERMISSION_EDIT:
-                if (!$archiveModel->allowEdit) {
-                    return false;
-                }
-                break;
+                return $this->voteOnEdit($attribute, $user, $archiveModel);
             case self::PERMISSION_DELETE:
                 return $this->voteOnDelete($archiveModel, $user, $subject);
         }
 
-        return $this->voteForFrontendUser($attribute, $subject, $user, $archiveModel);
+        return false;
     }
 
-    private function voteForFrontendUser(string $attribute, ProductModel $subject, FrontendUser $user, ProductArchiveModel $archiveModel): bool
+    private function voteOnEdit(string $attribute, FrontendUser $user, ProductArchiveModel $archiveModel): bool
     {
+        if (!$archiveModel->allowEdit) {
+            return false;
+        }
+
         $isAllowed = function ($entity) use ($archiveModel, $attribute) {
             $groups = StringUtil::deserialize($entity->ml_archives, true);
             if (!in_array($archiveModel->id, $groups)) {

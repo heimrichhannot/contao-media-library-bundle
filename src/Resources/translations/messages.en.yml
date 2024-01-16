@@ -1,0 +1,16 @@
+huh.mediaLibrary:
+  backend:
+    module:
+      notice_internal: "This module was only created for testing purposes and is therefore not offers all the functions to be expected. There may also be future incompatible changes!"
+
+huh.mediaLibrary.options.label: 'Choose an option'
+
+huh.mediaLibrary.btn.class: 'btn btn-primary border-0'
+huh.mediaLibrary.btn.label: 'download'
+huh.mediaLibrary.btn.abort.label: 'cancel'
+huh.mediaLibrary.alert.download.title: 'Choose an option'
+
+huh.mediaLibrary.downloadTitle.original: 'Original size'
+huh.mediaLibrary.downloadTitle.sizeWithProductTitle: '{title} ({size})'
+
+huh.mediaLibrary.product.delete.success: 'Image "{title}" was successfully deleted'
