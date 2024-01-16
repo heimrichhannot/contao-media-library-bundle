@@ -2,6 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Security;
 
+use Contao\Controller;
 use Contao\FrontendUser;
 use Contao\MemberGroupModel;
 use Contao\StringUtil;
@@ -116,6 +117,7 @@ class ProductVoter extends Voter
 
     public static function createAccessRightFields(array &$dca): void
     {
+        Controller::loadLanguageFile('tl_member');
         $dca['fields']['ml_archives'] = [
             'exclude'                 => true,
             'inputType'               => 'checkbox',
@@ -127,7 +129,7 @@ class ProductVoter extends Voter
             'exclude'                 => true,
             'inputType'               => 'checkbox',
             'options'                 => self::PERMISSIONS,
-            'reference'               => &$GLOBALS['TL_LANG']['MSC'],
+            'reference'               => &$GLOBALS['TL_LANG']['tl_member']['ml_archivesp'],
             'eval'                    => ['multiple'=>true],
             'sql'                     => "blob NULL"
         ];
