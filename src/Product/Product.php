@@ -64,4 +64,6 @@ class Product
 
         return $this->deleteLink;
     }
+
+
 }

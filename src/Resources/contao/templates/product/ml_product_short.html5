@@ -1,5 +1,8 @@
 <div class="product product-short product-<?= $this->product->id ?>">
     <span class="product-title"><?= $this->product->title ?></span>
+
+    <?php $this->insert('image', $this->arrData); ?>
+
     <?php if ($this->editLink): ?>
         <a href="<?= $this->editLink ?>" class="product-edit-link">Edit</a>
     <?php endif; ?>

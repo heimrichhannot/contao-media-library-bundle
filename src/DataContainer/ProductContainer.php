@@ -122,10 +122,6 @@ class ProductContainer
         return $varValue;
     }
 
-
-
-
-
     public function updateTagAssociations(DataContainer $dc): void
     {
         $source = $GLOBALS['TL_DCA']['tl_ml_product']['fields']['tags']['eval']['tagsManager'];

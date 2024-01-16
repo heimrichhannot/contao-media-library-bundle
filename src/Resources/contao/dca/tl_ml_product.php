@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
     'palettes' => [
         '__selector__' => ['type', 'addAdditionalFiles', 'protected', 'published'],
         'default' => 'type',
-    ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
+        ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
         ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
         ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
     ],
