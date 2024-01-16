@@ -22,7 +22,7 @@ class ProductHelper
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request && $request->query->has('delete') && ($product = ProductModel::findByPk($request->query->get('delete')))) {
+        if ($request && $request->query->has(Product::PARAMETER_DELETE) && ($product = ProductModel::findByPk($request->query->get(Product::PARAMETER_DELETE)))) {
             return $this->deleteProduct($product);
         }
 

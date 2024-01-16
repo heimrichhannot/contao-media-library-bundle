@@ -24,7 +24,6 @@ class ReaderBundleListener implements EventSubscriberInterface
         private RequestStack $requestStack,
         private TranslatorInterface $translator,
         private ProductFactory $productFactory,
-        private Utils $utils,
         private Security $security,
     )
     {
@@ -48,12 +47,14 @@ class ReaderBundleListener implements EventSubscriberInterface
 
         $product = $this->productFactory->createFromModel($productModel);
 
+        $templateData = $event->getTemplateData();
         if ($this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
-            $item->setFormattedValue('editLink', $product->editLink());
+            $templateData['editLink'] = $product->editLink();
         }
         if ($this->security->isGranted(ProductVoter::PERMISSION_DELETE, $productModel)) {
-            $item->setFormattedValue('deleteLink', $product->deleteLink());
+            $templateData['deleteLink'] = $product->deleteLink();
         }
+        $event->setTemplateData($templateData);
     }
 
     private function runIfDeleteAction(Request $request, ProductModel $productModel)
@@ -71,7 +72,7 @@ class ReaderBundleListener implements EventSubscriberInterface
                 $page = PageModel::findByPk($archive->redirectAfterDelete);
                 if ($page) {
                     $request->getSession()->getFlashBag()->add('success', $this->translator->trans('huh.mediaLibrary.product.delete.success', ['title' => $productModel->title]));
-                    throw new RedirectResponseException(throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl(Product::PARAMETER_DELETE)));
+                    throw new RedirectResponseException(throw new RedirectResponseException($page->getAbsoluteUrl()));
                 }
             }
         }
@@ -81,7 +82,7 @@ class ReaderBundleListener implements EventSubscriberInterface
     {
         $events = [];
         if (class_exists(ReaderBeforeRenderEvent::class)) {
-            $events[ReaderBeforeRenderEvent::NAME] = 'deleteProduct';
+            $events[ReaderBeforeRenderEvent::NAME] = 'onBeforeRenderEvent';
         }
         return $events;
     }

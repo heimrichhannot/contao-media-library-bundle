@@ -60,7 +60,7 @@ class ProductVoter extends Voter
 //            case self::PERMISSION_CREATE:
 //                break;
             case self::PERMISSION_EDIT:
-                return $this->voteOnEdit($attribute, $user, $archiveModel);
+                return $this->voteOnEdit($attribute, $user, $subject, $archiveModel);
             case self::PERMISSION_DELETE:
                 return $this->voteOnDelete($archiveModel, $user, $subject);
         }
@@ -68,10 +68,14 @@ class ProductVoter extends Voter
         return false;
     }
 
-    private function voteOnEdit(string $attribute, FrontendUser $user, ProductArchiveModel $archiveModel): bool
+    private function voteOnEdit(string $attribute, FrontendUser $user, ProductModel $productModel, ProductArchiveModel $archiveModel): bool
     {
         if (!$archiveModel->allowEdit) {
             return false;
+        }
+
+        if ($productModel->author === $user->id) {
+            return true;
         }
 
         $isAllowed = function ($entity) use ($archiveModel, $attribute) {

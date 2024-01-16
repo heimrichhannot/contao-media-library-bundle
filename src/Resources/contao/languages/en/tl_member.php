@@ -1,4 +1,7 @@
 <?php
+
+use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
+
 $lang = &$GLOBALS['TL_LANG']['tl_member'];
 
 $lang['media_library_legend'] = 'Media library';
