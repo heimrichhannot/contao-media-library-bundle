@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2024-02-01
+- Added: edit function ([#7])
+- Added: voter for edit and delete permissions ([#7])
+- Added: edit and delete buttons to list item ([#7])
+- Added: internal test list module ([#7])
+- Fixed: contao 4.9 incompatible code ([#7])
+- Fixed: some missing translations ([#7])
+
 ## [1.3.4] - 2023-12-13
 - Fixed: issue with disallowed delete method
 
@@ -166,3 +174,4 @@ All notable changes to this project will be documented in this file.
 - changed creating download entity and modifying product entity with `Database`
 
 [#2]: https://github.com/heimrichhannot/contao-media-library-bundle/pull/2
+[#7]: https://github.com/heimrichhannot/contao-media-library-bundle/pull/7
