@@ -46,46 +46,11 @@ huh_media_library:
   sanitize_download_filenames: false
 ```
 
-### Delete ML Products
+### Edit and Delete product
 
-Submit a `DELETE`-Request to the product's details URL. If the HTTP `DELETE` method is unavailable, use a hidden form field with a name of `_method` and the value `DELETE` instead.
+You can add edit and delete support for your media library products by setting the corresponding option in the archive settings.
+You also need to adjust the member (group) settings accordingly.
 
-Example for use within a Bootstrap 5 modal:
-```html
-<form method="post">
-    <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-    <button type="submit" class="btn btn-primary">Löschen</button>
-</form>
-```
+Edit and delete links will automatically be added to the template data of reader bundle templates, if the member has the corresponding permissions.
+The variable names are `editLink` and `deleteLink`.
 
-#### More on creating a Delete Form
-
-Further, if you need to inject a request token into the respective `HeimrichHannot\ReaderBundle` reader template, you may want to implement an EventListener:
-
-```php
-use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
-use HeimrichHannot\ReaderBundle\Event\ReaderBeforeRenderEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class MLDeleteFormEventListener implements EventSubscriberInterface
-{
-    public function __construct(private readonly ContaoCsrfTokenManager $csrfTokenManager) {}
-
-    public static function getSubscribedEvents()
-    {
-        return [ReaderBeforeRenderEvent::NAME => 'onReaderBeforeRenderEvents'];
-    }
-
-    public function onReaderBeforeRenderEvents(ReaderBeforeRenderEvent $event): void
-    {
-        if ($item['dataContainer'] === 'tl_ml_product')
-        {
-            $item = $event->getTemplateData();
-            $item['request_token'] = $this->csrfTokenManager->getDefaultTokenValue();
-            $event->setTemplateData($item);
-        }
-    }
-}
-```
