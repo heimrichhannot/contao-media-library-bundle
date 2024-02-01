@@ -10,11 +10,14 @@ namespace HeimrichHannot\MediaLibraryBundle\FormType;
 
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
 use Contao\FormModel;
+use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
@@ -22,24 +25,29 @@ use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
+use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaLibraryType extends AbstractFormType
 {
     public const TYPE = 'huh_media_library';
+    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
+    public const PARAMETER_EDIT = 'edit';
 
     private TranslatorInterface $translator;
     private Slug $slug;
-    private RequestStack $requestStack;
+    private Security $security;
 
-    public function __construct(TranslatorInterface $translator, Slug $slug, RequestStack $requestStack)
+    public function __construct(TranslatorInterface $translator, Slug $slug, Security $security)
     {
         $this->translator = $translator;
         $this->slug = $slug;
-        $this->requestStack = $requestStack;
+        $this->security = $security;
     }
 
     public function getType(): string
@@ -169,4 +177,32 @@ class MediaLibraryType extends AbstractFormType
         $fileModel->copyright = $event->getSubmittedData()['copyright'];
         $fileModel->save();
     }
+
+    protected function evaluateFormContext(): FormContext
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        if (!$request->query->has(static::PARAMETER_EDIT)) {
+            return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
+        }
+
+        $id = $request->query->get(static::PARAMETER_EDIT);
+        if  (!$id || !is_numeric($id) || !($productModel = ProductModel::findByPk($id))) {
+            throw new PageNotFoundException('Product not found!');
+        }
+
+        if ($this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+            return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $productModel->row());
+        }
+
+        throw new AccessDeniedException('No permission to edit product.');
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'request_stack' => '?request_stack',
+        ]);
+    }
+
+
 }

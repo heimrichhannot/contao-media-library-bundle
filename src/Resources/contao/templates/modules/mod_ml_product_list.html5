@@ -1,0 +1,6 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+<?= implode('', $this->products ?? []) ?>
+<?= $this->pagination; ?>
+<?php $this->endblock(); ?>

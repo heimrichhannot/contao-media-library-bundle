@@ -13,6 +13,8 @@ use Contao\BackendUser;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\Database\Result;
 use Contao\DataContainer;
@@ -27,7 +29,9 @@ use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
+use Exception;
 use HeimrichHannot\MediaLibraryBundle\Event\BeforeCreateImageDownloadEvent;
+use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
@@ -77,7 +81,8 @@ class ProductContainer
         EventDispatcherInterface $eventDispatcher,
         Utils $utils,
         ParameterBagInterface $parameterBag,
-        Security $security
+        Security $security,
+        private Slug $slug
     ) {
         $this->bundleConfig = $bundleConfig;
         $this->dcaUtil = $dcaUtil;
@@ -88,6 +93,33 @@ class ProductContainer
         $this->utils = $utils;
         $this->parameterBag = $parameterBag;
         $this->security = $security;
+    }
+
+    /**
+     * @Callback(table="tl_ml_product", target="fields.alias.save")
+     */
+    public function onFieldsAliasSaveCallback($varValue, DataContainer $dc)
+    {
+        $aliasExists = function (string $alias) use ($dc): bool
+        {
+            return Database::getInstance()->prepare("SELECT id FROM tl_ml_product WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
+        };
+
+        // Generate alias if there is none
+        if (!$varValue)
+        {
+            $varValue = $this->slug->generate($dc->activeRecord->title, null, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
     }
 
     public function updateTagAssociations(DataContainer $dc): void
@@ -233,7 +265,7 @@ class ProductContainer
     /**
      * Generate download.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function generateDownloadItems(DataContainer $dc)
     {
@@ -493,33 +525,9 @@ class ProductContainer
     }
 
     /**
-     * @throws \Exception
-     */
-    public function generateAlias(DataContainer $dc)
-    {
-        if (null === ($product = $this->getProduct($dc->id))) {
-            return;
-        }
-
-        if ($product->alias) {
-            return;
-        }
-
-        $alias = $this->dcaUtil->generateAlias(
-            $dc->activeRecord->alias,
-            $dc->activeRecord->id,
-            'tl_ml_product',
-            $dc->activeRecord->title
-        );
-
-        Database::getInstance()->prepare('UPDATE tl_ml_product SET tl_ml_product.alias=? WHERE tl_ml_product.id=?')->execute($alias,
-            $dc->activeRecord->id);
-    }
-
-    /**
      * create download items.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function createDownloadItems(DataContainer $dc, bool $isAdditional = false)
     {
@@ -624,7 +632,7 @@ class ProductContainer
     /**
      * Create image download items that will be resized.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function createImageDownloadItems(FilesModel $file, DataContainer $dc, Model $archiveModel, int $originalDownload = 0, bool $isAdditional = false)
     {
@@ -723,7 +731,7 @@ class ProductContainer
      *
      * @param ImageSizeModel $size
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function createDownloadItem(
         string $path,

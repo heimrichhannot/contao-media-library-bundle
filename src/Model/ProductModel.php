@@ -19,6 +19,12 @@ class ProductModel extends Model
 
     protected static $strTable = 'tl_ml_product';
 
+    /**
+     * @param MemberModel $member
+     * @return bool
+     *
+     * @deprecated Use Voter instead
+     */
     public function memberCanDelete(MemberModel $member)
     {
         $productArchive = ProductArchiveModel::findByPk($this->pid);

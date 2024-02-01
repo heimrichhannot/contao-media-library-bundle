@@ -1,3 +1,8 @@
+huh.mediaLibrary:
+  backend:
+    module:
+      notice_internal: "Dieses Modul wurde nur zu Testzwecken angelegt und ist nicht bietet daher nicht alle zu erwartenden Funktionen. Auch kann es zu künftigen inkompatiblen Änderungen kommen!"
+
 huh.mediaLibrary.options.label: 'Wählen Sie eine Option'
 
 huh.mediaLibrary.btn.class: 'btn btn-primary border-0'
