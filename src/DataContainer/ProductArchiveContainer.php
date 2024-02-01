@@ -11,7 +11,6 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;

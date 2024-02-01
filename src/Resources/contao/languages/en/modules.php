@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mkunitzsch
- * Date: 13.03.18
- * Time: 17:28
- */
-
 use HeimrichHannot\MediaLibraryBundle\Controller\FrontendModule\ProductListModuleController;
 
 $GLOBALS['TL_LANG']['MOD']['media-library'] = ['Media library', ''];
