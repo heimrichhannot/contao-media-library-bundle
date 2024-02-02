@@ -117,7 +117,6 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'foreignKey' => 'tl_ml_product_archive.title',
             'exclude' => true,
             'search' => true,
-            'sorting' => true,
             'sql' => "int(10) unsigned NOT NULL default '0'",
             'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
