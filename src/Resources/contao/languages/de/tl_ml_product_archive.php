@@ -29,12 +29,17 @@ $lang['groupsCanDeleteOwn'][0]               = 'Eigene Produkte löschen';
 $lang['groupsCanDeleteOwn'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.';
 $lang['groupsCanDeleteAll'][0]               = 'Alle Produkte löschen';
 $lang['groupsCanDeleteAll'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.';
+$lang['allowEdit'][0] = 'Produkte können bearbeitet werden';
+$lang['allowEdit'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.';
+$lang['editJumpTo'][0] = 'Bearbeiten-Seite';
+$lang['editJumpTo'][1] = 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Bearbeiten des Produktes befindet.';
 
 /**
  * Legends
  */
 $lang['general_legend']   = 'Allgemeine Einstellungen';
 $lang['config_legend']    = 'Konfiguration';
+$lang['edit_legend']    = 'Bearbeitung';
 $lang['protected_legend'] = 'Zugriffsschutz';
 $lang['publish_legend']   = 'Veröffentlichung';
 

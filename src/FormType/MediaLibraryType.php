@@ -21,6 +21,8 @@ use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
+use HeimrichHannot\FormTypeBundle\Event\CompileFormFieldsEvent;
+use HeimrichHannot\FormTypeBundle\Event\LoadFormFieldEvent;
 use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
@@ -39,15 +41,12 @@ class MediaLibraryType extends AbstractFormType
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
     public const PARAMETER_EDIT = 'edit';
 
-    private TranslatorInterface $translator;
-    private Slug $slug;
-    private Security $security;
-
-    public function __construct(TranslatorInterface $translator, Slug $slug, Security $security)
+    public function __construct(
+        private TranslatorInterface $translator,
+        private Slug $slug,
+        private Security $security
+    )
     {
-        $this->translator = $translator;
-        $this->slug = $slug;
-        $this->security = $security;
     }
 
     public function getType(): string
@@ -99,7 +98,7 @@ class MediaLibraryType extends AbstractFormType
 
         if (class_exists(HeimrichHannotFileCreditsBundle::class)) {
             $fields[] = [
-                'type' => 'text',
+                'type' => 'textarea',
                 'name' => 'copyright',
                 'label' => $this->translator->trans('tl_ml_product.copyright.0', [], 'contao_tl_ml_product'),
             ];
@@ -118,64 +117,82 @@ class MediaLibraryType extends AbstractFormType
         parent::onPrepareFormData($event);
     }
 
+    public function onLoadFormField(LoadFormFieldEvent $event): void
+    {
+        $isUpdate = $event->getFormContext()->isUpdate();
+
+        if ($isUpdate && 'file' === $event->getWidget()->name) {
+            $event->getWidget()->mandatory = '';
+        }
+
+        if ($isUpdate && 'copyright' === $event->getWidget()->name && class_exists(HeimrichHannotFileCreditsBundle::class)) {
+            $fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file']);
+            if ($fileModel) {
+                $event->getWidget()->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
+            }
+        }
+    }
+
     public function onStoreFormData(StoreFormDataEvent $event): void
     {
-        if ($event->getForm()->ml_archive
-            && ($archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive)))
-        {
-            $data = $event->getData();
-            $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
-            $data['pid'] = $event->getForm()->ml_archive;
-            $data['dateAdded'] = time();
-            $data['alias'] = $this->slug->generate($data['title']);
-            $data['type'] = $archiveModel->type;
+        if (!$event->getForm()->ml_archive) {
+            return;
+        }
+        $archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive);
+        if (!$archiveModel) {
+            return;
+        }
 
-            if ($event->getForm()->ml_publish) {
-                $data['published'] = '1';
-            }
+        $data = $event->getData();
+        $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
+        $data['pid'] = $event->getForm()->ml_archive;
+        $data['dateAdded'] = time();
+        $data['alias'] = $this->slug->generate($data['title']);
+        $data['type'] = $archiveModel->type;
 
-            if (!empty($_SESSION['FILES'])) {
-                Controller::loadDataContainer(ProductModel::getTable());
+        if ($event->getForm()->ml_publish) {
+            $data['published'] = '1';
+        }
 
-                foreach ($_SESSION['FILES'] as $field => $fieldData) {
-                    if (isset($data[$field]) && isset($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field])) {
-                        $data[$field] = StringUtil::uuidToBin($fieldData['uuid']);
+        if (!empty($_SESSION['FILES'])) {
+            Controller::loadDataContainer(ProductModel::getTable());
 
-                        if (($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['fieldType'] ?? false) === 'checkbox'
-                            || ($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['multiple'] ?? false) === true
-                        ) {
-                            $data[$field] = serialize([$fieldData['uuid']]);
-                        }
+            foreach ($_SESSION['FILES'] as $field => $fieldData) {
+                if (isset($data[$field]) && isset($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field])) {
+                    $data[$field] = StringUtil::uuidToBin($fieldData['uuid']);
+
+                    if (($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['fieldType'] ?? false) === 'checkbox'
+                        || ($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['multiple'] ?? false) === true
+                    ) {
+                        $data[$field] = serialize([$fieldData['uuid']]);
                     }
                 }
             }
-
-            $event->setData($data);
         }
 
-        parent::onStoreFormData($event);
+        $event->setData($data);
+
     }
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
     {
         parent::onProcessFormData($event);
 
-        if (!class_exists(HeimrichHannotFileCreditsBundle::class)) {
-            return;
+        if (class_exists(HeimrichHannotFileCreditsBundle::class)) {
+            $context = $this->getFormContext();
+
+            if ($context->isCreate()) {
+                $uuid = $event->getFiles()['file']['uuid'] ?? null;
+            } else {
+                $uuid = $context->getData()['file'] ?? null;
+            }
+
+            if ($uuid && ($fileModel = FilesModel::findByUuid($uuid))) {
+                $copyright = preg_split("/\r\n|\n|\r/", $event->getSubmittedData()['copyright'] ?? '');
+                $fileModel->copyright = serialize($copyright);
+                $fileModel->save();
+            }
         }
-
-        if (empty($event->getSubmittedData()['copyright']) || !isset($event->getFiles()['file']['uuid'])) {
-            return;
-        }
-
-        $fileModel = FilesModel::findByUuid($event->getFiles()['file']['uuid']);
-
-        if (!$fileModel) {
-            return;
-        }
-
-        $fileModel->copyright = $event->getSubmittedData()['copyright'];
-        $fileModel->save();
     }
 
     protected function evaluateFormContext(): FormContext

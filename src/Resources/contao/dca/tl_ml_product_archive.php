@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         'enableVersioning' => true,
         'onload_callback' => [
             [ProductArchiveContainer::class, 'checkPermission'],
-            [ProductArchiveContainer::class, 'checkIncludeDelete'],
         ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
@@ -87,11 +86,12 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems,allowEdit,includeDelete,redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll;{protected_legend},protected;',
+        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowEdit,includeDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
         'allowEdit' => 'editJumpTo',
+        'includeDelete' => 'redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll',
         'protected' => 'groups',
     ],
     'fields' => [
@@ -214,7 +214,8 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'foreignKey' => 'tl_page.id',
             'eval' => [
                 'fieldType' => 'radio',
-                'tl_class' => 'clr'
+                'tl_class' => 'clr',
+                'mandatory' => true,
             ],
             'sql' => "int(10) unsigned NOT NULL default 0",
             'relation' => [
