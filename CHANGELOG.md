@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.2] - 2024-04-30
+- Fixed: dca issue
+
 ## [1.4.1] - 2024-04-30
 - Fixed: adding and editing copyright of file not working
 - Fixed: missing translations

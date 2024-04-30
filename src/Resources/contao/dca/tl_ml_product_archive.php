@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit'],
+        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit', 'includeDelete'],
         'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowEdit,includeDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
