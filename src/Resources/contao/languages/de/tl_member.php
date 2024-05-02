@@ -10,3 +10,4 @@ $lang['ml_archivesp'] = ['Archiv-Rechte', 'Wählen Sie hier die Rechte aus, die 
 
 $lang['ml_archivesp'][ProductVoter::PERMISSION_EDIT] = 'Produkte bearbeiten';
 $lang['ml_archivesp'][ProductVoter::PERMISSION_DELETE] = 'Produkte löschen';
+$lang['ml_archivesp'][ProductVoter::PERMISSION_DELETE_OWN] = 'Eigene Produkte löschen';

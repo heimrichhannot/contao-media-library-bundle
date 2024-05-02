@@ -10,3 +10,4 @@ $lang['ml_archivesp'] = ['Archive rights', 'Select the rights that the member sh
 
 $lang['ml_archivesp'][ProductVoter::PERMISSION_EDIT] = 'Edit products';
 $lang['ml_archivesp'][ProductVoter::PERMISSION_DELETE] = 'Delete products';
+$lang['ml_archivesp'][ProductVoter::PERMISSION_DELETE_OWN] = 'Delete own products';

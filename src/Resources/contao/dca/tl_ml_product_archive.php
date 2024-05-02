@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit', 'includeDelete'],
-        'default' => '{general_legend},title;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowEdit,includeDelete;{protected_legend},protected;',
+        'default' => '{general_legend},title,jumpTo;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowEdit,includeDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
@@ -129,6 +129,14 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
             'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
             'sql' => "varchar(64) NOT NULL default ''",
+        ],
+        'jumpTo' => [
+            'exclude' => true,
+            'inputType' => 'pageTree',
+            'foreignKey' => 'tl_page.title',
+            'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'additionalFields' => [
             'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['additionalFields'],
