@@ -25,3 +25,10 @@ $dca['fields']['ml_publish'] = [
     ],
     'sql' => "char(1) NOT NULL default ''",
 ];
+$dca['fields']['ml_redirectToElement'] = [
+    'inputType' => 'checkbox',
+    'eval' => [
+        'tl_class' => 'w50',
+    ],
+    'sql' => ['type' => 'boolean', 'default' => false],
+];

@@ -13,6 +13,8 @@ $lang['tstamp'] = ['Revision date', ''];
 $lang['palette'][0] = 'Fields for the product palette';
 $lang['palette'][1] = 'Select the fields that should be added to the palette of products in this archive.';
 
+$lang['jumpTo'][0]                           = 'Redirect page';
+$lang['jumpTo'][1]                           = 'Select the product reader page to which the user should be redirected after clicking on a product.';
 $lang['includeDelete'][0]                    = 'Products can be deleted';
 $lang['includeDelete'][1]                    = 'Select this option if you want to allow users to delete the product.';
 $lang['redirectAfterDelete'][0]              = 'Redirect page after deletion';

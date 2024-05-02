@@ -17,11 +17,10 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
 use Contao\FormModel;
-use Contao\Model;
+use Contao\PageModel;
 use Contao\StringUtil;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
-use HeimrichHannot\FormTypeBundle\Event\CompileFormFieldsEvent;
 use HeimrichHannot\FormTypeBundle\Event\LoadFormFieldEvent;
 use HeimrichHannot\FormTypeBundle\Event\PrepareFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
@@ -31,7 +30,6 @@ use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -58,9 +56,10 @@ class MediaLibraryType extends AbstractFormType
     {
         PaletteManipulator::create()
             ->removeField('storeValues')
+            ->addField('ml_redirectToElement', 'jumpTo')
             ->addLegend('huh_media_library_legend', 'title_legend')
-            ->addField('ml_archive', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
-            ->addField('ml_publish', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
+                ->addField('ml_archive', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
+                ->addField('ml_publish', 'huh_media_library_legend', PaletteManipulator::POSITION_APPEND)
             ->applyToPalette('default', 'tl_form');
     }
 
@@ -107,16 +106,6 @@ class MediaLibraryType extends AbstractFormType
         return $fields;
     }
 
-    public function onPrepareFormData(PrepareFormDataEvent $event): void
-    {
-        if ($event->getForm()->ml_archive && ProductArchiveModel::findByPk($event->getForm()->ml_archive)) {
-            $event->getForm()->storeValues = '1';
-            $event->getForm()->targetTable = ProductModel::getTable();
-        }
-
-        parent::onPrepareFormData($event);
-    }
-
     public function onLoadFormField(LoadFormFieldEvent $event): void
     {
         $isUpdate = $event->getFormContext()->isUpdate();
@@ -133,6 +122,28 @@ class MediaLibraryType extends AbstractFormType
         }
     }
 
+    public function onPrepareFormData(PrepareFormDataEvent $event): void
+    {
+        $archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive);
+
+        if ($archiveModel) {
+            $event->getForm()->storeValues = '1';
+            $event->getForm()->targetTable = ProductModel::getTable();
+
+            $data = $event->getData();
+            $data['pid'] = $event->getForm()->ml_archive;
+            $data['dateAdded'] = time();
+            $data['alias'] = $this->slug->generate($data['title']);
+            $data['type'] = $archiveModel->type;
+            if ($event->getForm()->ml_publish) {
+                $data['published'] = '1';
+            }
+            $event->setData($data);
+        }
+
+        parent::onPrepareFormData($event);
+    }
+
     public function onStoreFormData(StoreFormDataEvent $event): void
     {
         if (!$event->getForm()->ml_archive) {
@@ -145,14 +156,6 @@ class MediaLibraryType extends AbstractFormType
 
         $data = $event->getData();
         $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
-        $data['pid'] = $event->getForm()->ml_archive;
-        $data['dateAdded'] = time();
-        $data['alias'] = $this->slug->generate($data['title']);
-        $data['type'] = $archiveModel->type;
-
-        if ($event->getForm()->ml_publish) {
-            $data['published'] = '1';
-        }
 
         if (!empty($_SESSION['FILES'])) {
             Controller::loadDataContainer(ProductModel::getTable());
@@ -192,6 +195,16 @@ class MediaLibraryType extends AbstractFormType
                 $fileModel->copyright = serialize($copyright);
                 $fileModel->save();
             }
+        }
+
+        $form = $event->getForm();
+        if ($form->ml_redirectToElement
+            && ($archiveModel = ProductArchiveModel::findByPk($form->ml_archive))
+            && ($detailsJumpTo = PageModel::findByPk($archiveModel->jumpTo))
+        ) {
+            $url = $detailsJumpTo->getAbsoluteUrl('/'.$event->getSubmittedData()['alias']);
+            $_SESSION['FILES'] = array();
+            Controller::redirect($url);
         }
     }
 
