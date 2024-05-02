@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2024-05-02
+- Added: option to redirect to product detail page after frontend upload ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
+- Added: option to allow only deleting own products to member permissions ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
+- Changed: delete permission from member permission now respected by voter ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
+- Deprecated: set delete permissions from archive ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
+
 ## [1.4.2] - 2024-04-30
 - Fixed: dca issue
 
