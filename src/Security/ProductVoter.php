@@ -80,26 +80,13 @@ class ProductVoter extends Voter
             return true;
         }
 
-        $isAllowed = function ($entity) use ($archiveModel, $attribute) {
-            $groups = StringUtil::deserialize($entity->ml_archives, true);
-            if (!in_array($archiveModel->id, $groups)) {
-                return false;
-            }
-            $accessRights = StringUtil::deserialize($entity->ml_archivesp, true);
-            if (!in_array($attribute, $accessRights)) {
-                return false;
-            }
-
-            return true;
-        };
-
-        if ($isAllowed($archiveModel->id, $user)) {
+        if ($this->isAllowed(static::PERMISSION_EDIT, $user, $archiveModel)) {
             return true;
         }
 
         foreach ($user->groups as $group) {
             $groupModel = MemberGroupModel::findByPk($group);
-            if ($groupModel && $isAllowed($groupModel)) {
+            if ($groupModel && $this->isAllowed(static::PERMISSION_EDIT, $groupModel, $archiveModel)) {
                 return true;
             }
         }
@@ -145,8 +132,8 @@ class ProductVoter extends Voter
 
     private function isAllowed(string $attribute, FrontendUser|MemberGroupModel $user, ProductArchiveModel $archiveModel)
     {
-        $groups = StringUtil::deserialize($user->ml_archives, true);
-        if (!in_array($archiveModel->id, $groups)) {
+        $archives = StringUtil::deserialize($user->ml_archives, true);
+        if (!in_array($archiveModel->id, $archives)) {
             return false;
         }
         $accessRights = StringUtil::deserialize($user->ml_archivesp, true);
