@@ -43,9 +43,7 @@ class MediaLibraryType extends AbstractFormType
         private TranslatorInterface $translator,
         private Slug $slug,
         private Security $security
-    )
-    {
-    }
+    ) {}
 
     public function getType(): string
     {
@@ -227,12 +225,10 @@ class MediaLibraryType extends AbstractFormType
         throw new AccessDeniedException('No permission to edit product.');
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
             'request_stack' => '?request_stack',
         ]);
     }
-
-
 }

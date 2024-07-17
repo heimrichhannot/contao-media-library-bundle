@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2024-07-17
+- Fixed: PHP 8 incompatible method signature of `FormType\MediaLibraryType::getSubscribedServices()`
+
 ## [1.5.0] - 2024-05-02
 - Added: option to redirect to product detail page after frontend upload ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
 - Added: option to allow only deleting own products to member permissions ([#8](https://github.com/heimrichhannot/contao-media-library-bundle/pull/8))
