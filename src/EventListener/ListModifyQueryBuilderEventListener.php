@@ -8,65 +8,66 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\EventListener;
 
+use Contao\Database;
 use Contao\StringUtil;
 use HeimrichHannot\ListBundle\Event\ListModifyQueryBuilderEvent;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ListConfigContainer;
 use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
-use HeimrichHannot\UtilsBundle\Model\ModelUtil;
-use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
+use HeimrichHannot\UtilsBundle\Util\Utils;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-/**
- * @ServiceTag("kernel.event_listener", event="huh.list.event.list_modify_query_builder")
- */
+#[AsEventListener(event: "huh.list.event.list_modify_query_builder")]
 class ListModifyQueryBuilderEventListener
 {
-    /**
-     * @var ModelUtil
-     */
-    private $modelUtil;
-    /**
-     * @var Request
-     */
-    private $request;
-    /**
-     * @var DatabaseUtil
-     */
-    private $databaseUtil;
-
-    public function __construct(ModelUtil $modelUtil, Request $request, DatabaseUtil $databaseUtil)
-    {
-        $this->modelUtil = $modelUtil;
-        $this->request = $request;
-        $this->databaseUtil = $databaseUtil;
-    }
+    public function __construct(
+        private readonly Utils $utils,
+        private readonly Request $request,
+        private readonly DatabaseUtil $databaseUtil
+    ) {}
 
     public function __invoke(ListModifyQueryBuilderEvent $event): void
     {
         $listConfig = $event->getListConfig();
 
         // set order according to additionalFilesOrder in tl_ml_product
-        if (ListConfigContainer::SORTING_MODE_ML_ADDITIONAL_FILES === $listConfig->sortingMode) {
-            $queryBuilder = $event->getQueryBuilder();
-
-            if (null !== ($product = $this->modelUtil->findOneModelInstanceBy('tl_ml_product',
-                    ['tl_ml_product.alias=?'], [$this->request->getGet('auto_item')])) && $product->addAdditionalFiles) {
-                $order = StringUtil::deserialize($product->additionalFilesOrder, true);
-
-                if (!empty($order)) {
-                    if (null !== ($downloads = $this->findMultipleDownloadsByFileUuids($order)) && $downloads->numRows > 0) {
-                        $ids = $downloads->fetchEach('id');
-
-                        $queryBuilder->orderBy('FIELD(tl_ml_download.id,'.implode(',', array_map(function ($v) {
-                            return '"'.$v.'"';
-                        }, $ids)).')', ' ');
-                    }
-                }
-            }
+        if (ListConfigContainer::SORTING_MODE_ML_ADDITIONAL_FILES !== $listConfig->sortingMode)
+            // TODO: this currently is always true, as the comparison above is of incompatible types
+        {
+            return;
         }
+
+        $queryBuilder = $event->getQueryBuilder();
+
+        $product = $this->utils->model()
+            ->findOneModelInstanceBy(
+                'tl_ml_product',
+                ['tl_ml_product.alias=?'],
+                [$this->request->getGet('auto_item')]
+            );
+
+        if ($product === null || !$product->addAdditionalFiles) {
+            return;
+        }
+
+        $order = StringUtil::deserialize($product->additionalFilesOrder, true);
+        if (empty($order)) {
+            return;
+        }
+
+        $downloads = $this->findMultipleDownloadsByFileUuids($order);
+        if ($downloads === null || $downloads->numRows < 1) {
+            return;
+        }
+
+        $ids = $downloads->fetchEach('id');
+
+        $queryBuilder->orderBy('FIELD(tl_ml_download.id,'.implode(',', array_map(function ($v) {
+            return '"'.$v.'"';
+        }, $ids)).')', ' ');
     }
 
-    public function findMultipleDownloadsByFileUuids($uuids, array $options = [])
+    public function findMultipleDownloadsByFileUuids($uuids, array $options = []): Database\Statement|Database\Result|null
     {
         if (empty($uuids) || !\is_array($uuids)) {
             return null;
