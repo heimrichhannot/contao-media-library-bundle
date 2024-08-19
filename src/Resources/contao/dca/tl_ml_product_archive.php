@@ -85,11 +85,12 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowEdit', 'includeDelete'],
-        'default' => '{general_legend},title,jumpTo;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowEdit,includeDelete;{protected_legend},protected;',
+        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowCreate', 'allowEdit', 'includeDelete'],
+        'default' => '{general_legend},title,jumpTo;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowCreate,allowEdit,includeDelete;{protected_legend},protected;',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
+        'allowCreate' => 'createJumpTo',
         'allowEdit' => 'editJumpTo',
         'includeDelete' => 'redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll',
         'protected' => 'groups',
@@ -190,22 +191,45 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
-        'allowEdit' => [
+        'allowCreate' => [
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => [
-                'tl_class' => 'w50 clr',
+                'tl_class' => 'clr',
                 'submitOnChange' => true,
             ],
             'sql' => "char(1) NOT NULL default ''",
         ],
+        'allowEdit' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+                'submitOnChange' => true,
+            ],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'createJumpTo' => [
+            'exclude' => true,
+            'inputType' => 'pageTree',
+            'foreignKey' => 'tl_page.title',
+            'eval' => ['fieldType' => 'radio'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'relation' => [
+                'type' => 'hasOne',
+                'load' => 'lazy'
+            ],
+        ],
         'editJumpTo' => [
-            'exclude'                 => true,
-            'inputType'               => 'pageTree',
-            'foreignKey'              => 'tl_page.title',
-            'eval'                    => array('fieldType'=>'radio'),
-            'sql'                     => "int(10) unsigned NOT NULL default 0",
-            'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
+            'exclude' => true,
+            'inputType' => 'pageTree',
+            'foreignKey' => 'tl_page.title',
+            'eval' => ['fieldType' => 'radio'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'relation' => [
+                'type' => 'hasOne',
+                'load' => 'lazy'
+            ],
         ],
         'includeDelete' => [
             'exclude' => true,

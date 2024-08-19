@@ -2,6 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Security;
 
+use BackendUser;
 use Contao\Controller;
 use Contao\FrontendUser;
 use Contao\MemberGroupModel;
@@ -13,13 +14,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ProductVoter extends Voter
 {
-//    public const PERMISSION_CREATE = 'create_product';
+    public const PERMISSION_CREATE = 'create_product';
     public const PERMISSION_EDIT = 'edit_product';
     public const PERMISSION_DELETE = 'delete_product';
     public const PERMISSION_DELETE_OWN = 'delete_own_product';
 
     public const PERMISSIONS = [
-//        self::PERMISSION_CREATE,
+        self::PERMISSION_CREATE,
         self::PERMISSION_EDIT,
         self::PERMISSION_DELETE,
         self::PERMISSION_DELETE_OWN
@@ -27,8 +28,12 @@ class ProductVoter extends Voter
 
     protected function supports($attribute, $subject): bool
     {
-        if (!in_array($attribute, self::PERMISSIONS)) {
+        if (!\in_array($attribute, self::PERMISSIONS)) {
             return false;
+        }
+
+        if ($attribute === self::PERMISSION_CREATE) {
+            return true;
         }
 
         if (!$subject instanceof ProductModel) {
@@ -48,8 +53,18 @@ class ProductVoter extends Voter
     {
         $user = $token->getUser();
 
+        if ($user instanceof BackendUser) {
+            return $user->isAdmin;
+        }
+
         if (!$user instanceof FrontendUser) {
             return false;
+        }
+
+        if ($attribute === self::PERMISSION_CREATE)
+        {
+            return $subject instanceof ProductArchiveModel
+                && $this->voteOnCreate($user, $subject);
         }
 
         $archiveModel = ProductArchiveModel::findByPk($subject->pid);
@@ -58,11 +73,10 @@ class ProductVoter extends Voter
         }
 
         switch ($attribute) {
-            // @todo implement create permission
-//            case self::PERMISSION_CREATE:
-//                break;
+            case self::PERMISSION_CREATE:
+                return $this->voteOnCreate($user, $archiveModel);
             case self::PERMISSION_EDIT:
-                return $this->voteOnEdit($attribute, $user, $subject, $archiveModel);
+                return $this->voteOnEdit($user, $subject, $archiveModel);
             case self::PERMISSION_DELETE:
                 return $this->voteOnDelete($archiveModel, $user, $subject);
         }
@@ -70,13 +84,33 @@ class ProductVoter extends Voter
         return false;
     }
 
-    private function voteOnEdit(string $attribute, FrontendUser $user, ProductModel $productModel, ProductArchiveModel $archiveModel): bool
+    private function voteOnCreate(FrontendUser $user, ProductArchiveModel $archiveModel): bool
+    {
+        if (!$archiveModel->allowCreate) {
+            return false;
+        }
+
+        if ($this->isAllowed(static::PERMISSION_CREATE, $user, $archiveModel)) {
+            return true;
+        }
+
+        foreach ($user->groups as $group) {
+            $groupModel = MemberGroupModel::findByPk($group);
+            if ($groupModel && $this->isAllowed(static::PERMISSION_CREATE, $groupModel, $archiveModel)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function voteOnEdit(FrontendUser $user, ProductModel $productModel, ProductArchiveModel $archiveModel): bool
     {
         if (!$archiveModel->allowEdit) {
             return false;
         }
 
-        if ($productModel->author === $user->id) {
+        if ($user->id === (int) $productModel->author) {
             return true;
         }
 
@@ -104,16 +138,20 @@ class ProductVoter extends Voter
             return true;
         }
 
-        foreach ($user->groups as $group) {
+        foreach ($user->groups as $group)
+        {
             $groupModel = MemberGroupModel::findByPk($group);
             if (!$groupModel) {
                 continue;
             }
+
             if ($this->isAllowed(self::PERMISSION_DELETE, $groupModel, $archiveModel)) {
                 return true;
             }
+
             if ($this->isAllowed(self::PERMISSION_DELETE_OWN, $groupModel, $archiveModel)
-                && $productModel->author == $user->id) {
+                && $productModel->author == $user->id)
+            {
                 return true;
             }
         }
@@ -122,22 +160,23 @@ class ProductVoter extends Voter
          * Support old incorrect group permission fields
          * @deprecated Will be remove in next major version
          */
-        if (!empty(array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteAll, true)))) {
+        if (!empty(\array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteAll, true)))) {
             return true;
         }
 
-        return !empty(array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteOwn, true)))
+        return !empty(\array_intersect($user->groups, StringUtil::deserialize($archiveModel->groupsCanDeleteOwn, true)))
             && $productModel->author == $user->id;
     }
 
-    private function isAllowed(string $attribute, FrontendUser|MemberGroupModel $user, ProductArchiveModel $archiveModel)
+    private function isAllowed(string $attribute, FrontendUser|MemberGroupModel $user, ProductArchiveModel $archiveModel): bool
     {
         $archives = StringUtil::deserialize($user->ml_archives, true);
-        if (!in_array($archiveModel->id, $archives)) {
+        if (!\in_array($archiveModel->id, $archives)) {
             return false;
         }
+
         $accessRights = StringUtil::deserialize($user->ml_archivesp, true);
-        if (!in_array($attribute, $accessRights)) {
+        if (!\in_array($attribute, $accessRights)) {
             return false;
         }
 
@@ -147,6 +186,7 @@ class ProductVoter extends Voter
     public static function createAccessRightFields(array &$dca): void
     {
         Controller::loadLanguageFile('tl_member');
+
         $dca['fields']['ml_archives'] = [
             'exclude'                 => true,
             'inputType'               => 'checkbox',
@@ -154,6 +194,7 @@ class ProductVoter extends Voter
             'eval'                    => ['multiple'=>true],
             'sql'                     => "blob NULL"
         ];
+
         $dca['fields']['ml_archivesp'] = [
             'exclude'                 => true,
             'inputType'               => 'checkbox',
