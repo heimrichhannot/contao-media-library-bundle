@@ -16,6 +16,7 @@ use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
+use Contao\Form;
 use Contao\FormModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -30,19 +31,21 @@ use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaLibraryType extends AbstractFormType
 {
     public const TYPE = 'huh_media_library';
-    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
     public const PARAMETER_EDIT = 'edit';
+    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private Slug $slug,
-        private Security $security
+        protected readonly RequestStack $requestStack,
+        protected readonly Slug $slug,
+        protected readonly TranslatorInterface $translator,
+        protected readonly Security $security
     ) {}
 
     public function getType(): string
@@ -106,36 +109,49 @@ class MediaLibraryType extends AbstractFormType
 
     public function onLoadFormField(LoadFormFieldEvent $event): void
     {
-        $isUpdate = $event->getFormContext()->isUpdate();
+        if ($event->getFormContext()->isUpdate()) {
+            $this->contextUpdate_onLoadFormField($event);
+        }
+    }
 
-        if ($isUpdate && 'file' === $event->getWidget()->name) {
-            $event->getWidget()->mandatory = '';
+    private function contextUpdate_onLoadFormField(LoadFormFieldEvent $event): void
+    {
+        $widget = $event->getWidget();
+        $name = $widget->name;
+
+        if ($name === 'file')
+        {
+            $widget->mandatory = '';
         }
 
-        if ($isUpdate && 'copyright' === $event->getWidget()->name && class_exists(HeimrichHannotFileCreditsBundle::class)) {
-            $fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file']);
-            if ($fileModel) {
-                $event->getWidget()->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
+        if ($name === 'copyright' && \class_exists(HeimrichHannotFileCreditsBundle::class))
+        {
+            if ($fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file']))
+            {
+                $widget->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
             }
         }
     }
 
     public function onPrepareFormData(PrepareFormDataEvent $event): void
     {
-        $archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive);
+        $form = $event->getForm();
 
-        if ($archiveModel) {
-            $event->getForm()->storeValues = '1';
-            $event->getForm()->targetTable = ProductModel::getTable();
+        $archiveModel = ProductArchiveModel::findByPk($form->ml_archive);
+
+        if ($archiveModel)
+        {
+            $form->storeValues = '1';
+            $form->targetTable = ProductModel::getTable();
 
             $data = $event->getData();
-            $data['pid'] = $event->getForm()->ml_archive;
-            $data['dateAdded'] = time();
+
+            $data['pid'] = $archiveModel->id;
+            $data['dateAdded'] = \time();
             $data['alias'] = $this->slug->generate($data['title']);
             $data['type'] = $archiveModel->type;
-            if ($event->getForm()->ml_publish) {
-                $data['published'] = '1';
-            }
+            $data['published'] = ($form->ml_publish ?? false) ? '1' : '';
+
             $event->setData($data);
         }
 
@@ -144,43 +160,61 @@ class MediaLibraryType extends AbstractFormType
 
     public function onStoreFormData(StoreFormDataEvent $event): void
     {
-        if (!$event->getForm()->ml_archive) {
+        $form = $event->getForm();
+
+        $pid = $form->ml_archive ?? null;
+        if (!$pid) {
             return;
         }
-        $archiveModel = ProductArchiveModel::findByPk($event->getForm()->ml_archive);
+
+        $archiveModel = ProductArchiveModel::findByPk($pid);
         if (!$archiveModel) {
             return;
         }
 
-        $data = $event->getData();
-        $data = array_intersect_key($data, array_flip(Database::getInstance()->getFieldNames(ProductModel::getTable())));
+        $table = ProductModel::getTable();
 
-        if (!empty($_SESSION['FILES'])) {
-            Controller::loadDataContainer(ProductModel::getTable());
+        $fieldNames = Database::getInstance()->getFieldNames($table);
+        $data = \array_intersect_key($event->getData(), \array_flip($fieldNames));
 
-            foreach ($_SESSION['FILES'] as $field => $fieldData) {
-                if (isset($data[$field]) && isset($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field])) {
-                    $data[$field] = StringUtil::uuidToBin($fieldData['uuid']);
+        if (empty($_SESSION['FILES']))
+        {
+            $event->setData($data);
+            return;
+        }
 
-                    if (($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['fieldType'] ?? false) === 'checkbox'
-                        || ($GLOBALS['TL_DCA'][ProductModel::getTable()]['fields'][$field]['eval']['multiple'] ?? false) === true
-                    ) {
-                        $data[$field] = serialize([$fieldData['uuid']]);
-                    }
-                }
+        Controller::loadDataContainer($table);
+
+        foreach ($_SESSION['FILES'] as $fieldName => $fieldData)
+        {
+            $field = $GLOBALS['TL_DCA'][$table]['fields'][$fieldName] ?? null;
+
+            if (!isset($data[$fieldName]) || empty($field)) {
+                continue;
+            }
+
+            $data[$fieldName] = StringUtil::uuidToBin($fieldData['uuid']);
+
+            $fieldType = $field['eval']['fieldType'] ?? null;
+            $fieldMultiple = $field['eval']['multiple'] ?? null;
+
+            if ($fieldType === 'checkbox' || $fieldMultiple === true) {
+                $data[$fieldName] = \serialize([$fieldData['uuid']]);
             }
         }
 
         $event->setData($data);
-
     }
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
     {
         parent::onProcessFormData($event);
 
-        if (class_exists(HeimrichHannotFileCreditsBundle::class)) {
-            $context = $this->getFormContext();
+        $form = $event->getForm();
+
+        if (\class_exists(HeimrichHannotFileCreditsBundle::class))
+        {
+            $context = $this->getFormContext($form);
 
             if ($context->isCreate()) {
                 $uuid = $event->getFiles()['file']['uuid'] ?? null;
@@ -195,7 +229,6 @@ class MediaLibraryType extends AbstractFormType
             }
         }
 
-        $form = $event->getForm();
         if ($form->ml_redirectToElement
             && ($archiveModel = ProductArchiveModel::findByPk($form->ml_archive))
             && ($detailsJumpTo = PageModel::findByPk($archiveModel->jumpTo))
@@ -206,28 +239,40 @@ class MediaLibraryType extends AbstractFormType
         }
     }
 
-    protected function evaluateFormContext(): FormContext
+    protected function evaluateFormContext(Form $form): FormContext
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        if (!$request->query->has(static::PARAMETER_EDIT)) {
-            return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
-        }
+        $request = $this->requestStack->getCurrentRequest();
 
-        $id = $request->query->get(static::PARAMETER_EDIT);
-        if  (!$id || !is_numeric($id) || !($productModel = ProductModel::findByPk($id))) {
-            throw new PageNotFoundException('Product not found!');
-        }
+        $accessDenied = new AccessDeniedException('No permission to edit product.');
 
-        if ($this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+        if ($request->query->has(static::PARAMETER_EDIT))
+            // Edit product
+        {
+            $id = $request->query->get(static::PARAMETER_EDIT);
+
+            if  (!\is_numeric($id) || !($productModel = ProductModel::findByPk($id))) {
+                throw new PageNotFoundException('Product not found!');
+            }
+
+            if (!$this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+                throw $accessDenied;
+            }
+
             return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $productModel->row());
         }
 
-        throw new AccessDeniedException('No permission to edit product.');
+        $mlArchive = ProductArchiveModel::findByPk($form->ml_archive);
+
+        if (!$this->security->isGranted(ProductVoter::PERMISSION_CREATE, $mlArchive)) {
+            throw $accessDenied;
+        }
+
+        return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
     }
 
     public static function getSubscribedServices(): array
     {
-        return array_merge(parent::getSubscribedServices(), [
+        return \array_merge(parent::getSubscribedServices(), [
             'request_stack' => '?request_stack',
         ]);
     }

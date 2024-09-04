@@ -21,13 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReaderBundleListener implements EventSubscriberInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private TranslatorInterface $translator,
-        private ProductFactory $productFactory,
-        private Security $security,
-    )
-    {
-    }
+        private readonly RequestStack        $requestStack,
+        private readonly TranslatorInterface $translator,
+        private readonly ProductFactory      $productFactory,
+        private readonly Security            $security,
+    ) {}
 
     public function onBeforeRenderEvent(ReaderBeforeRenderEvent $event): void
     {
@@ -57,7 +55,7 @@ class ReaderBundleListener implements EventSubscriberInterface
         $event->setTemplateData($templateData);
     }
 
-    private function runIfDeleteAction(Request $request, ProductModel $productModel)
+    private function runIfDeleteAction(Request $request, ProductModel $productModel): void
     {
         $archiveId = $productModel->pid;
         $deleted = $this->productFactory->getProductHelper()->runIfDeleteAction();
@@ -78,7 +76,7 @@ class ReaderBundleListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         $events = [];
         if (class_exists(ReaderBeforeRenderEvent::class)) {

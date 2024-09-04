@@ -18,8 +18,9 @@ use Contao\Model;
  * @property string $type
  * @property string $additionalFields
  * @property bool   $keepProductTitleForDownloadItems
+ * @property bool   $allowCreate
  * @property bool   $allowEdit
- * @property int   $editJumpTo
+ * @property int    $editJumpTo
  * @property bool   $includeDelete
  * @property bool   $redirectAfterDelete
  * @property string $groupsCanDeleteAll
