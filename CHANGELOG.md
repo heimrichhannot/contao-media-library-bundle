@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2024-09-04
+- Added: permission for creating products
+- Changed: minimum version requirement heimrichhannot/contao-form-type-bundle v0.2.0
+
 ## [1.5.1] - 2024-07-17
 - Fixed: PHP 8 incompatible method signature of `FormType\MediaLibraryType::getSubscribedServices()`
 
