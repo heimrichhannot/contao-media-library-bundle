@@ -33,7 +33,7 @@ class ProductVoter extends Voter
         }
 
         if ($attribute === self::PERMISSION_CREATE) {
-            return true;
+            return $subject instanceof ProductArchiveModel;
         }
 
         if (!$subject instanceof ProductModel) {
