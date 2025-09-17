@@ -9,7 +9,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 
 class FormContainer
 {
@@ -19,7 +19,7 @@ class FormContainer
     public function onFieldsMlArchiveOptionsCallback(): array
     {
         $options = [];
-        $archives = ProductArchiveModel::findAll();
+        $archives = ArchiveModel::findAll();
 
         if (null === $archives) {
             return $options;

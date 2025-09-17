@@ -3,8 +3,8 @@
 namespace HeimrichHannot\MediaLibraryBundle\Product;
 
 use Contao\PageModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 
 /**
@@ -22,8 +22,8 @@ class Product
      * @internal Do initialize this class directly. Use the ProductFactory instead.
      */
     public function __construct(
-        private ProductModel $productModel,
-        private Utils $utils,
+        private ItemModel $productModel,
+        private Utils     $utils,
     )
     {
     }
@@ -33,7 +33,7 @@ class Product
         return $this->productModel->{$name};
     }
 
-    public function getModel(): ProductModel
+    public function getModel(): ItemModel
     {
         return $this->productModel;
     }
@@ -41,7 +41,7 @@ class Product
     public function editLink(): ?string
     {
         if (!isset($this->editLink)) {
-            $archive = ProductArchiveModel::findByPk($this->productModel->pid);
+            $archive = ArchiveModel::findByPk($this->productModel->pid);
             if (!$archive || !$archive->allowEdit || !($page = PageModel::findByPk($archive->editJumpTo))) {
                 $this->editLink = null;
                 return null;
@@ -56,7 +56,7 @@ class Product
     public function deleteLink(): ?string
     {
         if (!isset($this->deleteLink)) {
-            $archive = ProductArchiveModel::findByPk($this->productModel->pid);
+            $archive = ArchiveModel::findByPk($this->productModel->pid);
             if (!$archive || !$archive->includeDelete) {
                 $this->deleteLink = null;
                 return null;

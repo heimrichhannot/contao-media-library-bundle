@@ -2,6 +2,8 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $bundleConfig: '%huh_media_library%'
 
     Psr\Log\LoggerInterface:
         alias: monolog.logger.contao

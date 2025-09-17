@@ -31,7 +31,7 @@ use Contao\System;
 use Contao\Versions;
 use Exception;
 use HeimrichHannot\MediaLibraryBundle\Event\BeforeCreateImageDownloadEvent;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;

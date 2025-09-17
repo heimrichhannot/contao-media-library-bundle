@@ -1,23 +1,17 @@
 <?php
 
-/*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
 namespace HeimrichHannot\MediaLibraryBundle\Model;
 
 use Contao\MemberModel;
 use Contao\Model;
 use Contao\StringUtil;
 
-class ProductModel extends Model
+class ItemModel extends Model
 {
     public const ITEM_LICENCE_TYPE_FREE = 'free';
     public const ITEM_LICENCE_TYPE_LOCKED = 'locked';
 
-    protected static $strTable = 'tl_ml_product';
+    protected static $strTable = 'tl_ml_item';
 
     /**
      * @param MemberModel $member
@@ -25,9 +19,9 @@ class ProductModel extends Model
      *
      * @deprecated Use Voter instead
      */
-    public function memberCanDelete(MemberModel $member)
+    public function memberCanDelete(MemberModel $member): bool
     {
-        $productArchive = ProductArchiveModel::findByPk($this->pid);
+        $productArchive = ArchiveModel::findByPk($this->pid);
 
         if ($productArchive === null) {
             return false;
@@ -46,6 +40,6 @@ class ProductModel extends Model
 
         $groupsCanDeleteOwn = StringUtil::deserialize($productArchive->groupsCanDeleteOwn, true);
 
-        return !empty(array_intersect($memberGroups, $groupsCanDeleteOwn)) && $this->author == $member->id;
+        return !empty(array_intersect($memberGroups, $groupsCanDeleteOwn)) && (int) $this->author === (int) $member->id;
     }
 }

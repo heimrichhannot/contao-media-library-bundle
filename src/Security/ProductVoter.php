@@ -7,8 +7,8 @@ use Contao\Controller;
 use Contao\FrontendUser;
 use Contao\MemberGroupModel;
 use Contao\StringUtil;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -33,10 +33,10 @@ class ProductVoter extends Voter
         }
 
         if ($attribute === self::PERMISSION_CREATE) {
-            return $subject instanceof ProductArchiveModel;
+            return $subject instanceof ArchiveModel;
         }
 
-        if (!$subject instanceof ProductModel) {
+        if (!$subject instanceof ItemModel) {
             return false;
         }
 
@@ -45,7 +45,7 @@ class ProductVoter extends Voter
 
     /**
      * @param string $attribute
-     * @param ProductModel $subject
+     * @param ItemModel $subject
      * @param TokenInterface $token
      * @return bool
      */
@@ -63,11 +63,11 @@ class ProductVoter extends Voter
 
         if ($attribute === self::PERMISSION_CREATE)
         {
-            return $subject instanceof ProductArchiveModel
+            return $subject instanceof ArchiveModel
                 && $this->voteOnCreate($user, $subject);
         }
 
-        $archiveModel = ProductArchiveModel::findByPk($subject->pid);
+        $archiveModel = ArchiveModel::findByPk($subject->pid);
         if (!$archiveModel) {
             return false;
         }
@@ -84,7 +84,7 @@ class ProductVoter extends Voter
         return false;
     }
 
-    private function voteOnCreate(FrontendUser $user, ProductArchiveModel $archiveModel): bool
+    private function voteOnCreate(FrontendUser $user, ArchiveModel $archiveModel): bool
     {
         if (!$archiveModel->allowCreate) {
             return false;
@@ -104,7 +104,7 @@ class ProductVoter extends Voter
         return false;
     }
 
-    private function voteOnEdit(FrontendUser $user, ProductModel $productModel, ProductArchiveModel $archiveModel): bool
+    private function voteOnEdit(FrontendUser $user, ItemModel $productModel, ArchiveModel $archiveModel): bool
     {
         if (!$archiveModel->allowEdit) {
             return false;
@@ -128,7 +128,7 @@ class ProductVoter extends Voter
         return false;
     }
 
-    private function voteOnDelete(ProductArchiveModel $archiveModel, FrontendUser $user, ProductModel $productModel): bool
+    private function voteOnDelete(ArchiveModel $archiveModel, FrontendUser $user, ItemModel $productModel): bool
     {
         if (!$archiveModel->includeDelete) {
             return false;
@@ -168,7 +168,7 @@ class ProductVoter extends Voter
             && $productModel->author == $user->id;
     }
 
-    private function isAllowed(string $attribute, FrontendUser|MemberGroupModel $user, ProductArchiveModel $archiveModel): bool
+    private function isAllowed(string $attribute, FrontendUser|MemberGroupModel $user, ArchiveModel $archiveModel): bool
     {
         $archives = StringUtil::deserialize($user->ml_archives, true);
         if (!\in_array($archiveModel->id, $archives)) {

@@ -2,7 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Product;
 
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class ProductFactory
@@ -14,7 +14,7 @@ class ProductFactory
     {
     }
 
-    public function createFromModel(ProductModel $productModel): Product
+    public function createFromModel(ItemModel $productModel): Product
     {
         return new Product($productModel, $this->utils);
     }

@@ -16,8 +16,8 @@ use Contao\ModuleModel;
 use Contao\Pagination;
 use Contao\StringUtil;
 use Contao\Template;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Product\Product;
 use HeimrichHannot\MediaLibraryBundle\Product\ProductFactory;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
@@ -49,7 +49,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
             throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl(Product::PARAMETER_DELETE));
         }
 
-        $archives = ProductArchiveModel::findMultipleByIds(StringUtil::deserialize($model->ml_archives, true));
+        $archives = ArchiveModel::findMultipleByIds(StringUtil::deserialize($model->ml_archives, true));
         if (!$archives) {
             return $template->getResponse();
         }
@@ -68,7 +68,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
             'tl_ml_product.published=?',
         ];
 
-        $total = ProductModel::countBy($columns, ['1']);
+        $total = ItemModel::countBy($columns, ['1']);
 
 
         // Split the results
@@ -111,7 +111,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
             'limit' => $limit,
         ];
 
-        $productCollection = ProductModel::findBy($columns, ['1',], $options);
+        $productCollection = ItemModel::findBy($columns, ['1',], $options);
 
         if (!$productCollection) {
             return $template->getResponse();
