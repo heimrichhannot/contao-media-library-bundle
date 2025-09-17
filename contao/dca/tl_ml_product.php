@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_ml_product'] = [
             'downloads' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['downloads'],
                 'href' => 'table=tl_ml_download',
-                'icon' => 'bundles/heimrichhannotcontaomedialibrary/img/icon-download.png',
+                'icon' => 'bundles/heimrichhannotmedialibrary/img/icon-download.png',
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_ml_product']['copy'],

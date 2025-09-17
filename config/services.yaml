@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Psr\Log\LoggerInterface:
+        alias: monolog.logger.contao
+
+    HeimrichHannot\MediaLibraryBundle\:
+        resource: ../src
+        exclude:
+            - ../src/{ContaoManager,DependencyInjection,Model}
+            - ../src/Product/Product.php
+
+    # todo(@ericges): remove this when the ajax manager has been removed from the bundle
+    huh.media_library.ajax_manager:
+        public: true
+        class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
+        arguments:
+            - "@contao.framework"
+            - "@translator"
+            - "@huh.utils.file"
+            - "@huh.ajax"

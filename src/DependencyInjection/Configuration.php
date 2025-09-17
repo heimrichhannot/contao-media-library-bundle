@@ -13,17 +13,18 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('huh_media_library');
+        $rootNode = $treeBuilder->getRootNode();
 
-        $treeBuilder->getRootNode()
+        $rootNode
             ->children()
                 ->booleanNode('sanitize_download_filenames')
                     ->info('If true, the filenames of the generated product downloads will be sanitized.')
                     ->defaultFalse()
                 ->end()
-            ->end();
+            ?->end();
 
         return $treeBuilder;
     }

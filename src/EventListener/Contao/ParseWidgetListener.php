@@ -70,7 +70,7 @@ class ParseWidgetListener
             'nb' => '1',
         ]);
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/heimrichhannotcontaomedialibrary/backend/js/wizard.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/heimrichhannotmedialibrary/backend/js/wizard.js';
 
         $linkId = uniqid('huh_ml_copyright_');
         $scriptTitle = StringUtil::specialchars(\str_replace("'", "\\'", $title));

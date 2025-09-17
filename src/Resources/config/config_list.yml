@@ -1,5 +1,0 @@
-huh:
-  list:
-    items:
-      - { name: ml_product_default, class: HeimrichHannot\MediaLibraryBundle\Item\DefaultProductListItem }
-      - { name: ml_download_default, class: HeimrichHannot\MediaLibraryBundle\Item\DefaultDownloadListItem }

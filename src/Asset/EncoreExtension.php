@@ -4,14 +4,14 @@ namespace HeimrichHannot\MediaLibraryBundle\Asset;
 
 use HeimrichHannot\EncoreContracts\EncoreEntry;
 use HeimrichHannot\EncoreContracts\EncoreExtensionInterface;
-use HeimrichHannot\MediaLibraryBundle\HeimrichHannotContaoMediaLibraryBundle;
+use HeimrichHannot\MediaLibraryBundle\HeimrichHannotMediaLibraryBundle;
 
 class EncoreExtension implements EncoreExtensionInterface
 {
 
     public function getBundle(): string
     {
-        return HeimrichHannotContaoMediaLibraryBundle::class;
+        return HeimrichHannotMediaLibraryBundle::class;
     }
 
     public function getEntries(): array
