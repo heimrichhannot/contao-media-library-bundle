@@ -28,8 +28,8 @@ use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\FormTypeBundle\FormType\FormContext;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\ProductModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
@@ -137,12 +137,12 @@ class MediaLibraryType extends AbstractFormType
     {
         $form = $event->getForm();
 
-        $archiveModel = ProductArchiveModel::findByPk($form->ml_archive);
+        $archiveModel = ArchiveModel::findByPk($form->ml_archive);
 
         if ($archiveModel)
         {
             $form->storeValues = '1';
-            $form->targetTable = ProductModel::getTable();
+            $form->targetTable = ItemModel::getTable();
 
             $data = $event->getData();
 
@@ -167,12 +167,12 @@ class MediaLibraryType extends AbstractFormType
             return;
         }
 
-        $archiveModel = ProductArchiveModel::findByPk($pid);
+        $archiveModel = ArchiveModel::findByPk($pid);
         if (!$archiveModel) {
             return;
         }
 
-        $table = ProductModel::getTable();
+        $table = ItemModel::getTable();
 
         $fieldNames = Database::getInstance()->getFieldNames($table);
         $data = \array_intersect_key($event->getData(), \array_flip($fieldNames));
@@ -230,7 +230,7 @@ class MediaLibraryType extends AbstractFormType
         }
 
         if ($form->ml_redirectToElement
-            && ($archiveModel = ProductArchiveModel::findByPk($form->ml_archive))
+            && ($archiveModel = ArchiveModel::findByPk($form->ml_archive))
             && ($detailsJumpTo = PageModel::findByPk($archiveModel->jumpTo))
         ) {
             $url = $detailsJumpTo->getAbsoluteUrl('/'.$event->getSubmittedData()['alias']);
@@ -239,35 +239,47 @@ class MediaLibraryType extends AbstractFormType
         }
     }
 
+    protected function createAccessDeniedException(?string $message = null): AccessDeniedException
+    {
+        $message ??= 'No permission to edit product.';
+
+        return new AccessDeniedException($message);
+    }
+
     protected function evaluateFormContext(Form $form): FormContext
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        $accessDenied = new AccessDeniedException('No permission to edit product.');
+        if (!$request = $this->requestStack->getCurrentRequest()) {
+            return FormContext::invalid(static::DEFAULT_FORM_CONTEXT_TABLE);
+        }
 
         if ($request->query->has(static::PARAMETER_EDIT))
             // Edit product
         {
             $id = $request->query->get(static::PARAMETER_EDIT);
 
-            if  (!\is_numeric($id) || !($productModel = ProductModel::findByPk($id))) {
-                throw new PageNotFoundException('Product not found!');
-            }
-
-            if (!$this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
-                throw $accessDenied;
-            }
-
-            return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $productModel->row());
+            return $this->evaluateFormContext_editParameter($id);
         }
 
-        $mlArchive = ProductArchiveModel::findByPk($form->ml_archive);
+        $mlArchive = ArchiveModel::findByPk($form->ml_archive);
 
         if (!$this->security->isGranted(ProductVoter::PERMISSION_CREATE, $mlArchive)) {
-            throw $accessDenied;
+            throw $this->createAccessDeniedException();
         }
 
         return FormContext::create(static::DEFAULT_FORM_CONTEXT_TABLE);
+    }
+
+    protected function evaluateFormContext_editParameter(mixed $id): FormContext
+    {
+        if  (!\is_numeric($id) || !($productModel = ItemModel::findByPk($id))) {
+            throw new PageNotFoundException('Product not found!');
+        }
+
+        if (!$this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return FormContext::update(static::DEFAULT_FORM_CONTEXT_TABLE, $productModel->row());
     }
 
     public static function getSubscribedServices(): array
