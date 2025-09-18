@@ -42,7 +42,7 @@ class Product
     {
         if (!isset($this->editLink)) {
             $archive = ArchiveModel::findByPk($this->productModel->pid);
-            if (!$archive || !$archive->allowEdit || !($page = PageModel::findByPk($archive->editJumpTo))) {
+            if (!$archive || !$archive->enableEdit || !($page = PageModel::findByPk($archive->editJumpTo))) {
                 $this->editLink = null;
                 return null;
             }
@@ -57,7 +57,7 @@ class Product
     {
         if (!isset($this->deleteLink)) {
             $archive = ArchiveModel::findByPk($this->productModel->pid);
-            if (!$archive || !$archive->includeDelete) {
+            if (!$archive || !$archive->enableDelete) {
                 $this->deleteLink = null;
                 return null;
             }
