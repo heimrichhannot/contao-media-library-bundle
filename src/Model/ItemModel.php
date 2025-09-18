@@ -5,13 +5,14 @@ namespace HeimrichHannot\MediaLibraryBundle\Model;
 use Contao\MemberModel;
 use Contao\Model;
 use Contao\StringUtil;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 
 class ItemModel extends Model
 {
     public const ITEM_LICENCE_TYPE_FREE = 'free';
     public const ITEM_LICENCE_TYPE_LOCKED = 'locked';
 
-    protected static $strTable = 'tl_ml_item';
+    protected static $strTable = ItemContainer::TABLE;
 
     /**
      * @param MemberModel $member
@@ -27,7 +28,7 @@ class ItemModel extends Model
             return false;
         }
 
-        if (!$productArchive->includeDelete) {
+        if (!$productArchive->enableDelete) {
             return false;
         }
 

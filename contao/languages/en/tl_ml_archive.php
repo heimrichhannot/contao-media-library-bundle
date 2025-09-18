@@ -1,6 +1,8 @@
 <?php
 
-$lang = &$GLOBALS['TL_LANG']['tl_ml_product_archive'];
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+
+$lang = &$GLOBALS['TL_LANG'][ArchiveModel::getTable()];
 
 /**
  * Fields
@@ -15,18 +17,18 @@ $lang['palette'][1] = 'Select the fields that should be added to the palette of 
 
 $lang['jumpTo'][0]                           = 'Redirect page';
 $lang['jumpTo'][1]                           = 'Select the product reader page to which the user should be redirected after clicking on a product.';
-$lang['includeDelete'][0]                    = 'Products can be deleted';
-$lang['includeDelete'][1]                    = 'Select this option if you want to allow users to delete the product.';
-$lang['redirectAfterDelete'][0]              = 'Redirect page after deletion';
-$lang['redirectAfterDelete'][1]              = 'Select the page to which the user should be redirected after deleting the product.';
+$lang['enableDelete'][0]                    = 'Products can be deleted';
+$lang['enableDelete'][1]                    = 'Select this option if you want to allow users to delete the product.';
+$lang['deleteJumpTo'][0]              = 'Redirect page after deletion';
+$lang['deleteJumpTo'][1]              = 'Select the page to which the user should be redirected after deleting the product.';
 $lang['groupsCanDeleteOwn'][0]               = 'Delete own products (Obsolete, please set in member(group) settings)';
 $lang['groupsCanDeleteOwn'][1]               = 'Select the member groups here that are allowed to delete their own products.';
 $lang['groupsCanDeleteAll'][0]               = 'Delete all products (Obsolete, please set in member(group) settings)';
 $lang['groupsCanDeleteAll'][1]               = 'Select the member groups here that are allowed to delete all products.';
-$lang['allowCreate'][0] = 'Products can be created';
-$lang['allowCreate'][1] = 'Select this option if you want to allow users to create new products in the frontend.';
-$lang['allowEdit'][0] = 'Products can be edited';
-$lang['allowEdit'][1] = 'Select this option if you want to allow users to edit the product in the frontend.';
+$lang['enableCreate'][0] = 'Products can be created';
+$lang['enableCreate'][1] = 'Select this option if you want to allow users to create new products in the frontend.';
+$lang['enableEdit'][0] = 'Products can be edited';
+$lang['enableEdit'][1] = 'Select this option if you want to allow users to edit the product in the frontend.';
 $lang['editJumpTo'][0] = 'Edit page';
 $lang['editJumpTo'][1] = 'Select the page on which the form for editing the product is located.';
 

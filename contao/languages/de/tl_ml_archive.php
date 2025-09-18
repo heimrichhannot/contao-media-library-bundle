@@ -1,6 +1,8 @@
 <?php
 
-$lang = &$GLOBALS['TL_LANG']['tl_ml_product_archive'];
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+
+$lang = &$GLOBALS['TL_LANG'][ArchiveModel::getTable()];
 
 /**
  * Fields
@@ -23,18 +25,18 @@ $lang['groups'][0]                           = 'Mitgliedergruppen';
 $lang['groups'][1]                           = 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.';
 $lang['keepProductTitleForDownloadItems'][0] = 'Produktnamen im Downloadtitel behalten';
 $lang['keepProductTitleForDownloadItems'][1] = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
-$lang['includeDelete'][0]                    = 'Produkte können gelöscht werden';
-$lang['includeDelete'][1]                    = 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.';
-$lang['redirectAfterDelete'][0]              = 'Weiterleitungsseite nach dem Löschen';
-$lang['redirectAfterDelete'][1]              = 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.';
+$lang['enableDelete'][0]                    = 'Produkte können gelöscht werden';
+$lang['enableDelete'][1]                    = 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.';
+$lang['deleteJumpTo'][0]              = 'Weiterleitungsseite nach dem Löschen';
+$lang['deleteJumpTo'][1]              = 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.';
 $lang['groupsCanDeleteOwn'][0]               = 'Eigene Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)';
 $lang['groupsCanDeleteOwn'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.';
 $lang['groupsCanDeleteAll'][0]               = 'Alle Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)';
 $lang['groupsCanDeleteAll'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.';
-$lang['allowCreate'][0] = 'Produkte können erstellt werden';
-$lang['allowCreate'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.';
-$lang['allowEdit'][0] = 'Produkte können bearbeitet werden';
-$lang['allowEdit'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.';
+$lang['enableCreate'][0] = 'Produkte können erstellt werden';
+$lang['enableCreate'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.';
+$lang['enableEdit'][0] = 'Produkte können bearbeitet werden';
+$lang['enableEdit'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.';
 $lang['editJumpTo'][0] = 'Bearbeiten-Seite';
 $lang['editJumpTo'][1] = 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Bearbeiten des Produktes befindet.';
 

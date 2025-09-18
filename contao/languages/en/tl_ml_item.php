@@ -6,7 +6,9 @@
  * @license LGPL-3.0-or-later
  */
 
-$lang = &$GLOBALS['TL_LANG']['tl_ml_product'];
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
+
+$lang = &$GLOBALS['TL_LANG'][ItemModel::getTable()];
 
 /*
  * Fields

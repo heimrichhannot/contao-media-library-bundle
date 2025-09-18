@@ -1,6 +1,6 @@
 <?php
 
-$GLOBALS['TL_DCA']['tl_cfg_tag_ml_product'] = [
+$GLOBALS['TL_DCA']['tl_cfg_tag_ml_item'] = [
     'config' => [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,

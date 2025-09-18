@@ -1,5 +1,9 @@
 <?php
 
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+
+$archiveTable = ArchiveModel::getTable();
+
 $dca = &$GLOBALS['TL_DCA']['tl_user'];
 
 /**
@@ -12,16 +16,14 @@ $dca['palettes']['custom'] = str_replace('fop;', 'fop;{contao_media_library_bund
  * Fields
  */
 $dca['fields']['contao_media_library_bundles'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_user']['contao_media_library_bundles'],
     'exclude'    => true,
     'inputType'  => 'checkbox',
-    'foreignKey' => 'tl_ml_product_archive.title',
+    'foreignKey' => "$archiveTable.title",
     'eval'       => ['multiple' => true],
     'sql'        => "blob NULL"
 ];
 
 $dca['fields']['contao_media_library_bundlep'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_user']['contao_media_library_bundlep'],
     'exclude'   => true,
     'inputType' => 'checkbox',
     'options'   => ['create', 'delete'],

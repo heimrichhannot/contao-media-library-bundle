@@ -1,6 +1,8 @@
 <?php
 
-$lang = &$GLOBALS['TL_LANG']['tl_ml_download'];
+use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
+
+$lang = &$GLOBALS['TL_LANG'][DownloadModel::getTable()];
 
 /**
  * Fields

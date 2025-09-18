@@ -1,11 +1,5 @@
 <?php
 
-/*
- * Copyright (c) 2023 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
 $dca = &$GLOBALS['TL_DCA']['tl_form'];
 
 $dca['fields']['ml_archive'] = [
@@ -18,6 +12,7 @@ $dca['fields']['ml_archive'] = [
     ],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
+
 $dca['fields']['ml_publish'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -25,6 +20,7 @@ $dca['fields']['ml_publish'] = [
     ],
     'sql' => "char(1) NOT NULL default ''",
 ];
+
 $dca['fields']['ml_redirectToElement'] = [
     'inputType' => 'checkbox',
     'eval' => [

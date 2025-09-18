@@ -1,30 +1,22 @@
 <?php
 
-/*
- * Copyright (c) 2023 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
+use Contao\DC_Table;
 use Contao\System;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
-System::loadLanguageFile('tl_ml_product');
+$table = ArchiveModel::getTable();
+$itemTable = ItemModel::getTable();
 
-$GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
+$GLOBALS['TL_DCA'][$table] = [
     'config' => [
-        'dataContainer' => 'Table',
-        'ctable' => ['tl_ml_product'],
+        'dataContainer' => DC_Table::class,
+        'ctable' => [$itemTable],
         'enableVersioning' => true,
         'onload_callback' => [
             [ProductArchiveContainer::class, 'checkPermission'],
-        ],
-        'onsubmit_callback' => [
-            ['huh.utils.dca', 'setDateAdded'],
-        ],
-        'oncopy_callback' => [
-            ['huh.utils.dca', 'setDateAddedOnCopy'],
         ],
         'sql' => [
             'keys' => [
@@ -53,24 +45,24 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['edit'],
-                'href' => 'table=tl_ml_product',
+                'label' => &$GLOBALS['TL_LANG'][$table]['edit'],
+                'href' => "table=$itemTable",
                 'icon' => 'edit.svg',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['editheader'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.svg',
                 'button_callback' => [ProductArchiveContainer::class, 'editHeader'],
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['copy'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.svg',
                 'button_callback' => [ProductArchiveContainer::class, 'copyArchive'],
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['delete'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
@@ -78,29 +70,31 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'button_callback' => [ProductArchiveContainer::class, 'deleteArchive'],
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['show'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
         ],
     ],
     'palettes' => [
-        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'allowCreate', 'allowEdit', 'includeDelete'],
-        'default' => '{general_legend},title,jumpTo;{config_legend},type,additionalFields,keepProductTitleForDownloadItems;{edit_legend},allowCreate,allowEdit,includeDelete;{protected_legend},protected;',
+        '__selector__' => ['type', 'protected', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
+        'default' => '
+            {general_legend},title,jumpTo;
+            {config_legend},type,additionalFields,keepProductTitleForDownloadItems;
+            {edit_legend},enableCreate,enableEdit,enableDelete;
+        ',
     ],
     'subpalettes' => [
         'type_'. ProductContainer::TYPE_IMAGE => 'imageSizes',
-        'allowCreate' => 'createJumpTo',
-        'allowEdit' => 'editJumpTo',
-        'includeDelete' => 'redirectAfterDelete,groupsCanDeleteOwn,groupsCanDeleteAll',
-        'protected' => 'groups',
+        'enableCreate' => 'createJumpTo',
+        'enableEdit' => 'editJumpTo',
+        'enableDelete' => 'deleteJumpTo',
     ],
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['tstamp'],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'dateAdded' => [
@@ -112,7 +106,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
         // general
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -122,13 +115,17 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'type' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['type'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
             'options' => ProductContainer::TYPES,
-            'reference' => &$GLOBALS['TL_LANG']['tl_ml_product']['reference'],
-            'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'submitOnChange' => true],
+            'reference' => &$GLOBALS['TL_LANG'][$itemTable]['reference'],
+            'eval' => [
+                'tl_class' => 'w50',
+                'mandatory' => true,
+                'includeBlankOption' => true,
+                'submitOnChange' => true,
+            ],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'jumpTo' => [
@@ -140,14 +137,13 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'additionalFields' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['additionalFields'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkboxWizard',
-            'options_callback' => function (Contao\DataContainer $dc) {
+            'options_callback' => function (Contao\DataContainer $dc) use ($itemTable) {
                 return System::getContainer()->get('huh.utils.choice.field')->getCachedChoices(
                     [
-                        'dataContainer' => 'tl_ml_product',
+                        'dataContainer' => $itemTable,
                         'evalConditions' => [
                             'isAdditionalField' => true,
                         ],
@@ -159,7 +155,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
         ],
         // image
         'imageSizes' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['imageSizes'],
             'exclude' => true,
             'flag' => 1,
             'inputType' => 'checkboxWizard',
@@ -168,14 +163,12 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql' => 'blob NULL',
         ],
         'protected' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['protected'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'groups' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['groups'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'foreignKey' => 'tl_member_group.name',
@@ -183,7 +176,6 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'sql' => 'blob NULL',
         ],
         'keepProductTitleForDownloadItems' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_product_archive']['keepProductTitleForDownloadItems'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
@@ -191,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
-        'allowCreate' => [
+        'enableCreate' => [
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => [
@@ -200,9 +192,19 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
             ],
             'sql' => "char(1) NOT NULL default ''",
         ],
-        'allowEdit' => [
+        'enableEdit' => [
             'exclude' => true,
             'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+                'submitOnChange' => true,
+            ],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'enableDelete' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
             'eval' => [
                 'tl_class' => 'clr',
                 'submitOnChange' => true,
@@ -231,17 +233,7 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'load' => 'lazy'
             ],
         ],
-        'includeDelete' => [
-            'exclude' => true,
-            'inputType' => 'checkbox',
-            'default' => true,
-            'eval' => [
-                'tl_class' => 'clr',
-                'submitOnChange' => true,
-            ],
-            'sql' => "char(1) NOT NULL default ''",
-        ],
-        'redirectAfterDelete' => [
+        'deleteJumpTo' => [
             'inputType' => 'pageTree',
             'foreignKey' => 'tl_page.id',
             'eval' => [
@@ -255,37 +247,5 @@ $GLOBALS['TL_DCA']['tl_ml_product_archive'] = [
                 'load' => 'lazy'
             ]
         ],
-        'groupsCanDeleteAll' => [
-            'exclude'                 => true,
-            'filter'                  => true,
-            'inputType'               => 'checkboxWizard',
-            'foreignKey'              => 'tl_user_group.id',
-            'eval'                    => [
-                'multiple' => true,
-                'tl_class' => 'w50'
-            ],
-            'sql'                     => "blob NULL",
-            'relation'                => [
-                'type' => 'belongsToMany',
-                'load'=>'lazy'
-            ],
-            'options_callback' => [ProductArchiveContainer::class, 'getMemberGroupOptions']
-        ],
-        'groupsCanDeleteOwn' => [
-            'exclude'                 => true,
-            'filter'                  => true,
-            'inputType'               => 'checkboxWizard',
-            'foreignKey'              => 'tl_user_group.id',
-            'eval'                    => [
-                'multiple' => true,
-                'tl_class' => 'w50'
-            ],
-            'sql'                     => "blob NULL",
-            'relation'                => [
-                'type' => 'belongsToMany',
-                'load'=>'lazy'
-            ],
-            'options_callback' => [ProductArchiveContainer::class, 'getMemberGroupOptions']
-        ]
     ],
 ];

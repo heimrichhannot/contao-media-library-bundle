@@ -3,6 +3,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\Model;
 
 use Contao\Model;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ArchiveContainer;
 
 /**
  * @property int    $id
@@ -12,16 +13,16 @@ use Contao\Model;
  * @property string $type
  * @property string $additionalFields
  * @property bool   $keepProductTitleForDownloadItems
- * @property bool   $allowCreate
- * @property bool   $allowEdit
+ * @property bool   $enableCreate
+ * @property bool   $enableEdit
  * @property int    $editJumpTo
- * @property bool   $includeDelete
- * @property bool   $redirectAfterDelete
+ * @property bool   $enableDelete
+ * @property bool   $deleteJumpTo
  * @property string $groupsCanDeleteAll
  * @property string $groupsCanDeleteOwn
  * @property bool   $protected
  */
 class ArchiveModel extends Model
 {
-    protected static $strTable = 'tl_ml_archive';
+    protected static $strTable = ArchiveContainer::TABLE;
 }

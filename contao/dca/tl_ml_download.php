@@ -1,15 +1,15 @@
 <?php
 
-/*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
+use Contao\DC_Table;
+use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
-$GLOBALS['TL_DCA']['tl_ml_download'] = [
+$table = DownloadModel::getTable();
+
+$GLOBALS['TL_DCA'][$table] = [
     'config' => [
-        'dataContainer' => 'Table',
-        'ptable' => 'tl_ml_product',
+        'dataContainer' => DC_Table::class,
+        'ptable' => ItemModel::getTable(),
         'enableVersioning' => true,
         'onload_callback' => [
             [\HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadContainer::class, 'checkPermission'],
@@ -49,25 +49,25 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['edit'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['delete'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
                                 .'\'))return false;Backend.getScrollOffset()"',
             ],
             'toggle' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['toggle'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['toggle'],
                 'icon' => 'visible.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
                 'button_callback' => [\HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadContainer::class, 'toggleIcon'],
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['show'],
+                'label' => &$GLOBALS['TL_LANG'][$table]['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'pid' => [
-            'foreignKey' => 'tl_ml_product.id',
+            'foreignKey' => 'tl_ml_item.id',
             'exclude' => true,
             'sql' => "int(10) unsigned NOT NULL default '0'",
             'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'tstamp' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['tstamp'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['tstamp'],
             'exclude' => true,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['title'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'file' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['file'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['file'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => [
@@ -128,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => 'blob NULL',
         ],
         'imageSize' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['imageSize'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['imageSize'],
             'exclude' => true,
             'inputType' => 'select',
             'eval' => ['tl_class' => 'w50 clr', 'readonly' => true, 'includeBlankOption' => true],
@@ -136,14 +136,14 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'isAdditional' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['isAdditional'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['isAdditional'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['tl_class' => 'w50', 'disabled' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'published' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['published'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['published'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
@@ -151,14 +151,14 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'start' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['start'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['start'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'stop' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_ml_download']['stop'],
+            'label' => &$GLOBALS['TL_LANG'][$table]['stop'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
@@ -167,4 +167,4 @@ $GLOBALS['TL_DCA']['tl_ml_download'] = [
     ],
 ];
 
-\Contao\System::getContainer()->get('huh.utils.dca')->addAuthorFieldAndCallback('tl_ml_download');
+\Contao\System::getContainer()->get('huh.utils.dca')->addAuthorFieldAndCallback($table);
