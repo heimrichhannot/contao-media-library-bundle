@@ -10,48 +10,25 @@ namespace HeimrichHannot\MediaLibraryBundle\EventListener\Contao;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer;
-use Psr\Container\ContainerInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
 #[AsHook("loadDataContainer")]
-class LoadDataContainerListener implements ServiceSubscriberInterface
+readonly class LoadDataContainerListener
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     public function __invoke(string $table): void
     {
-        if ('tl_ml_product' !== $table) {
+        if ($table !== ItemModel::getTable()) {
             return;
         }
 
-        if (class_exists(FileCreditContainer::class)
-            && $this->container->has(FileCreditContainer::class))
-        {
-            /** @var FileCreditContainer $fileCreditContainer */
-            $fileCreditContainer = $this->container->get(FileCreditContainer::class);
-            $fileCreditContainer->addCopyrightFieldToDca(
-                'tl_ml_product', 'copyright', 'file'
-            );
-            $GLOBALS['TL_DCA']['tl_ml_product']['fields']['copyright']['eval']['tl_class'] = 'clr';
-        }
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = [];
-
-        if (class_exists(FileCreditContainer::class)) {
-            $services[] = '?'.FileCreditContainer::class;
+        if (!\class_exists(FileCreditContainer::class)) {
+            return;
         }
 
-        return $services;
+        $field = 'filecredits_copyright';
+
+        FileCreditContainer::addCopyrightFieldToDca($table, $field, 'file');
+
+        $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval']['tl_class'] = 'clr';
     }
 }
