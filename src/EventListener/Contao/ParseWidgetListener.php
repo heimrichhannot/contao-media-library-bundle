@@ -20,20 +20,21 @@ use HeimrichHannot\UtilsBundle\Util\Utils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsHook("parseWidget")]
-class ParseWidgetListener
+readonly class ParseWidgetListener
 {
     public function __construct(
-        private readonly Utils $utils,
-        private readonly ContaoFramework $contaoFramework,
-        private readonly TranslatorInterface $translator
+        private Utils               $utils,
+        private ContaoFramework     $contaoFramework,
+        private TranslatorInterface $translator
     ) {}
 
     public function __invoke(string $buffer, Widget $widget): string
     {
-        if (!$this->utils->container()->isBackend()
-            || 'tl_ml_product' !== $widget->strTable
-            || 'copyright' !== $widget->name)
-        {
+        if ($widget->name !== 'copyright' || $widget->strTable !== ItemModel::getTable()) {
+            return $buffer;
+        }
+
+        if ($this->utils->container()->isFrontend()) {
             return $buffer;
         }
 
@@ -72,27 +73,32 @@ class ParseWidgetListener
 
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/heimrichhannotmedialibrary/backend/js/wizard.js';
 
-        $linkId = uniqid('huh_ml_copyright_');
+        $linkId = \uniqid('huh_ml_copyright_', more_entropy: true);
         $scriptTitle = StringUtil::specialchars(\str_replace("'", "\\'", $title));
+        $itemTable = ItemModel::getTable();
+        $closeModal = $this->translator->trans("{$itemTable}.closeModal", [], 'contao_tl_ml_product');
         $script = <<<HTML
-        <script>
-            HuhMlLang = {
-                "closeModal": "{$this->translator->trans('tl_ml_product.closeModal', [], 'contao_tl_ml_product')}"
-            };
-            
-            $("$linkId").addEvent("click", function(e) {
-                e.preventDefault();
-                HuhMlWizard.openWizardModal({
-                  "id": "tl_listing",
-                  "title": "$scriptTitle",
-                  "url": "$href",
-                  "callback": function(value) {
-                      $("ctrl_{$widget->id}").value = value.value;
-                  }
+            <script>
+                HuhMlLang = {
+                    "closeModal": "{$closeModal}"
+                };
+                
+                const link = document.getElementById("{$linkId}");
+                
+                link?.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    HuhMlWizard.openWizardModal({
+                        "id": "tl_listing",
+                        "title": "$scriptTitle",
+                        "url": "$href",
+                        "callback": function (value) {
+                            const widgetCtrl = document.getElementById("ctrl_{$widget->id}");
+                            widgetCtrl.value = value.value;
+                        }
+                    });
                 });
-            });
-        </script>
-        HTML;
+            </script>
+            HTML;
 
         return \sprintf(
             '<div class="wizard">%s <a href="%s" id="%s" title="%s" style="position:relative;top:-2px;vertical-align:middle;">%s</a></div>%s',
