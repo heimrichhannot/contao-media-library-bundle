@@ -86,7 +86,7 @@ class ProductVoter extends Voter
 
     private function voteOnCreate(FrontendUser $user, ArchiveModel $archiveModel): bool
     {
-        if (!$archiveModel->allowCreate) {
+        if (!$archiveModel->enableCreate) {
             return false;
         }
 
@@ -106,7 +106,7 @@ class ProductVoter extends Voter
 
     private function voteOnEdit(FrontendUser $user, ItemModel $productModel, ArchiveModel $archiveModel): bool
     {
-        if (!$archiveModel->allowEdit) {
+        if (!$archiveModel->enableEdit) {
             return false;
         }
 
@@ -130,7 +130,7 @@ class ProductVoter extends Voter
 
     private function voteOnDelete(ArchiveModel $archiveModel, FrontendUser $user, ItemModel $productModel): bool
     {
-        if (!$archiveModel->includeDelete) {
+        if (!$archiveModel->enableDelete) {
             return false;
         }
 
