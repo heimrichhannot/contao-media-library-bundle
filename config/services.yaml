@@ -14,6 +14,18 @@ services:
             - ../src/{ContaoManager,DependencyInjection,Model}
             - ../src/Product/Product.php
 
+    HeimrichHannot\MediaLibraryBundle\Migration\RenameProductTablesMigration:
+        tags:
+            - { name: contao.migration, priority: 200 }
+
+    HeimrichHannot\MediaLibraryBundle\Migration\RenameColumnsMigration:
+        tags:
+            - { name: contao.migration, priority: 50 }
+
+    HeimrichHannot\MediaLibraryBundle\DataContainer\:
+        resource: '../src/DataContainer'
+        public: true
+
     # todo(@ericges): remove this when the ajax manager has been removed from the bundle
     huh.media_library.ajax_manager:
         public: true
