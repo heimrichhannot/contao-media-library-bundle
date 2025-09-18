@@ -12,8 +12,8 @@ use Codefog\TagsBundle\Model\TagModel;
 use Contao\BackendUser;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\Database\Result;
@@ -32,12 +32,10 @@ use Contao\Versions;
 use Exception;
 use HeimrichHannot\MediaLibraryBundle\Event\BeforeCreateImageDownloadEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
-use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\Driver\DC_Table_Utils;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
-use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 use Model\Collection;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -48,17 +46,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProductContainer
 {
+    public const TABLE = ItemContainer::TABLE;
+
     public const TYPE_FILE = 'file';
     public const TYPE_IMAGE = 'image';
     public const TYPE_VIDEO = 'video';
 
+    /**
+     * @todo(@ericges): Replace with registry system in v2.
+     * @deprecated To be replaced with registry system in v2.
+     */
     public const TYPES = [
         self::TYPE_FILE,
         self::TYPE_IMAGE,
         self::TYPE_VIDEO,
     ];
 
-    public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_product';
+    public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_item';
     public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
     public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
 
@@ -95,9 +99,7 @@ class ProductContainer
         $this->security = $security;
     }
 
-    /**
-     * @Callback(table="tl_ml_product", target="fields.alias.save")
-     */
+    #[AsCallback(table: 'tl_ml_product', target: 'fields.alias.save')]
     public function onFieldsAliasSaveCallback($varValue, DataContainer $dc)
     {
         $aliasExists = function (string $alias) use ($dc): bool
@@ -191,17 +193,17 @@ class ProductContainer
         }
     }
 
-    public function addAdditionalFields(DataContainer $dc)
+    public function addAdditionalFields(DataContainer $dc): void
     {
-        if (null === ($product = $this->getProduct($dc->id))) {
+        if (!$product = ItemModel::findByPk($dc->id)) {
             return;
         }
 
-        if (null === ($productArchive = $this->utils->model()->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+        if (!$productArchive = $product->getRelated('pid')) {
             return;
         }
 
-        $dca = &$GLOBALS['TL_DCA']['tl_ml_product'];
+        $dca = &$GLOBALS['TL_DCA'][ItemModel::getTable()];
 
         $additionalFields = StringUtil::deserialize($productArchive->additionalFields, true);
 
@@ -214,7 +216,7 @@ class ProductContainer
         }
     }
 
-    public function setCopyright(DataContainer $dc)
+    public function setCopyright(DataContainer $dc): void
     {
         if (!$dc->activeRecord || !$dc->activeRecord->file) {
             return;
@@ -241,33 +243,12 @@ class ProductContainer
         $versions->create();
     }
 
-    public function getCopyright($value, DataContainer $dc)
-    {
-        if (!$dc->activeRecord || !$dc->activeRecord->file) {
-            return '';
-        }
-
-        $file = StringUtil::deserialize($dc->activeRecord->file, true);
-
-        if (empty($file)) {
-            return '';
-        }
-
-        $model = FilesModel::findByUuid($file[0]);
-
-        if (null === $model) {
-            return $dc->activeRecord->copyright;
-        }
-
-        return $dc->activeRecord->copyright ?: $model->copyright;
-    }
-
     /**
      * Generate download.
      *
      * @throws Exception
      */
-    public function generateDownloadItems(DataContainer $dc)
+    public function generateDownloadItems(DataContainer $dc): void
     {
         if ($dc->activeRecord->doNotCreateDownloadItems || !$dc->activeRecord->file) {
             return;
@@ -451,6 +432,7 @@ class ProductContainer
         /** @var BackendUser $user */
         $user = $this->security->getUser();
         $database = \Contao\Database::getInstance();
+        $table = self::TABLE;
 
         // Set the ID and action
         Input::setGet('id', $intId);
@@ -461,8 +443,8 @@ class ProductContainer
         }
 
         // Trigger the onload_callback
-        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onload_callback'] as $callback) {
+        if (\is_array($GLOBALS['TL_DCA'][self::TABLE]['config']['onload_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][self::TABLE]['config']['onload_callback'] as $callback) {
                 if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
                 } elseif (\is_callable($callback)) {
@@ -472,25 +454,26 @@ class ProductContainer
         }
 
         // Check the field access
-        if (!$user->hasAccess('tl_ml_product::published', 'alexf')) {
+        if (!$user->hasAccess("{self::TABLE}::published", 'alexf')) {
             throw new AccessDeniedException('Not enough permissions to publish/unpublish ml_product item ID '.$intId.'.');
         }
 
         // Set the current record
-        if ($dc) {
-            $objRow = $database->prepare('SELECT * FROM tl_ml_product WHERE id=?')->limit(1)->execute($intId);
+        if ($dc)
+        {
+            $objRow = $database->prepare("SELECT * FROM {$table} WHERE id=?")->limit(1)->execute($intId);
 
             if ($objRow->numRows) {
                 $dc->activeRecord = $objRow;
             }
         }
 
-        $objVersions = new Versions('tl_ml_product', $intId);
+        $objVersions = new Versions(self::TABLE, $intId);
         $objVersions->initialize();
 
         // Trigger the save_callback
-        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['fields']['published']['save_callback'] as $callback) {
+        if (\is_array($GLOBALS['TL_DCA'][self::TABLE]['fields']['published']['save_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][self::TABLE]['fields']['published']['save_callback'] as $callback) {
                 if (\is_array($callback)) {
                     $blnVisible = System::importStatic($callback[0])->{$callback[1]}($blnVisible, $dc);
                 } elseif (\is_callable($callback)) {
@@ -502,7 +485,7 @@ class ProductContainer
         $time = time();
 
         // Update the database
-        $database->prepare("UPDATE tl_ml_product SET tstamp=?, published=? WHERE id=?")
+        $database->prepare("UPDATE {$table} SET tstamp=?, published=? WHERE id=?")
             ->execute($time, $blnVisible ? '1' : '', $intId);
 
         if ($dc) {
@@ -511,8 +494,8 @@ class ProductContainer
         }
 
         // Trigger the onsubmit_callback
-        if (\is_array($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_ml_product']['config']['onsubmit_callback'] as $callback) {
+        if (\is_array($GLOBALS['TL_DCA'][self::TABLE]['config']['onsubmit_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][self::TABLE]['config']['onsubmit_callback'] as $callback) {
                 if (\is_array($callback)) {
                     System::importStatic($callback[0])->{$callback[1]}($dc);
                 } elseif (\is_callable($callback)) {
@@ -554,7 +537,7 @@ class ProductContainer
         // create image size-based downloads for the additional files, as well
         if ($dc->activeRecord->addAdditionalFiles && !$isAdditional) {
             // create a new dc using DC_Table_Utils so that no callbacks are called
-            $newDc = new DC_Table_Utils('tl_ml_product');
+            $newDc = new DC_Table_Utils(ItemModel::getTable());
             $newDc->id = $dc->id;
             $newDc->activeRecord = $dc->activeRecord;
 
@@ -570,14 +553,14 @@ class ProductContainer
     {
         $associations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, [self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?'], [$id]);
 
-        return $associations->numRows;
+        return $associations?->numRows;
     }
 
     protected function getTagsInUse()
     {
         $records = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, null, null);
 
-        if ($records->numRows < 1) {
+        if (!$records || $records->numRows < 1) {
             return [];
         }
 
@@ -601,10 +584,7 @@ class ProductContainer
         }
     }
 
-    /**
-     * @return Collection|Model|null
-     */
-    protected function getDownloadItems(DataContainer $dc, array $options = [])
+    protected function getDownloadItems(DataContainer $dc, array $options = []): Collection|Model|null
     {
         $columns = ['tl_ml_download.pid=?'];
         $values = [$dc->id];
@@ -634,16 +614,24 @@ class ProductContainer
      *
      * @throws Exception
      */
-    protected function createImageDownloadItems(FilesModel $file, DataContainer $dc, Model $archiveModel, int $originalDownload = 0, bool $isAdditional = false)
-    {
+    protected function createImageDownloadItems(
+        FilesModel    $file,
+        DataContainer $dc,
+        Model         $archiveModel,
+        int           $originalDownload = 0,
+        bool          $isAdditional = false
+    ): void {
         if (empty($sizes = $this->getSizes($archiveModel, $dc))) {
             return;
         }
 
-        $imageFactory = System::getContainer()->get('contao.image.image_factory');
+        if (!$imageFactory = System::getContainer()->get('contao.image.image_factory')) {
+            throw new \Exception('The Contao Image Factory is not available.');
+        }
 
-        foreach ($sizes as $size) {
-            if (null === ($sizeModel = $this->utils->model()->findModelInstanceByPk('tl_image_size', $size))) {
+        foreach ($sizes as $size)
+        {
+            if (!$sizeModel = ImageSizeModel::findByPk($size)) {
                 continue;
             }
 

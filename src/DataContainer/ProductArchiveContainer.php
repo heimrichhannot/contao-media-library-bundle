@@ -68,7 +68,12 @@ class ProductArchiveContainer
         return $options;
     }
 
-    public function checkPermission()
+    /**
+     * @return void
+     * @todo(@ericges): Replace with voter
+     * @deprecated To be replaced with voter in v2.
+     */
+    public function checkPermission(): void
     {
         $user = BackendUser::getInstance();
         $database = Database::getInstance();
@@ -196,23 +201,6 @@ class ProductArchiveContainer
 
                 break;
         }
-    }
-
-    public function getMemberGroupOptions(): array
-    {
-        $options = [];
-        $groups = MemberGroupModel::findAll();
-
-        if ($groups !== null)
-        {
-            while ($groups->next()) {
-                $options[$groups->id] = $groups->name;
-            }
-
-            asort($options);
-        }
-
-        return $options;
     }
 
     public function editHeader($row, $href, $label, $title, $icon, $attributes)

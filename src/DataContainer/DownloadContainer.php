@@ -10,11 +10,14 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\System;
+use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Model\ModelUtil;
 
 class DownloadContainer
 {
+    public const TABLE = 'tl_ml_download';
+
     /**
      * @var ModelUtil
      */
@@ -62,8 +65,8 @@ class DownloadContainer
         $id = \strlen(\Contao\Input::get('id')) ? \Contao\Input::get('id') : CURRENT_ID;
         $pid = 0;
 
-        if (null !== ($product = $this->modelUtil->findModelInstanceByPk('tl_ml_product', $id))) {
-            if (null !== ($archive = $this->modelUtil->findModelInstanceByPk('tl_ml_product_archive', $product->pid))) {
+        if (null !== ($product = ItemModel::findByPk($id))) {
+            if (null !== ($archive = $product->getRelated('pid'))) {
                 $pid = $archive->id;
             }
         }
