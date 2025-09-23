@@ -27,7 +27,7 @@ class ArchiveTypeCollection
         return $this->archiveTypes;
     }
 
-    public function getAll(): iterable
+    public function all(): iterable
     {
         return $this->resolve();
     }
@@ -41,7 +41,7 @@ class ArchiveTypeCollection
         return $this->resolve()[$alias] ?? null;
     }
 
-    public function getAllAliases(): array
+    public function aliases(): array
     {
         return \array_keys($this->resolve());
     }

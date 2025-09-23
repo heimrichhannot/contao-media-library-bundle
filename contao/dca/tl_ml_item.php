@@ -5,11 +5,13 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
+use HeimrichHannot\UtilsBundle\Dca\AuthorField;
 use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 
 $table = ItemModel::getTable();
 $archiveTable = ArchiveModel::getTable();
 
+AuthorField::register($table);
 DateAddedField::register($table);
 
 $GLOBALS['TL_DCA'][$table] = [
@@ -86,7 +88,7 @@ $GLOBALS['TL_DCA'][$table] = [
     ],
     'palettes' => [
         '__selector__' => ['type', 'addAdditionalFiles', 'protected', 'published'],
-        'default' => 'type',
+        'default' => '{general_legend},type',
         ProductContainer::TYPE_FILE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
         ProductContainer::TYPE_VIDEO => '{general_legend},title,alias;{product_legend},file,videoPosterImage,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
         ProductContainer::TYPE_IMAGE => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{protected_legend},protected;{publish_legend},published;',
@@ -120,8 +122,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'options' => ProductContainer::TYPES,
-            'reference' => &$GLOBALS['TL_LANG'][$table]['reference'],
             'eval' => [
                 'tl_class' => 'w50',
                 'mandatory' => true,
@@ -270,5 +270,3 @@ System::getContainer()->get('huh.utils.dca')->addOverridableFields(
     $archiveTable,
     $table
 );
-
-\Contao\System::getContainer()->get(\HeimrichHannot\UtilsBundle\Dca\DcaUtil::class)->addAuthorFieldAndCallback($table);

@@ -117,7 +117,6 @@ $dca['fields'] = [
         'exclude' => true,
         'filter' => true,
         'inputType' => 'select',
-        'reference' => &$GLOBALS['TL_LANG'][$itemTable]['type__reference'],
         'eval' => [
             'tl_class' => 'w50',
             'mandatory' => true,
@@ -154,13 +153,6 @@ $dca['fields'] = [
         'inputType' => 'checkbox',
         'eval' => ['submitOnChange' => true],
         'sql' => "char(1) NOT NULL default ''",
-    ],
-    'groups' => [
-        'exclude' => true,
-        'inputType' => 'checkbox',
-        'foreignKey' => 'tl_member_group.name',
-        'eval' => ['mandatory' => true, 'multiple' => true],
-        'sql' => 'blob NULL',
     ],
     'keepProductTitleForDownloadItems' => [
         'exclude' => true,

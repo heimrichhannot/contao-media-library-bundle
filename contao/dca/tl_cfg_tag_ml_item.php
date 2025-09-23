@@ -2,10 +2,10 @@
 
 $GLOBALS['TL_DCA']['tl_cfg_tag_ml_item'] = [
     'config' => [
-        'dataContainer'    => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
-        'notCopyable'      => true,
-        'sql'              => [
+        'notCopyable' => true,
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],

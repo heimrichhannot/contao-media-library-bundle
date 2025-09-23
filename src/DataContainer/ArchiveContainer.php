@@ -8,25 +8,27 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Image\ImageSizes;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\ParameterType;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ArchiveContainer
 {
     public const TABLE = 'tl_ml_archive';
 
     public function __construct(
-        private readonly ArchiveTypeCollection $archiveCollection,
+        private readonly ArchiveTypeCollection $archiveTypes,
         private readonly Connection            $connection,
         private readonly ImageSizes            $imageSizes,
         private readonly RequestStack          $requestStack,
-        private readonly TranslatorInterface   $translator,
     ) {}
 
+    /**
+     * @throws DBALException When the database query fails for some reason.
+     */
     #[AsCallback(self::TABLE, 'config.onsubmit')]
     public function onSubmit(DataContainer $dc): void
     {
@@ -53,7 +55,7 @@ class ArchiveContainer
     }
 
     #[AsCallback(self::TABLE, 'config.onload')]
-    public function onLoad(?DataContainer $dc = null): void
+    public function onLoadGeneratePalette(?DataContainer $dc = null): void
     {
         $act = $this->requestStack->getCurrentRequest()?->query?->get('act');
 
@@ -79,7 +81,7 @@ class ArchiveContainer
             return;
         }
 
-        if (!$archiveType = $this->archiveCollection->get((string) $archive->type)) {
+        if (!$archiveType = $this->archiveTypes->get((string) $archive->type)) {
             return;
         }
 
@@ -89,19 +91,6 @@ class ArchiveContainer
         $suffix = $dca['palettes']['__suffix__'] ?? '';
 
         $dca['palettes'][$archive->type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
-    }
-
-    #[AsCallback(self::TABLE, 'fields.type.options')]
-    public function getTypeOptions(): array
-    {
-        $aliases = $this->archiveCollection->getAllAliases();
-        $options = [];
-
-        foreach ($aliases as $alias) {
-            $options[$alias] = $this->translator->trans('archive_type.' . $alias, [], 'huh_media_library');
-        }
-
-        return $options;
     }
 
     #[AsCallback(self::TABLE,  'fields.additionalFields.options')]
