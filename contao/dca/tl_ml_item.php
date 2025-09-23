@@ -5,9 +5,12 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
+use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 
 $table = ItemModel::getTable();
 $archiveTable = ArchiveModel::getTable();
+
+DateAddedField::register($table);
 
 $GLOBALS['TL_DCA'][$table] = [
     'config' => [
@@ -15,20 +18,10 @@ $GLOBALS['TL_DCA'][$table] = [
         'ptable' => $archiveTable,
         'ctable' => [DownloadModel::getTable()],
         'enableVersioning' => true,
-        'oncreate_callback' => [
-            [ProductContainer::class, 'setType'],
-        ],
-        'onload_callback' => [
-            [ProductContainer::class, 'addAdditionalFields'],
-        ],
         'onsubmit_callback' => [
-            ['huh.utils.dca', 'setDateAdded'],
             [ProductContainer::class, 'generateDownloadItems'],
             [ProductContainer::class, 'setCopyright'],
             [ProductContainer::class, 'updateTagAssociations'],
-        ],
-        'oncopy_callback' => [
-            ['huh.utils.dca', 'setDateAddedOnCopy'],
         ],
         'ondelete_callback' => [
             [ProductContainer::class, 'deleteDownloads'],
@@ -63,35 +56,29 @@ $GLOBALS['TL_DCA'][$table] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
             'downloads' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['downloads'],
                 'href' => 'table=tl_ml_download',
                 'icon' => 'bundles/heimrichhannotmedialibrary/img/icon-download.png',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.svg',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
                     .'\'))return false;Backend.getScrollOffset()"',
             ],
             'toggle' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['toggle'],
                 'icon' => 'visible.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
                 'button_callback' => [ProductContainer::class, 'toggleIcon'],
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['show'],
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
@@ -114,7 +101,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'pid' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['pid'],
             'foreignKey' => "$archiveTable.title",
             'exclude' => true,
             'search' => true,
@@ -122,25 +108,15 @@ $GLOBALS['TL_DCA'][$table] = [
             'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
         'tstamp' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['tstamp'],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'alias' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['alias'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['tl_class' => 'w50', 'doNotCopy' => true],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'dateAdded' => [
-            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
-            'sorting' => true,
-            'flag' => 6,
-            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
         'type' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['type'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
@@ -155,7 +131,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -165,7 +140,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'file' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['file'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => [
@@ -179,7 +153,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => 'binary(16) NULL',
         ],
         'addAdditionalFiles' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['addAdditionalFiles'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => [
@@ -191,7 +164,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'additionalFiles' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['additionalFiles'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => [
@@ -212,7 +184,6 @@ $GLOBALS['TL_DCA'][$table] = [
             ],
         ],
         'videoPosterImage' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['videoPosterImage'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => [
@@ -225,14 +196,12 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => 'blob NULL',
         ],
         'doNotCreateDownloadItems' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['doNotCreateDownloadItems'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'text' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['text'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'textarea',
@@ -240,7 +209,6 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => 'text NULL',
         ],
         'tags' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['tags'],
             'exclude' => true,
             'inputType' => 'cfgTags',
             'eval' => [
@@ -250,7 +218,6 @@ $GLOBALS['TL_DCA'][$table] = [
             ],
         ],
         'published' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['published'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
@@ -258,14 +225,12 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'start' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['start'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'stop' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['stop'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],

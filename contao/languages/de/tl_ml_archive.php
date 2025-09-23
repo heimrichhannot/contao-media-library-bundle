@@ -7,38 +7,22 @@ $lang = &$GLOBALS['TL_LANG'][ArchiveModel::getTable()];
 /**
  * Fields
  */
-$lang['tstamp'][0]                           = 'Änderungsdatum';
-$lang['tstamp'][1]                           = '';
-$lang['title'][0]                            = 'Titel';
-$lang['title'][0]                            = 'Geben Sie hier bitte den Titel ein.';
-$lang['jumpTo'][0]                           = 'Weiterleitungsseite';
-$lang['jumpTo'][1]                           = 'Wählen Sie hier die Produktleser-Seite aus, zu der Besucher nach dem Klicken auf ein Produkt weitergeleitet werden soll.';
-$lang['type'][0]                             = 'Typ';
-$lang['type'][1]                             = 'Wählen Sie hier den Typ aus, den Produkte dieses Archivs erhalten sollen.';
-$lang['additionalFields'][0]                 = 'Zusätzliche Produktfelder';
-$lang['additionalFields'][1]                 = 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.';
-$lang['imageSizes'][0]                       = 'Bildgrößen';
-$lang['imageSizes'][1]                       = 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.';
-$lang['protected'][0]                        = 'Downloadelemente schützen';
-$lang['protected'][1]                        = 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.';
-$lang['groups'][0]                           = 'Mitgliedergruppen';
-$lang['groups'][1]                           = 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.';
-$lang['keepProductTitleForDownloadItems'][0] = 'Produktnamen im Downloadtitel behalten';
-$lang['keepProductTitleForDownloadItems'][1] = 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.';
-$lang['enableDelete'][0]                    = 'Produkte können gelöscht werden';
-$lang['enableDelete'][1]                    = 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.';
-$lang['deleteJumpTo'][0]              = 'Weiterleitungsseite nach dem Löschen';
-$lang['deleteJumpTo'][1]              = 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.';
-$lang['groupsCanDeleteOwn'][0]               = 'Eigene Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)';
-$lang['groupsCanDeleteOwn'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.';
-$lang['groupsCanDeleteAll'][0]               = 'Alle Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)';
-$lang['groupsCanDeleteAll'][1]               = 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.';
-$lang['enableCreate'][0] = 'Produkte können erstellt werden';
-$lang['enableCreate'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.';
-$lang['enableEdit'][0] = 'Produkte können bearbeitet werden';
-$lang['enableEdit'][1] = 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.';
-$lang['editJumpTo'][0] = 'Bearbeiten-Seite';
-$lang['editJumpTo'][1] = 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Bearbeiten des Produktes befindet.';
+$lang['tstamp'] = ['Änderungsdatum', ''];
+$lang['title'] = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
+$lang['type'] = ['Typ', 'Wählen Sie hier aus, von welcher Art die Einträge dieses Archives sind.'];
+$lang['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie hier die Produktleser-Seite aus, zu der Besucher nach dem Klicken auf ein Produkt weitergeleitet werden soll.'];
+$lang['additionalFields'] = ['Zusätzliche Felder der Einträge', 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.'];
+$lang['imageSizes'] = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
+$lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
+$lang['groups'] = ['Mitgliedergruppen', 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.'];
+$lang['keepProductTitleForDownloadItems'] = ['Produktnamen im Downloadtitel behalten', 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.'];
+$lang['enableDelete'] = ['Produkte können gelöscht werden', 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.'];
+$lang['deleteJumpTo'] = ['Weiterleitungsseite nach dem Löschen', 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.'];
+$lang['groupsCanDeleteOwn'] = ['Eigene Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)', 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.'];
+$lang['groupsCanDeleteAll'] = ['Alle Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)', 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.'];
+$lang['enableCreate'] = ['Produkte können erstellt werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.'];
+$lang['enableEdit'] = ['Produkte können bearbeitet werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.'];
+$lang['editJumpTo'] = ['Bearbeiten-Seite', 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Bearbeiten des Produktes befindet.'];
 
 /**
  * Legends
@@ -52,17 +36,10 @@ $lang['publish_legend']   = 'Veröffentlichung';
 /**
  * Buttons
  */
-$lang['new'][0]        = 'Neue Produkt-Archiv';
-$lang['new'][1]        = 'Produkt-Archiv erstellen';
-$lang['edit'][0]       = 'Produkte aus Archiv anzeigen';
-$lang['edit'][1]       = 'Produkte aus Archiv ID %s anzeigen';
-$lang['editheader'][0] = 'Produkt-Archiv bearbeiten';
-$lang['editheader'][1] = 'Produkt-Archiv ID %s bearbeiten';
-$lang['copy'][0]       = 'Produkt-Archiv duplizieren';
-$lang['copy'][1]       = 'Produkt-Archiv ID %s duplizieren';
-$lang['delete'][0]     = 'Produkt-Archiv löschen';
-$lang['delete'][1]     = 'Produkt-Archiv ID %s löschen';
-$lang['toggle'][0]     = 'Produkt-Archiv veröffentlichen';
-$lang['toggle'][1]     = 'Produkt-Archiv ID %s veröffentlichen/verstecken';
-$lang['show'][0]       = 'Produkt-Archiv Details';
-$lang['show'][1]       = 'Produkt-Archiv Details ID %s anzeigen';
+$lang['new'] = ['Neue Produkt-Archiv', 'Produkt-Archiv erstellen'];
+$lang['edit'] = ['Produkte aus Archiv anzeigen', 'Produkte aus Archiv ID %s anzeigen'];
+$lang['editheader'] = ['Produkt-Archiv bearbeiten', 'Produkt-Archiv ID %s bearbeiten'];
+$lang['copy'] = ['Produkt-Archiv duplizieren', 'Produkt-Archiv ID %s duplizieren'];
+$lang['delete'] = ['Produkt-Archiv löschen', 'Produkt-Archiv ID %s löschen'];
+$lang['toggle'] = ['Produkt-Archiv veröffentlichen', 'Produkt-Archiv ID %s veröffentlichen/verstecken'];
+$lang['show'] = ['Produkt-Archiv Details', 'Produkt-Archiv Details ID %s anzeigen'];
