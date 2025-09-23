@@ -27,11 +27,12 @@ $lang['editJumpTo'] = ['Bearbeiten-Seite', 'Wählen Sie hier die Seite aus, auf 
 /**
  * Legends
  */
-$lang['general_legend']   = 'Allgemeine Einstellungen';
-$lang['config_legend']    = 'Konfiguration';
-$lang['edit_legend']    = 'Bearbeitung';
+$lang['general_legend'] = 'Allgemeine Einstellungen';
+$lang['advanced_legend'] = 'Erweiterte Einstellungen';
+$lang['image_legend'] = 'Bildeinstellungen';
+$lang['edit_legend'] = 'Bearbeitungseinstellungen';
 $lang['protected_legend'] = 'Zugriffsschutz';
-$lang['publish_legend']   = 'Veröffentlichung';
+$lang['publish_legend'] = 'Veröffentlichung';
 
 /**
  * Buttons

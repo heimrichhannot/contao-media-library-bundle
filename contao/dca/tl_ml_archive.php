@@ -13,7 +13,7 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
     '__selector__' => ['type', 'protected', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
-    '__prefix__' => '{general_legend},title,type,jumpTo;{config_legend},additionalFields,keepProductTitleForDownloadItems;',
+    '__prefix__' => '{general_legend},title,type,jumpTo;{advanced_legend},additionalFields,keepProductTitleForDownloadItems;',
     '__suffix__' => '{edit_legend},enableCreate,enableEdit,enableDelete;',
 ];
 
