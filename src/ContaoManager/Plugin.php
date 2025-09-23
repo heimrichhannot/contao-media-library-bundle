@@ -13,12 +13,13 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use Contao\ManagerPlugin\Config\ContainerBuilder;
-use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
+use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use HeimrichHannot\MediaLibraryBundle\HeimrichHannotMediaLibraryBundle;
-use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouteCollection;
 
-class Plugin implements BundlePluginInterface, ExtensionPluginInterface
+class Plugin implements BundlePluginInterface, RoutingPluginInterface
 {
     public function getBundles(ParserInterface $parser):array
     {
@@ -36,20 +37,8 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
         ];
     }
 
-    public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)
+    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel): ?RouteCollection
     {
-        $extensionConfigs = ContainerUtil::mergeConfigFile(
-            'huh_list',
-            $extensionName,
-            $extensionConfigs,
-            $container->getParameter('kernel.project_dir').'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_list.yml'
-        );
-
-        return ContainerUtil::mergeConfigFile(
-            'huh_reader',
-            $extensionName,
-            $extensionConfigs,
-            $container->getParameter('kernel.project_dir').'/vendor/heimrichhannot/contao-media-library-bundle/src/Resources/config/config_reader.yml'
-        );
+        return $resolver->resolve($routes = '@HeimrichHannotMediaLibraryBundle/config/routes.yaml')->load($routes);
     }
 }
