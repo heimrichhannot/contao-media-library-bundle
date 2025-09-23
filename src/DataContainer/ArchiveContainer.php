@@ -2,17 +2,29 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
+use Contao\BackendUser;
+use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Image\ImageSizes;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Util\Str;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ArchiveContainer
 {
     public const TABLE = 'tl_ml_archive';
 
     public function __construct(
-        private readonly Connection $connection,
+        private readonly ArchiveTypeCollection $archiveCollection,
+        private readonly Connection            $connection,
+        private readonly ImageSizes            $imageSizes,
+        private readonly RequestStack          $requestStack,
+        private readonly TranslatorInterface   $translator,
     ) {}
 
     #[AsCallback(self::TABLE, 'config.onsubmit')]
@@ -38,5 +50,108 @@ class ArchiveContainer
     public function onCopy(int $id, DataContainer $dc): void
     {
         $this->connection->update(self::TABLE, ['dateAdded' => \time()], ['id' => $id]);
+    }
+
+    #[AsCallback(self::TABLE, 'config.onload')]
+    public function onLoad(?DataContainer $dc = null): void
+    {
+        $act = $this->requestStack->getCurrentRequest()?->query?->get('act');
+
+        if (!$dc?->id || $act !== 'edit') {
+            return;
+        }
+
+        if (!$archive = ArchiveModel::findByPk($dc->id)) {
+            return;
+        }
+
+        if (!$archive->type) {
+            return;
+        }
+
+        $dca = &$GLOBALS['TL_DCA'][self::TABLE];
+
+        if (!\is_array($palettes = $dca['palettes'] ?? null)) {
+            throw new \Exception('Unable to load DCA for ' . self::TABLE);
+        }
+
+        if ($palettes[$archive->type] ?? null) {
+            return;
+        }
+
+        if (!$archiveType = $this->archiveCollection->get((string) $archive->type)) {
+            return;
+        }
+
+        $archivePalette = $archiveType->getArchivePalette($archive);
+
+        $prefix = $dca['palettes']['__prefix__'] ?? '';
+        $suffix = $dca['palettes']['__suffix__'] ?? '';
+
+        $dca['palettes'][$archive->type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
+    }
+
+    #[AsCallback(self::TABLE, 'fields.type.options')]
+    public function getTypeOptions(): array
+    {
+        $aliases = $this->archiveCollection->getAllAliases();
+        $options = [];
+
+        foreach ($aliases as $alias) {
+            $options[$alias] = $this->translator->trans('archive_type.' . $alias, [], 'huh_media_library');
+        }
+
+        return $options;
+    }
+
+    #[AsCallback(self::TABLE,  'fields.additionalFields.options')]
+    public function getAdditionalFieldsOptions(): array
+    {
+        Controller::loadDataContainer(ItemContainer::TABLE);
+        Controller::loadLanguageFile(ItemContainer::TABLE);
+
+        if (!$dca = $GLOBALS['TL_DCA'][ItemContainer::TABLE] ?? null) {
+            return [];
+        }
+
+        if (!\is_array($fields = $dca['fields'] ?? null)) {
+            return [];
+        }
+
+        $options = [];
+
+        foreach ($fields as $fieldName => $field)
+        {
+            if (!($field['eval']['isAdditionalField'] ?? false)) {
+                continue;
+            }
+
+            $label = $field['label'][0] ?? $fieldName;
+            $options[$fieldName] = "$label [$fieldName]";
+        }
+
+        return $options;
+    }
+
+    #[AsCallback(self::TABLE, 'fields.imageSizes.options')]
+    public function getImageSizes(): array
+    {
+        $user = BackendUser::getInstance();
+        $imageSizes = $this->imageSizes->getOptionsForUser($user);
+
+        $options = [];
+
+        foreach ($imageSizes as $key => $size)
+        {
+            if (\in_array($key, ['image_sizes', 'relative', 'exact'])) {
+                continue;
+            }
+
+            foreach ($size as $id => $label) {
+                $options[$id] = "$label [ID $id]";
+            }
+        }
+
+        return $options;
     }
 }

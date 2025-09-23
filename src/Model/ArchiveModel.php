@@ -6,6 +6,8 @@ use Contao\Model;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ArchiveContainer;
 
 /**
+ * Reads and writes media library archives.
+ *
  * @property int    $id
  * @property int    $tstamp
  * @property int    $dateAdded

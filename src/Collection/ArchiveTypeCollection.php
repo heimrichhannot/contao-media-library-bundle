@@ -2,9 +2,10 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Collection;
 
+use HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-class ArchiveCollection
+class ArchiveTypeCollection
 {
     private array $archiveTypes;
 
@@ -31,8 +32,17 @@ class ArchiveCollection
         return $this->resolve();
     }
 
-    public function get(string $alias): ?object
+    public function get(string $alias): ?AbstractArchiveType
     {
+        if (!$alias) {
+            return null;
+        }
+
         return $this->resolve()[$alias] ?? null;
+    }
+
+    public function getAllAliases(): array
+    {
+        return \array_keys($this->resolve());
     }
 }

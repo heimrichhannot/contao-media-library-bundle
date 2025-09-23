@@ -43,12 +43,7 @@ class ProductArchiveContainer
         $this->security = $security;
     }
 
-    /**
-     * get image sizes.
-     *
-     * @return mixed
-     */
-    public function getImageSizes()
+    public function getImageSizes(): array
     {
         $user = BackendUser::getInstance();
         $imageSizes = System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser($user);
@@ -72,6 +67,18 @@ class ProductArchiveContainer
      * @return void
      * @todo(@ericges): Replace with voter
      * @deprecated To be replaced with voter in v2.
+     *
+     * This was here:
+     * $GLOBALS['TL_DCA']['tl_ml_archive'] = [
+     *   'config' => [
+     *     'dataContainer' => DC_Table::class,
+     *     'ctable' => [$itemTable],
+     *     'enableVersioning' => true,
+     *     'onload_callback' => [
+     *       [ProductArchiveContainer::class, 'checkPermission'],
+     *   ],
+     * // ...
+     * ];
      */
     public function checkPermission(): void
     {

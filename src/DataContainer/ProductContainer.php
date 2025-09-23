@@ -193,29 +193,6 @@ class ProductContainer
         }
     }
 
-    public function addAdditionalFields(DataContainer $dc): void
-    {
-        if (!$product = ItemModel::findByPk($dc->id)) {
-            return;
-        }
-
-        if (!$productArchive = $product->getRelated('pid')) {
-            return;
-        }
-
-        $dca = &$GLOBALS['TL_DCA'][ItemModel::getTable()];
-
-        $additionalFields = StringUtil::deserialize($productArchive->additionalFields, true);
-
-        if (!empty($additionalFields)) {
-            $dca['palettes'][$product->type] = str_replace(
-                '{additional_fields_legend}',
-                '{additional_fields_legend},'.implode(',', $additionalFields),
-                $dca['palettes'][$product->type]
-            );
-        }
-    }
-
     public function setCopyright(DataContainer $dc): void
     {
         if (!$dc->activeRecord || !$dc->activeRecord->file) {
