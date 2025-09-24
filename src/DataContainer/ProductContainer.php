@@ -29,7 +29,6 @@ use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
-use Exception;
 use HeimrichHannot\MediaLibraryBundle\Event\BeforeCreateImageDownloadEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\UtilsBundle\Database\DatabaseUtil;
@@ -64,7 +63,7 @@ class ProductContainer
 
     public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_item';
     public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
-    public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_product_id';
+    public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_item_id';
 
     protected DcaUtil $dcaUtil;
     protected FileUtil $fileUtil;
@@ -114,11 +113,11 @@ class ProductContainer
         }
         elseif (preg_match('/^[1-9]\d*$/', $varValue))
         {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+            throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
         }
         elseif ($aliasExists($varValue))
         {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+            throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 
         return $varValue;
@@ -151,7 +150,7 @@ class ProductContainer
 
     public function deleteTagAssociations(DataContainer $dc, int $undoId): void
     {
-        $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_product_id=?'],
+        $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_item_id=?'],
             [$dc->id]);
 
         if (!$tagAssociations->numRows) {
@@ -223,7 +222,7 @@ class ProductContainer
     /**
      * Generate download.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function generateDownloadItems(DataContainer $dc): void
     {

@@ -25,6 +25,8 @@ $dca['subpalettes'] = [
     'enableDelete' => 'deleteJumpTo',
 ];
 
+$contao5 = !\defined('VERSION');
+
 $dca['config'] = [
     'dataContainer' => DC_Table::class,
     'ctable' => [$itemTable],
@@ -56,15 +58,13 @@ $dca['list'] = [
         ],
     ],
     'operations' => [
-        'edit' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['edit'],
+        $contao5 ? 'children' : 'edit' => [
             'href' => "table=$itemTable",
-            'icon' => 'edit.svg',
+            'icon' => $contao5 ? 'children.svg' : 'edit.svg',
         ],
-        'editheader' => [
-            'label' => &$GLOBALS['TL_LANG'][$table]['editheader'],
+        $contao5 ? 'edit' : 'editheader' => [
             'href' => 'act=edit',
-            'icon' => 'header.svg',
+            'icon' => $contao5 ? 'edit.svg' : 'header.svg',
             'button_callback' => [ProductArchiveContainer::class, 'editHeader'],
         ],
         'copy' => [

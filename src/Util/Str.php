@@ -2,8 +2,6 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Util;
 
-use Contao\StringUtil;
-
 readonly class Str
 {
     /**

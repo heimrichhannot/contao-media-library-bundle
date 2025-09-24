@@ -5,10 +5,6 @@ services:
         bind:
             $bundleConfig: '%huh_media_library%'
 
-    _instanceof:
-        HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType:
-            tags: ['huh.media_library.archive_type']
-
     Psr\Log\LoggerInterface:
         alias: monolog.logger.contao
 

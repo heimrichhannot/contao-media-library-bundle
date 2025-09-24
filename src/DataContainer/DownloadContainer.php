@@ -33,18 +33,6 @@ class DownloadContainer
         $this->fileUtil = $fileUtil;
     }
 
-    public function listChildren($row)
-    {
-        $data = [$this->fileUtil->getPathFromUuid($row['file'])];
-
-        if ($row['isAdditional']) {
-            $data[] = $GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['additional'];
-        }
-
-        return '<div class="tl_content_left">'.($row['title'] ?: $row['id']).' <span style="color:#b3b3b3; padding-left:3px">['.
-            implode(', ', $data).']</span></div>';
-    }
-
     public function checkPermission()
     {
         $archive = null;
