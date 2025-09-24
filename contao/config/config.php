@@ -21,10 +21,6 @@ $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['huh.media_library.ajax_manager', 'aj
 // if (\Contao\System::getContainer()->get('huh.utils.container')->isFrontend() && !class_exists(\HeimrichHannot\EncoreBundle\DependencyInjection\EncoreExtension::class)) {
 //     $GLOBALS['TL_JAVASCRIPT']['contao-media-library-bundle'] = 'bundles/heimrichhannotmedialibrary/js/contao-media-library-bundle.js|static';
 // }
-//
-// if (\Contao\System::getContainer()->get('huh.utils.container')->isBackend()) {
-//     $GLOBALS['TL_CSS']['contao-media-library-bundle-be'] = 'bundles/heimrichhannotmedialibrary/css/contao-media-library-bundle-be.css';
-// }
 
 /*
  * Models
