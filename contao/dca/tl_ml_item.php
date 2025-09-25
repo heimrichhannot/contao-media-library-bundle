@@ -6,6 +6,7 @@ use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
+use HeimrichHannot\UtilsBundle\Dca\AliasField;
 use HeimrichHannot\UtilsBundle\Dca\AuthorField;
 use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 
@@ -14,6 +15,7 @@ $archiveTable = ArchiveModel::getTable();
 
 AuthorField::register($table);
 DateAddedField::register($table);
+AliasField::register($table);
 
 $dca = &$GLOBALS['TL_DCA'][$table];
 
@@ -63,7 +65,6 @@ $dca['list'] = [
         'fields' => ['title'],
         'headerFields' => ['title', 'tstamp'],
         'panelLayout' => 'filter;sort,search,limit',
-        'child_record_callback' => [ProductContainer::class, 'listChildren'],
     ],
     'global_operations' => [
         'all' => [
@@ -117,12 +118,6 @@ $dca['fields'] = [
     ],
     'tstamp' => [
         'sql' => "int(10) unsigned NOT NULL default '0'",
-    ],
-    'alias' => [
-        'exclude' => true,
-        'inputType' => 'text',
-        'eval' => ['tl_class' => 'w50', 'doNotCopy' => true],
-        'sql' => "varchar(255) NOT NULL default ''",
     ],
     'type' => [
         'exclude' => true,
@@ -268,10 +263,4 @@ $dca['fields'] = [
         'parentsUnselectable' => true,
         'isAdditionalField' => true,
     ]
-);
-
-System::getContainer()->get('huh.utils.dca')->addOverridableFields(
-    ['imageSizes'],
-    $archiveTable,
-    $table
 );

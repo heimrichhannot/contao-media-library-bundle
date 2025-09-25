@@ -36,6 +36,14 @@ class ItemContainer
             ->execute($archive->type, $insertId);
     }
 
+    #[AsCallback(self::TABLE, 'list.sorting.child_record')]
+    public function childRecordCallback(array $row): string
+    {
+        $title = ($row['title'] ?? null) ?: ($row['id'] ?? null) ?: 'item';
+
+        return \sprintf('<div class="tl_content_left">%s</div>', $title);
+    }
+
     /**
      * @param DataContainer $dc
      * @return void

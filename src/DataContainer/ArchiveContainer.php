@@ -2,10 +2,8 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
-use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\CoreBundle\Image\ImageSizes;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
@@ -22,7 +20,6 @@ class ArchiveContainer
     public function __construct(
         private readonly ArchiveTypeCollection $archiveTypes,
         private readonly Connection            $connection,
-        private readonly ImageSizes            $imageSizes,
         private readonly RequestStack          $requestStack,
     ) {}
 
@@ -117,28 +114,6 @@ class ArchiveContainer
 
             $label = $field['label'][0] ?? $fieldName;
             $options[$fieldName] = "$label [$fieldName]";
-        }
-
-        return $options;
-    }
-
-    #[AsCallback(self::TABLE, 'fields.imageSizes.options')]
-    public function getImageSizes(): array
-    {
-        $user = BackendUser::getInstance();
-        $imageSizes = $this->imageSizes->getOptionsForUser($user);
-
-        $options = [];
-
-        foreach ($imageSizes as $key => $size)
-        {
-            if (\in_array($key, ['image_sizes', 'relative', 'exact'])) {
-                continue;
-            }
-
-            foreach ($size as $id => $label) {
-                $options[$id] = "$label [ID $id]";
-            }
         }
 
         return $options;
