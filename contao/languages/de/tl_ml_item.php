@@ -22,8 +22,8 @@ $lang['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle
 $lang['copyright'] = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
 $lang['text'] = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
 $lang['tags'] = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
-$lang['addAdditionalFiles'] = ['Zusätzliche Dateien hinzufügen', 'Wählen Sie diese Option, um dem Produkt weitere Dateien hinzuzufügen (bspw. für Bildergallerien).'];
-$lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier die gewünschten Bilder aus.'];
+$lang['addAdditionalFiles'] = ['Datei-Varianten hinzufügen', 'Wählen Sie diese Option, um weitere Dateien hinzuzufügen, die das originale Motiv aufgreifen, als Varianten der Originaldatei sind.'];
+$lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier zusätzliche Varianten zum Originaldateiinhalt aus.'];
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start'] = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop'] = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
@@ -36,18 +36,10 @@ $lang['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Mitgliedergruppen könne
 $lang['general_legend'] = 'Allgemeine Einstellungen';
 $lang['details_legend'] = 'Detaileinstellungen';
 $lang['additional_fields_legend'] = 'Einstellungen zusätzlicher Felder';
+$lang['variants_legend'] = 'Varianteneinstellungen';
 $lang['publish_legend'] = 'Veröffentlichung';
-$lang['protected_legend'] = 'Zugriffsschutz';
+$lang['protect_legend'] = 'Zugriffsschutz';
 $lang['video_legend'] = 'Video-Einstellungen';
-
-/*
- * Reference
- */
-$lang['reference'] = [
-    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_IMAGE => 'Bild',
-    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_FILE => 'Datei',
-    \HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer::TYPE_VIDEO => 'Video',
-];
 
 /*
  * Buttons

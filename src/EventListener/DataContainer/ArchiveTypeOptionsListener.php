@@ -1,6 +1,6 @@
 <?php
 
-namespace HeimrichHannot\MediaLibraryBundle\EventListener\Contao;
+namespace HeimrichHannot\MediaLibraryBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;

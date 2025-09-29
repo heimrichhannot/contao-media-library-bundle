@@ -38,7 +38,7 @@ $lang['editJumpTo'][1] = 'Select the page on which the form for editing the prod
 $lang['general_legend'] = 'General settings';
 $lang['advanced_legend'] = 'Advanced settings';
 $lang['edit_legend'] = 'Edit settings';
-$lang['protected_legend'] = 'Access protection';
+$lang['protect_legend'] = 'Access protection';
 $lang['publish_legend'] = 'Publish settings';
 
 /**

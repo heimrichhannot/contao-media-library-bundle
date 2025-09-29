@@ -8,22 +8,15 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
-use Codefog\TagsBundle\Model\TagModel;
 use Contao\BackendUser;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Slug\Slug;
-use Contao\Database;
-use Contao\Database\Result;
 use Contao\DataContainer;
-use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\Image;
 use Contao\ImageSizeModel;
 use Contao\Input;
-use Contao\Message;
 use Contao\Model;
 use Contao\RequestToken;
 use Contao\StringUtil;
@@ -40,146 +33,26 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @deprecated To be removed in v2.
+ */
 class ProductContainer
 {
     public const TABLE = ItemContainer::TABLE;
 
-    public const TYPE_FILE = 'file';
-    public const TYPE_IMAGE = 'image';
-    public const TYPE_VIDEO = 'video';
-
-    /**
-     * @todo(@ericges): Replace with registry system in v2.
-     * @deprecated To be replaced with registry system in v2.
-     */
-    public const TYPES = [
-        self::TYPE_FILE,
-        self::TYPE_IMAGE,
-        self::TYPE_VIDEO,
-    ];
-
-    public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_item';
-    public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
-    public const CFG_TAG_ASSOCIATION_PRODUCT_FIELD = 'ml_item_id';
-
-    protected DcaUtil $dcaUtil;
-    protected FileUtil $fileUtil;
-    protected array $bundleConfig;
-    private DatabaseUtil $databaseUtil;
-    private TranslatorInterface $translator;
-    private EventDispatcherInterface $eventDispatcher;
-    private Utils $utils;
-    private ParameterBagInterface $parameterBag;
-    private Security $security;
-
     public function __construct(
-        array $bundleConfig,
-        TranslatorInterface $translator,
-        DcaUtil $dcaUtil,
-        FileUtil $fileUtil,
-        DatabaseUtil $databaseUtil,
-        EventDispatcherInterface $eventDispatcher,
-        Utils $utils,
-        ParameterBagInterface $parameterBag,
-        Security $security,
-    ) {
-        $this->bundleConfig = $bundleConfig;
-        $this->dcaUtil = $dcaUtil;
-        $this->fileUtil = $fileUtil;
-        $this->databaseUtil = $databaseUtil;
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->utils = $utils;
-        $this->parameterBag = $parameterBag;
-        $this->security = $security;
-    }
+        protected array $bundleConfig,
+        protected DcaUtil $dcaUtil,
+        protected FileUtil $fileUtil,
+        private DatabaseUtil $databaseUtil,
+        private EventDispatcherInterface $eventDispatcher,
+        private Utils $utils,
+        private ParameterBagInterface $parameterBag,
+        private Security $security,
+    ) {}
 
-    public function updateTagAssociations(DataContainer $dc): void
-    {
-        $source = $GLOBALS['TL_DCA']['tl_ml_product']['fields']['tags']['eval']['tagsManager'];
-        $tags = $this->databaseUtil->findResultsBy(TagModel::getTable(), ['source=?'], [$source]);
-
-        if (!$tags->numRows) {
-            return;
-        }
-
-        $ids = [];
-        $tagsInUse = $this->getTagsInUse();
-
-        while ($tags->next()) {
-            $tagId = (int) $tags->id;
-
-            if (!\in_array($tagId, $tagsInUse)) {
-                $ids[] = $tagId;
-            }
-        }
-
-        if (!empty($ids)) {
-            $this->databaseUtil->delete(TagModel::getTable(), 'id IN ('.implode(',', $ids).')', []);
-        }
-    }
-
-    public function deleteTagAssociations(DataContainer $dc, int $undoId): void
-    {
-        $tagAssociations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, ['ml_item_id=?'],
-            [$dc->id]);
-
-        if (!$tagAssociations->numRows) {
-            return;
-        }
-
-        while ($tagAssociations->next()) {
-            $tagId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_TAG_FIELD};
-            $productId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD};
-
-            $tagUsedByOtherRecord = $this->databaseUtil->findOneResultBy(self::CFG_TAG_ASSOCIATION_TABLE, [
-                self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?',
-                self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD.'!=?',
-            ], [
-                $tagId,
-                $dc->id,
-            ]);
-
-            if ($tagUsedByOtherRecord->numRows < 1) {
-                $this->databaseUtil->delete(TagModel::getTable(), 'id=?', [$tagId]);
-            }
-
-            $this->databaseUtil->delete(self::CFG_TAG_ASSOCIATION_TABLE,
-                self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=? AND '.self::CFG_TAG_ASSOCIATION_PRODUCT_FIELD.'=?', [$tagId, $productId]
-            );
-        }
-    }
-
-    public function setCopyright(DataContainer $dc): void
-    {
-        if (!$dc->activeRecord || !$dc->activeRecord->file) {
-            return;
-        }
-
-        $file = StringUtil::deserialize($dc->activeRecord->file, true);
-
-        if (empty($file)) {
-            return;
-        }
-
-        $model = FilesModel::findByUuid($file[0]);
-
-        if (null === $model) {
-            return;
-        }
-
-        $versions = new Versions('tl_files', $model->id);
-        $versions->initialize();
-
-        $model->copyright = $dc->activeRecord->copyright ?? null;
-        $model->save();
-
-        $versions->create();
-    }
-
-    public function checkPermission()
+    public function checkPermission(): void
     {
         /** @var BackendUser $user */
         if (!($user = $this->security->getUser() instanceof BackendUser)) {
@@ -420,41 +293,6 @@ class ProductContainer
 
                 $this->createDownloadItems($dc, true);
             }
-        }
-    }
-
-    protected function tagIsInUse(int $id): int
-    {
-        $associations = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, [self::CFG_TAG_ASSOCIATION_TAG_FIELD.'=?'], [$id]);
-
-        return $associations?->numRows;
-    }
-
-    protected function getTagsInUse()
-    {
-        $records = $this->databaseUtil->findResultsBy(self::CFG_TAG_ASSOCIATION_TABLE, null, null);
-
-        if (!$records || $records->numRows < 1) {
-            return [];
-        }
-
-        return $records->fetchEach('cfg_tag_id');
-    }
-
-    protected function modifyTagAssociations(string $table, Result $tagAssociations): void
-    {
-        $source = $GLOBALS['TL_DCA']['tl_ml_product']['fields']['tags']['eval']['tagManager'];
-
-        while ($tagAssociations->next()) {
-            // delete tag if not in use by another entity
-            $associationsFromOtherEntities = $this->databaseUtil->findResultsBy($table, ['cfg_tag_id=?'],
-                [$tagAssociations->cfg_tag_id]);
-
-            if ($associationsFromOtherEntities->numRows) {
-                continue;
-            }
-
-            $this->databaseUtil->delete('tl_cfg_tag', 'tl_cfg_tag.id=? AND tl_cfg_tag.source=?', [$tagAssociations->cfg_tag_id, $source]);
         }
     }
 

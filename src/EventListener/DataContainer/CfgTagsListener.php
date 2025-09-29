@@ -1,6 +1,6 @@
 <?php
 
-namespace HeimrichHannot\MediaLibraryBundle\EventListener\Contao;
+namespace HeimrichHannot\MediaLibraryBundle\EventListener\DataContainer;
 
 use Codefog\TagsBundle\Model\TagModel;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
@@ -9,10 +9,11 @@ use Contao\DataContainer;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 
-class UpdateCategoryTagsListener
+class CfgTagsListener
 {
-    public const TABLE = 'tl_ml_item';
+    public const TABLE = ItemContainer::TABLE;
 
     public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_item';
     public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
@@ -22,6 +23,8 @@ class UpdateCategoryTagsListener
         private readonly Connection $connection,
     ) {}
 
+    /** @noinspection PhpUnused */
+    #[AsCallback(self::TABLE, 'config.ondelete')]
     public function deleteTagAssociations(DataContainer $dc, int $undoId): void
     {
         $qTagTable = $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TABLE);
@@ -72,6 +75,7 @@ class UpdateCategoryTagsListener
         }
     }
 
+    /** @noinspection PhpUnused */
     #[AsCallback(self::TABLE, 'config.onsubmit')]
     public function updateTagAssociations(DataContainer $dc): void
     {
@@ -129,6 +133,6 @@ class UpdateCategoryTagsListener
             return [];
         }
 
-        return \array_unique(\array_map('intval', \array_filter($records->fetchEach($tagIdAlias))));
+        return \array_unique(\array_map('\intval', \array_filter($records->fetchEach($tagIdAlias))));
     }
 }

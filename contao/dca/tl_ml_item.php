@@ -1,6 +1,7 @@
 <?php
 
 use Contao\DC_Table;
+use HeimrichHannot\CategoriesBundle\Backend\Category;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
@@ -21,7 +22,7 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 $dca['palettes'] = [
     '__selector__' => ['type', 'addAdditionalFiles', 'protected'],
     '__prefix__' => '{general_legend},title,alias,file;{details_legend},tags,copyright,text;',
-    '__suffix__' => '{additional_fields_legend};{protected_legend},protected;{published_legend},published,start,stop;',
+    '__suffix__' => '{additional_fields_legend};{variants_legend},addAdditionalFiles;{protect_legend},protected;{publish_legend},published,start,stop;',
 ];
 
 $dca['palettes']['default'] = Str::mergePalettes($dca['palettes']['__prefix__'], $dca['palettes']['__suffix__']);
@@ -37,12 +38,6 @@ $dca['config'] = [
     'dataContainer' => DC_Table::class,
     'ptable' => $archiveTable,
     'enableVersioning' => true,
-    'onsubmit_callback' => [
-        [ProductContainer::class, 'setCopyright'],
-    ],
-    'ondelete_callback' => [
-        [ProductContainer::class, 'deleteTagAssociations'],
-    ],
     'sql' => [
         'keys' => [
             'id' => 'primary',
@@ -236,7 +231,7 @@ $dca['fields'] = [
     ],
 ];
 
-\HeimrichHannot\CategoriesBundle\Backend\Category::addMultipleCategoriesFieldToDca(
+Category::addMultipleCategoriesFieldToDca(
     $table,
     'categories',
     [

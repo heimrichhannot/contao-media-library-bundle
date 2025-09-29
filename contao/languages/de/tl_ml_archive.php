@@ -31,7 +31,7 @@ $lang['general_legend'] = 'Allgemeine Einstellungen';
 $lang['advanced_legend'] = 'Erweiterte Einstellungen';
 $lang['image_legend'] = 'Bildeinstellungen';
 $lang['edit_legend'] = 'Bearbeitungseinstellungen';
-$lang['protected_legend'] = 'Zugriffsschutz';
+$lang['protect_legend'] = 'Zugriffsschutz';
 $lang['publish_legend'] = 'Veröffentlichung';
 
 /**
