@@ -51,6 +51,11 @@ class ArchiveContainer
         $this->connection->update(self::TABLE, ['dateAdded' => \time()], ['id' => $id]);
     }
 
+    /**
+     * Dynamically generate and add the palette for the current archive type if it does not exist yet.
+     *
+     * @throws \Exception When the DCA for the table cannot be loaded.
+     */
     #[AsCallback(self::TABLE, 'config.onload')]
     public function onLoadGeneratePalette(?DataContainer $dc = null): void
     {
@@ -64,7 +69,7 @@ class ArchiveContainer
             return;
         }
 
-        if (!$archive->type) {
+        if (!$type = (string) $archive->type) {
             return;
         }
 
@@ -74,11 +79,11 @@ class ArchiveContainer
             throw new \Exception('Unable to load DCA for ' . self::TABLE);
         }
 
-        if ($palettes[$archive->type] ?? null) {
+        if ($palettes[$type] ?? null) {
             return;
         }
 
-        if (!$archiveType = $this->archiveTypes->get((string) $archive->type)) {
+        if (!$archiveType = $this->archiveTypes->get($type)) {
             return;
         }
 
@@ -87,7 +92,7 @@ class ArchiveContainer
         $prefix = $dca['palettes']['__prefix__'] ?? '';
         $suffix = $dca['palettes']['__suffix__'] ?? '';
 
-        $dca['palettes'][$archive->type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
+        $dca['palettes'][$type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
     }
 
     #[AsCallback(self::TABLE,  'fields.additionalFields.options')]
