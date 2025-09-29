@@ -36,7 +36,6 @@ use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\Driver\DC_Table_Utils;
 use HeimrichHannot\UtilsBundle\File\FileUtil;
 use HeimrichHannot\UtilsBundle\Util\Utils;
-use Model\Collection;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -178,68 +177,6 @@ class ProductContainer
         $model->save();
 
         $versions->create();
-    }
-
-    /**
-     * Generate download.
-     *
-     * @throws \Exception
-     */
-    public function generateDownloadItems(DataContainer $dc): void
-    {
-        if ($dc->activeRecord->doNotCreateDownloadItems || !$dc->activeRecord->file) {
-            return;
-        }
-
-        $this->doDeleteDownloads($dc, [
-            'keepManuallyAdded' => true,
-        ]);
-
-        $this->createDownloadItems($dc);
-    }
-
-    public function deleteDownloads(DataContainer $dc, int $undoId)
-    {
-        $this->doDeleteDownloads($dc, [
-            'addConfirmationMessage' => true,
-        ]);
-    }
-
-    public function doDeleteDownloads(DataContainer $dc, array $options = [])
-    {
-        $addConfirmationMessage = $options['addConfirmationMessage'] ?? false;
-
-        if (null === ($downloads = $this->getDownloadItems($dc, $options))) {
-            return;
-        }
-
-        if (null === ($product = $this->getProduct($dc->id))) {
-            return;
-        }
-
-        foreach ($downloads as $i => $download) {
-            // get file model of download for later deletion
-            $downloadFile = $this->fileUtil->getFileFromUuid($download->file);
-
-            // delete model
-            if (null !== $download) {
-                $download->delete();
-            }
-
-            // keep the original files
-            if (!$download->imageSize) {
-                if ($addConfirmationMessage) {
-                    Message::addConfirmation($GLOBALS['TL_LANG']['MSC']['contaoMediaLibraryBundle']['messageOriginalFileKept']);
-                }
-
-                continue;
-            }
-
-            // delete file
-            if (null !== $downloadFile) {
-                $downloadFile->delete();
-            }
-        }
     }
 
     public function checkPermission()
@@ -521,19 +458,6 @@ class ProductContainer
         }
     }
 
-    protected function getDownloadItems(DataContainer $dc, array $options = []): Collection|Model|null
-    {
-        $columns = ['tl_ml_download.pid=?'];
-        $values = [$dc->id];
-
-        if (isset($options['keepManuallyAdded']) && $options['keepManuallyAdded']) {
-            $columns[] = 'tl_ml_download.author=?';
-            $values[] = 0;
-        }
-
-        return $this->utils->model()->findModelInstancesBy('tl_ml_download', $columns, $values);
-    }
-
     protected function getProduct(int $id): ?Model
     {
         return $this->utils->model()->findModelInstanceByPk('tl_ml_product', $id);
@@ -649,76 +573,5 @@ class ProductContainer
         }
 
         return $productArchive;
-    }
-
-    /**
-     * create the DownloadModel for the image size.
-     *
-     * @param ImageSizeModel $size
-     *
-     * @throws Exception
-     */
-    protected function createDownloadItem(
-        string $path,
-        DataContainer $dc,
-        int $originalDownload = 0,
-        bool $keepProductName = false,
-        ImageSizeModel $size = null,
-        bool $isAdditional = false
-    ) {
-        $data = [];
-
-        $path = str_replace($this->parameterBag->get('kernel.project_dir').\DIRECTORY_SEPARATOR,
-            '', $path);
-
-        if (null === ($file = FilesModel::findByPath($path))) {
-            $file = Dbafs::addResource(urldecode($path));
-        }
-
-        if (null !== $size) {
-            $data['imageSize'] = $size->id;
-        }
-
-        $data['tstamp'] = $data['dateAdded'] = time();
-
-        $data['title'] = $this->getDownloadTitle($dc, $keepProductName, $size);
-        $data['pid'] = $dc->activeRecord->id;
-        $data['file'] = $file->uuid;
-
-        $data['published'] = true;
-
-        $this->databaseUtil->insert('tl_ml_download', [
-            'imageSize' => $data['imageSize'] ?? 0,
-            'originalDownload' => $originalDownload,
-            'tstamp' => $data['tstamp'],
-            'dateAdded' => $data['dateAdded'],
-            'title' => $data['title'],
-            'pid' => $data['pid'],
-            'file' => $data['file'],
-            'isAdditional' => $isAdditional ? 1 : '',
-            'published' => $data['published'],
-        ]);
-
-        // return download id
-        $download = Database::getInstance()->prepare('SELECT id FROM tl_ml_download WHERE pid=? AND imageSize=? AND file=UNHEX(?)')
-            ->limit(1)->execute(
-                $data['pid'], $data['imageSize'] ?? 0, bin2hex($data['file'])
-            );
-
-        return $download->id;
-    }
-
-    protected function getDownloadTitle(
-        DataContainer $dc,
-        bool $keepProductName = false,
-        ImageSizeModel $size = null
-    ): string {
-        $title = $dc->activeRecord->title;
-
-        if (null === $size) {
-            return $keepProductName ? $title : $this->translator->trans('huh.mediaLibrary.downloadTitle.original');
-        }
-
-        return $keepProductName ? $this->translator->trans('huh.mediaLibrary.downloadTitle.sizeWithProductTitle', ['{title}' => $title, '{size}' => $size->name]) : $size->name;
     }
 }

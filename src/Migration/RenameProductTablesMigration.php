@@ -6,10 +6,10 @@ use Contao\CoreBundle\Migration\MigrationInterface;
 use Contao\CoreBundle\Migration\MigrationResult;
 use Doctrine\DBAL\Connection;
 
-class RenameProductTablesMigration implements MigrationInterface
+readonly class RenameProductTablesMigration implements MigrationInterface
 {
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {}
 
     public function getName(): string

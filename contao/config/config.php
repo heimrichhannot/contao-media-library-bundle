@@ -2,7 +2,6 @@
 
 use HeimrichHannot\MediaLibraryBundle\Contao\BackendModule;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
 /*
@@ -26,7 +25,6 @@ $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['huh.media_library.ajax_manager', 'aj
  * Models
  */
 $GLOBALS['TL_MODELS'][ArchiveModel::getTable()] = ArchiveModel::class;
-$GLOBALS['TL_MODELS'][DownloadModel::getTable()] = DownloadModel::class;
 $GLOBALS['TL_MODELS'][ItemModel::getTable()] = ItemModel::class;
 
 // $GLOBALS['AJAX'][\HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager::MEDIA_LIBRARY_XHR_GROUP] = [

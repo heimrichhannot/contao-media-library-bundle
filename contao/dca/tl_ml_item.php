@@ -3,7 +3,6 @@
 use Contao\DC_Table;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Model\DownloadModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use HeimrichHannot\UtilsBundle\Dca\AliasField;
@@ -13,38 +12,35 @@ use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 $table = ItemModel::getTable();
 $archiveTable = ArchiveModel::getTable();
 
-AuthorField::register($table);
+AuthorField::register($table)->setType(AuthorField::TYPE_MEMBER);
 DateAddedField::register($table);
 AliasField::register($table);
 
 $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
-    '__selector__' => ['type', 'addAdditionalFiles', 'protected', 'published'],
-    '__prefix__' => '{general_legend},title,alias;{product_legend},file,copyright,doNotCreateDownloadItems,text;{additional_fields_legend};{tags_legend},tags;{author_legend},author;',
-    '__suffix__' => '{protected_legend},protected;{published_legend},published;',
+    '__selector__' => ['type', 'addAdditionalFiles', 'protected'],
+    '__prefix__' => '{general_legend},title,alias,file;{details_legend},tags,copyright,text;',
+    '__suffix__' => '{additional_fields_legend};{protected_legend},protected;{published_legend},published,start,stop;',
 ];
 
 $dca['palettes']['default'] = Str::mergePalettes($dca['palettes']['__prefix__'], $dca['palettes']['__suffix__']);
 
 $dca['subpalettes'] = [
     'addAdditionalFiles' => 'additionalFiles',
-    'published' => 'start,stop',
     'protected' => 'groups',
 ];
+
+$contao5 = !\defined('VERSION');
 
 $dca['config'] = [
     'dataContainer' => DC_Table::class,
     'ptable' => $archiveTable,
-    'ctable' => [DownloadModel::getTable()],
     'enableVersioning' => true,
     'onsubmit_callback' => [
-        [ProductContainer::class, 'generateDownloadItems'],
         [ProductContainer::class, 'setCopyright'],
-        [ProductContainer::class, 'updateTagAssociations'],
     ],
     'ondelete_callback' => [
-        [ProductContainer::class, 'deleteDownloads'],
         [ProductContainer::class, 'deleteTagAssociations'],
     ],
     'sql' => [
@@ -75,17 +71,9 @@ $dca['list'] = [
         ],
     ],
     'operations' => [
-        'edit' => [
+        $contao5 ? 'edit' : 'editheader' => [
             'href' => 'act=edit',
-            'icon' => 'edit.svg',
-        ],
-        'downloads' => [
-            'href' => 'table=tl_ml_download',
-            'icon' => 'bundles/heimrichhannotmedialibrary/img/icon-download.png',
-        ],
-        'copy' => [
-            'href' => 'act=copy',
-            'icon' => 'copy.svg',
+            'icon' => $contao5 ? 'edit.svg' : 'header.svg',
         ],
         'delete' => [
             'href' => 'act=delete',
@@ -196,12 +184,6 @@ $dca['fields'] = [
         ],
         'sql' => 'blob NULL',
     ],
-    'doNotCreateDownloadItems' => [
-        'exclude' => true,
-        'inputType' => 'checkbox',
-        'eval' => ['tl_class' => 'clr'],
-        'sql' => "char(1) NOT NULL default ''",
-    ],
     'text' => [
         'exclude' => true,
         'search' => true,
@@ -222,7 +204,7 @@ $dca['fields'] = [
         'exclude' => true,
         'filter' => true,
         'inputType' => 'checkbox',
-        'eval' => ['doNotCopy' => true, 'submitOnChange' => true, 'tl_class' => 'clr'],
+        'eval' => ['doNotCopy' => true, 'tl_class' => 'clr'],
         'sql' => "char(1) NOT NULL default ''",
     ],
     'start' => [

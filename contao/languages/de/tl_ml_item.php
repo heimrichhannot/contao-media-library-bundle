@@ -22,24 +22,23 @@ $lang['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle
 $lang['copyright'] = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
 $lang['text'] = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
 $lang['tags'] = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
-$lang['doNotCreateDownloadItems'] = [
-    'Keine Download-Items erzeugen',
-    'Wählen Sie diese Option, wenn für dieses Produkt keine Download-Items aus den hochgeladenen Dateien erstellt werden sollen.',
-];
 $lang['addAdditionalFiles'] = ['Zusätzliche Dateien hinzufügen', 'Wählen Sie diese Option, um dem Produkt weitere Dateien hinzuzufügen (bspw. für Bildergallerien).'];
 $lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier die gewünschten Bilder aus.'];
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start'] = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop'] = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
+$lang['protected'] = ['Zugriff auf Gruppen beschränken', 'Produkt nur bestimmten Mitgliedergruppen zugänglich machen.'];
+$lang['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Mitgliedergruppen können auf das Produkt zugreifen.'];
 
 /*
  * Legends
  */
 $lang['general_legend'] = 'Allgemeine Einstellungen';
-$lang['product_legend'] = 'Produkt-Einstellungen';
-$lang['additional_fields_legend'] = 'Zusätzliche Einstellungen';
+$lang['details_legend'] = 'Detaileinstellungen';
+$lang['additional_fields_legend'] = 'Einstellungen zusätzlicher Felder';
 $lang['publish_legend'] = 'Veröffentlichung';
 $lang['protected_legend'] = 'Zugriffsschutz';
+$lang['video_legend'] = 'Video-Einstellungen';
 
 /*
  * Reference

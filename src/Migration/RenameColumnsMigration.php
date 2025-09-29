@@ -88,7 +88,10 @@ readonly class RenameColumnsMigration implements MigrationInterface
                 'allowEdit' => 'enableEdit',
                 'includeDelete' => 'enableDelete',
                 'redirectAfterDelete' => 'deleteJumpTo',
-            ]
+            ],
+            'tl_cfg_tag_ml_item' => [
+                'ml_product_id' => 'ml_item_id',
+            ],
         ];
 
         $schemaManager = $this->connection->createSchemaManager();

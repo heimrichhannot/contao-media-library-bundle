@@ -6,10 +6,8 @@ use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Image\ImageSizes;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ArchiveContainer;
-use HeimrichHannot\MediaLibraryBundle\DataContainer\DownloadNewContainer;
 
 #[AsCallback(ArchiveContainer::TABLE, 'fields.imageSizes.options')]
-#[AsCallback(DownloadNewContainer::TABLE, 'fields.imageSizes.options')]
 readonly class ImageSizesOptionsListener
 {
     public function __construct(
