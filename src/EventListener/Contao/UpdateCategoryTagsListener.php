@@ -24,11 +24,15 @@ class UpdateCategoryTagsListener
 
     public function deleteTagAssociations(DataContainer $dc, int $undoId): void
     {
+        $qTagTable = $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TABLE);
+        $qItemField = $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_ITEM_FIELD);
+        $qTagField = $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TAG_FIELD);
+
         $tagAssociations = Database::getInstance()
             ->prepare(\sprintf(
                 'SELECT * FROM %s WHERE %s = ?',
-                $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TABLE),
-                $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_ITEM_FIELD),
+                $qTagTable,
+                $qItemField,
             ))
             ->execute($dc->id);
 
@@ -42,12 +46,7 @@ class UpdateCategoryTagsListener
             $itemId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_ITEM_FIELD};
 
             $tagUsedByOtherRecord = $this->connection->executeQuery(
-                \sprintf(
-                    'SELECT 1 FROM %s WHERE %s = ? AND %s != ? LIMIT 1',
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TABLE),
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TAG_FIELD),
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_ITEM_FIELD),
-                ),
+                \sprintf('SELECT 1 FROM %s WHERE %s = ? AND %s != ? LIMIT 1', $qTagTable, $qTagField, $qItemField),
                 [$tagId, $dc->id],
                 [ParameterType::INTEGER, ParameterType::INTEGER]
             );
@@ -66,12 +65,7 @@ class UpdateCategoryTagsListener
             }
 
             $this->connection->executeStatement(
-                \sprintf(
-                    'DELETE FROM %s WHERE %s = ? AND %s = ?',
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TABLE),
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_TAG_FIELD),
-                    $this->connection->quoteIdentifier(self::CFG_TAG_ASSOCIATION_ITEM_FIELD),
-                ),
+                \sprintf('DELETE FROM %s WHERE %s = ? AND %s = ?', $qTagTable, $qTagField, $qItemField),
                 [$tagId, $itemId],
                 [ParameterType::INTEGER, ParameterType::INTEGER]
             );
