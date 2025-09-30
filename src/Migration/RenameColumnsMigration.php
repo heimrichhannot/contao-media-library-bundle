@@ -92,6 +92,12 @@ readonly class RenameColumnsMigration implements MigrationInterface
             'tl_cfg_tag_ml_item' => [
                 'ml_product_id' => 'ml_item_id',
             ],
+            'tl_member' => [
+                'ml_archivesp' => 'ml_archivep',
+            ],
+            'tl_member_group' => [
+                'ml_archivesp' => 'ml_archivep',
+            ],
         ];
 
         $schemaManager = $this->connection->createSchemaManager();

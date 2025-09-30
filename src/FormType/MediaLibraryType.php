@@ -1,11 +1,5 @@
 <?php
 
-/*
- * Copyright (c) 2023 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
 namespace HeimrichHannot\MediaLibraryBundle\FormType;
 
 use Contao\Controller;
@@ -30,7 +24,7 @@ use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\FormTypeBundle\FormType\FormContext;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
-use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
+use HeimrichHannot\MediaLibraryBundle\Security\Voter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -39,7 +33,7 @@ class MediaLibraryType extends AbstractFormType
 {
     public const TYPE = 'huh_media_library';
     public const PARAMETER_EDIT = 'edit';
-    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_product';
+    protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
     public function __construct(
         protected readonly RequestStack $requestStack,
@@ -73,17 +67,20 @@ class MediaLibraryType extends AbstractFormType
         $folder = new Folder('files/media/mediathek');
         $uuid = $folder->getModel()->uuid;
 
+        $table = ItemModel::getTable();
+        $domain = 'contao_' . $table;
+
         $fields = [
             [
                 'type' => 'text',
                 'name' => 'title',
-                'label' => $this->translator->trans('tl_ml_product.title.0', [], 'contao_tl_ml_product'),
+                'label' => $this->translator->trans("{$table}.title.0", [], $domain),
                 'mandatory' => '1',
             ],
             [
                 'type' => 'upload',
                 'name' => 'file',
-                'label' => $this->translator->trans('tl_ml_product.file.0', [], 'contao_tl_ml_product'),
+                'label' => $this->translator->trans("{$table}.file.0", [], $domain),
                 'extensions' => 'jpg,jpeg,gif,png',
                 'mandatory' => '1',
                 'storeFile' => '1',
@@ -92,15 +89,16 @@ class MediaLibraryType extends AbstractFormType
             [
                 'type' => 'textarea',
                 'name' => 'text',
-                'label' => $this->translator->trans('tl_ml_product.text.0', [], 'contao_tl_ml_product'),
+                'label' => $this->translator->trans("{$table}.text.0", [], $domain),
             ],
         ];
 
-        if (class_exists(HeimrichHannotFileCreditsBundle::class)) {
+        if (\class_exists(HeimrichHannotFileCreditsBundle::class))
+        {
             $fields[] = [
                 'type' => 'textarea',
                 'name' => 'copyright',
-                'label' => $this->translator->trans('tl_ml_product.copyright.0', [], 'contao_tl_ml_product'),
+                'label' => $this->translator->trans("{$table}.copyright.0", [], $domain),
             ];
         }
 
@@ -246,6 +244,13 @@ class MediaLibraryType extends AbstractFormType
         return new AccessDeniedException($message);
     }
 
+    protected function createPageNotFoundException(?string $message = null): PageNotFoundException
+    {
+        $message ??= 'Product not found.';
+
+        return new PageNotFoundException($message);
+    }
+
     protected function evaluateFormContext(Form $form): FormContext
     {
         if (!$request = $this->requestStack->getCurrentRequest()) {
@@ -260,9 +265,11 @@ class MediaLibraryType extends AbstractFormType
             return $this->evaluateFormContext_editParameter($id);
         }
 
-        $mlArchive = ArchiveModel::findByPk($form->ml_archive);
+        if (!$form->ml_archive || !$mlArchive = ArchiveModel::findByPk($form->ml_archive)) {
+            throw $this->createPageNotFoundException('Could not find media library archive.');
+        }
 
-        if (!$this->security->isGranted(ProductVoter::PERMISSION_CREATE, $mlArchive)) {
+        if (!$this->security->isGranted(Voter::PERMISSION_CREATE, $mlArchive)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -275,7 +282,7 @@ class MediaLibraryType extends AbstractFormType
             throw new PageNotFoundException('Product not found!');
         }
 
-        if (!$this->security->isGranted(ProductVoter::PERMISSION_EDIT, $productModel)) {
+        if (!$this->security->isGranted(Voter::PERMISSION_EDIT, $productModel)) {
             throw $this->createAccessDeniedException();
         }
 

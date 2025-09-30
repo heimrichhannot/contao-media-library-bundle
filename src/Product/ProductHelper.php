@@ -2,9 +2,8 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Product;
 
-use Contao\Input;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
-use HeimrichHannot\MediaLibraryBundle\Security\ProductVoter;
+use HeimrichHannot\MediaLibraryBundle\Security\Voter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Security;
@@ -31,7 +30,7 @@ class ProductHelper
 
     public function deleteProduct(ItemModel $product): bool
     {
-        if (!$this->security->isGranted(ProductVoter::PERMISSION_DELETE, $product)) {
+        if (!$this->security->isGranted(Voter::PERMISSION_DELETE, $product)) {
             throw new AccessDeniedHttpException();
         }
 

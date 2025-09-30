@@ -16,12 +16,14 @@ $lang['imageSizes'] = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, f
 $lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
 $lang['groups'] = ['Mitgliedergruppen', 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.'];
 $lang['keepProductTitleForDownloadItems'] = ['Produktnamen im Downloadtitel behalten', 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.'];
-$lang['enableDelete'] = ['Produkte können gelöscht werden', 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.'];
+
+$lang['enableDelete'] = ['Einträge können gelöscht werden', 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.'];
 $lang['deleteJumpTo'] = ['Weiterleitungsseite nach dem Löschen', 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.'];
-$lang['groupsCanDeleteOwn'] = ['Eigene Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)', 'Wählen Sie hier die Mitgliedergruppen aus, die ihre eigenen Produkte löschen dürfen.'];
-$lang['groupsCanDeleteAll'] = ['Alle Produkte löschen (Veraltet, bitte in Mitglieder(gruppen)einstellungen setzen)', 'Wählen Sie hier die Mitgliedergruppen aus, die alle Produkte löschen dürfen.'];
-$lang['enableCreate'] = ['Produkte können erstellt werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.'];
-$lang['enableEdit'] = ['Produkte können bearbeitet werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.'];
+
+$lang['enableCreate'] = ['Neue Einträge können erstellt werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, neue Produkte im Frontend zu erstellen.'];
+$lang['createJumpTo'] = ['Erstellen-Seite', 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Erstellen eines neuen Produktes befindet.'];
+
+$lang['enableEdit'] = ['Einträge können bearbeitet werden', 'Wählen Sie diese Option, wenn den Nutzern die Möglichkeit gegeben werden soll, das Produkt im Frontend zu bearbeiten.'];
 $lang['editJumpTo'] = ['Bearbeiten-Seite', 'Wählen Sie hier die Seite aus, auf der sich das Formular zum Bearbeiten des Produktes befindet.'];
 
 /**
@@ -37,10 +39,10 @@ $lang['publish_legend'] = 'Veröffentlichung';
 /**
  * Buttons
  */
-$lang['new'] = ['Neue Produkt-Archiv', 'Produkt-Archiv erstellen'];
-$lang['edit'] = ['Produkte aus Archiv anzeigen', 'Produkte aus Archiv ID %s anzeigen'];
-$lang['editheader'] = ['Produkt-Archiv bearbeiten', 'Produkt-Archiv ID %s bearbeiten'];
-$lang['copy'] = ['Produkt-Archiv duplizieren', 'Produkt-Archiv ID %s duplizieren'];
-$lang['delete'] = ['Produkt-Archiv löschen', 'Produkt-Archiv ID %s löschen'];
-$lang['toggle'] = ['Produkt-Archiv veröffentlichen', 'Produkt-Archiv ID %s veröffentlichen/verstecken'];
-$lang['show'] = ['Produkt-Archiv Details', 'Produkt-Archiv Details ID %s anzeigen'];
+$lang['new'] = ['Neues Mediathek-Archiv', 'Mediathek-Archiv erstellen'];
+$lang['edit'] = ['Einträge aus Archiv anzeigen', 'Einträge aus Archiv ID %s anzeigen'];
+$lang['editheader'] = ['Mediathek-Archiv bearbeiten', 'Mediathek-Archiv ID %s bearbeiten'];
+$lang['copy'] = ['Mediathek-Archiv duplizieren', 'Mediathek-Archiv ID %s duplizieren'];
+$lang['delete'] = ['Mediathek-Archiv löschen', 'Mediathek-Archiv ID %s löschen'];
+$lang['toggle'] = ['Mediathek-Archiv veröffentlichen', 'Mediathek-Archiv ID %s veröffentlichen/verstecken'];
+$lang['show'] = ['Mediathek-Archiv Details', 'Details von Mediathek-Archiv ID %s anzeigen'];
