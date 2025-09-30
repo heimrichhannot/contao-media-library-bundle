@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArchiveContainer
 {
+    /**
+     * @api Table name can be used in userland callbacks etc.
+     */
     public const TABLE = 'tl_ml_archive';
 
     public function __construct(

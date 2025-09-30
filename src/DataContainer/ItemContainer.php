@@ -14,6 +14,9 @@ use HeimrichHannot\MediaLibraryBundle\Util\Str;
 
 class ItemContainer
 {
+    /**
+     * @api Table name can be used in userland callbacks etc.
+     */
     public const TABLE = 'tl_ml_item';
 
     public function __construct(
