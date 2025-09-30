@@ -2,32 +2,35 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\Input;
 use Contao\Message;
 use Contao\ModuleModel;
-use HeimrichHannot\MediaLibraryBundle\Controller\FrontendModule\ProductListModuleController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ModuleContainer
+readonly class ModuleContainer
 {
+    public const TABLE = 'tl_module';
+
+    public const PRODUCT_LIST_TYPE = 'ml_product_list';
+
     public function __construct(
         private TranslatorInterface $translator,
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @Callback(table="tl_module", target="config.onload")
-     */
+    #[AsCallback(self::TABLE, 'config.onload')]
     public function onConfigLoadCallback(DataContainer $dc = null): void
     {
-        if ('edit' !== Input::get('act') || !$dc || !$dc->id || !($module = ModuleModel::findByPk($dc->id))) {
+        if (!$dc || !$dc->id || !Input::get('act') !== 'edit') {
             return;
         }
 
-        if (ProductListModuleController::TYPE !== $module->type) {
+        if (!$module = ModuleModel::findByPk($dc->id)) {
+            return;
+        }
+
+        if (self::PRODUCT_LIST_TYPE !== $module->type) {
             return;
         }
 
