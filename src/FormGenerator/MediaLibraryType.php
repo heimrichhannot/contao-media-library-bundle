@@ -1,19 +1,24 @@
 <?php
 
-namespace HeimrichHannot\MediaLibraryBundle\FormType;
+namespace HeimrichHannot\MediaLibraryBundle\FormGenerator;
 
+use App\EventListener\DataContainer\MediaLibrary\FileUploadPathCallback;
+use Ausi\SlugGenerator\SlugGenerator;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
 use Contao\Form;
 use Contao\FormModel;
+use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
+use Contao\Widget;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
 use HeimrichHannot\FormTypeBundle\Event\LoadFormFieldEvent;
@@ -36,10 +41,12 @@ class MediaLibraryType extends AbstractFormType
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
     public function __construct(
-        protected readonly RequestStack $requestStack,
-        protected readonly Slug $slug,
-        protected readonly TranslatorInterface $translator,
-        protected readonly Security $security
+        private readonly FileUploadPathCallback $uploadPath,
+        private readonly RequestStack           $requestStack,
+        private readonly Security               $security,
+        private readonly Slug                   $slug,
+        private readonly TokenChecker           $tokenChecker,
+        private readonly TranslatorInterface    $translator,
     ) {}
 
     public function getType(): string
@@ -72,23 +79,24 @@ class MediaLibraryType extends AbstractFormType
 
         $fields = [
             [
-                'type' => 'text',
                 'name' => 'title',
+                'type' => 'text',
                 'label' => $this->translator->trans("{$table}.title.0", [], $domain),
                 'mandatory' => '1',
             ],
             [
-                'type' => 'upload',
                 'name' => 'file',
+                'type' => 'upload',
                 'label' => $this->translator->trans("{$table}.file.0", [], $domain),
                 'extensions' => 'jpg,jpeg,gif,png',
                 'mandatory' => '1',
                 'storeFile' => '1',
                 'uploadFolder' => $uuid,
+                'doNotOverwrite' => '1',
             ],
             [
-                'type' => 'textarea',
                 'name' => 'text',
+                'type' => 'textarea',
                 'label' => $this->translator->trans("{$table}.text.0", [], $domain),
             ],
         ];
@@ -96,20 +104,59 @@ class MediaLibraryType extends AbstractFormType
         if (\class_exists(HeimrichHannotFileCreditsBundle::class))
         {
             $fields[] = [
-                'type' => 'textarea',
                 'name' => 'copyright',
+                'type' => 'textarea',
                 'label' => $this->translator->trans("{$table}.copyright.0", [], $domain),
             ];
         }
+
+        $fields[] = [
+            'name' => 'additionalFiles',
+            'type' => 'upload',
+            'label' => $this->translator->trans("{$table}.additionalFiles.0", [], $domain),
+            'extensions' => 'jpg,jpeg,gif,png',
+            'mandatory' => '1',
+            'storeFile' => '1',
+            'uploadFolder' => $uuid,
+            'doNotOverwrite' => '1',
+        ];
 
         return $fields;
     }
 
     public function onLoadFormField(LoadFormFieldEvent $event): void
     {
-        if ($event->getFormContext()->isUpdate()) {
+        match ($event->getWidget()->name) {
+            'additionalFiles' => $this->onLoadFormField_additionalFields($event->getWidget()),
+        };
+
+        if ($event->getFormContext()->isUpdate())
+        {
             $this->contextUpdate_onLoadFormField($event);
         }
+    }
+
+    public function onLoadFormField_additionalFields(Widget $widget): void
+    {
+        if (!$request = $this->requestStack->getCurrentRequest()) {
+            return;
+        }
+
+        $folderName = match (true) {
+            $this->tokenChecker->hasFrontendUser() => MemberModel::findByUsername($this->tokenChecker->getFrontendUsername())?->id
+                ?: $this->tokenChecker->getFrontendUsername(),
+            $this->tokenChecker->hasBackendUser() => 'be_' . $this->tokenChecker->getBackendUsername(),
+            default => \uniqid('anon_', true),
+        };
+
+        $slug = (new SlugGenerator())->generate(
+            $request->request->get('title')
+                ?: \uniqid('auto_', true)
+        );
+
+        $folder = new Folder($this->uploadPath->fileUploadPath($folderName, $slug));
+
+        $widget->uploadFolder = $folder->getModel()->uuid;
     }
 
     private function contextUpdate_onLoadFormField(LoadFormFieldEvent $event): void
@@ -122,35 +169,31 @@ class MediaLibraryType extends AbstractFormType
             $widget->mandatory = '';
         }
 
-        if ($name === 'copyright' && \class_exists(HeimrichHannotFileCreditsBundle::class))
+        if ($name === 'copyright'
+            && \class_exists(HeimrichHannotFileCreditsBundle::class)
+            && ($fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file'])))
         {
-            if ($fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file']))
-            {
-                $widget->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
-            }
+            $widget->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
         }
     }
 
     public function onPrepareFormData(PrepareFormDataEvent $event): void
     {
-        $form = $event->getForm();
-
-        $archiveModel = ArchiveModel::findByPk($form->ml_archive);
-
-        if ($archiveModel)
+        if ($archiveModel = ArchiveModel::findByPk($event->form->ml_archive))
         {
-            $form->storeValues = '1';
-            $form->targetTable = ItemModel::getTable();
+            $event->form->storeValues = '1';
+            $event->form->targetTable = ItemModel::getTable();
 
-            $data = $event->getData();
+            $event->data['pid'] = $archiveModel->id;
+            $event->data['dateAdded'] = \time();
+            $event->data['alias'] = $this->slug->generate($event->data['title']);
+            $event->data['type'] = $archiveModel->type;
+            $event->data['published'] = ($event->form->ml_publish ?? false) ? '1' : '';
+        }
 
-            $data['pid'] = $archiveModel->id;
-            $data['dateAdded'] = \time();
-            $data['alias'] = $this->slug->generate($data['title']);
-            $data['type'] = $archiveModel->type;
-            $data['published'] = ($form->ml_publish ?? false) ? '1' : '';
-
-            $event->setData($data);
+        if (!empty($event->data['additionalFiles']))
+        {
+            $event->data['addAdditionalFiles'] = '1';
         }
 
         parent::onPrepareFormData($event);
