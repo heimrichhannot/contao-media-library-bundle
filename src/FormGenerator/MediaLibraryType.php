@@ -128,6 +128,7 @@ class MediaLibraryType extends AbstractFormType
     {
         match ($event->getWidget()->name) {
             'additionalFiles' => $this->onLoadFormField_additionalFields($event->getWidget()),
+            default => null,
         };
 
         if ($event->getFormContext()->isUpdate())
