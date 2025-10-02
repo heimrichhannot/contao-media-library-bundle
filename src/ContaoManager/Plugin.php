@@ -1,11 +1,5 @@
 <?php
 
-/*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
 namespace HeimrichHannot\MediaLibraryBundle\ContaoManager;
 
 use Codefog\TagsBundle\CodefogTagsBundle;
@@ -14,6 +8,8 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
+use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
+use HeimrichHannot\FlareBundle\HeimrichHannotFlareBundle;
 use HeimrichHannot\MediaLibraryBundle\HeimrichHannotMediaLibraryBundle;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -28,8 +24,12 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
             CodefogTagsBundle::class,
         ];
 
-        if (class_exists('HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle')) {
-            $loadAfter[] = \HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle::class;
+        if (\class_exists(HeimrichHannotFileCreditsBundle::class)) {
+            $loadAfter[] = HeimrichHannotFileCreditsBundle::class;
+        }
+
+        if (\class_exists(HeimrichHannotFlareBundle::class)) {
+            $loadAfter[] = HeimrichHannotFlareBundle::class;
         }
 
         return [

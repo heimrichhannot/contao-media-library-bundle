@@ -9,6 +9,7 @@
         "codefog/tags-bundle": "^3.2",
         "heimrichhannot/contao-categories-bundle": "^1.1",
         "heimrichhannot/contao-encore-contracts": "^1.0",
+        "heimrichhannot/contao-flare-bundle": "^0.0",
         "heimrichhannot/contao-form-type-bundle": "^0.2.0",
         "heimrichhannot/contao-utils-bundle": "^2.220 || ^3.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
