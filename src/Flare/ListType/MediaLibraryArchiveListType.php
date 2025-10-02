@@ -2,11 +2,11 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Flare\ListType;
 
-use HeimrichHannot\FlareBundle\Contract\Config\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListCallback;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
 use HeimrichHannot\FlareBundle\FilterElement\PublishedElement;
 use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
+use HeimrichHannot\FlareBundle\List\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
 
 #[AsListType(alias: self::TYPE, dataContainer: 'tl_ml_item', palette: '{archive_legend},ml_archive')]
