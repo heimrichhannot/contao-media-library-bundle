@@ -73,7 +73,7 @@ readonly class RenameProductTablesMigration implements MigrationInterface
         $tlMlProductArchive = $tables['tl_ml_product_archive'] ?? false;
         $tlMlArchive = $tables['tl_ml_archive'] ?? false;
         $tlCfgTagMlProduct = $tables['tl_cfg_tag_ml_product'] ?? false;
-        $tlCtgTagMlItem = $tables['tl_ctg_tag_ml_item'] ?? false;
+        $tlCfgTagMlItem = $tables['tl_cfg_tag_ml_item'] ?? false;
 
         if ($tlMlProduct && $tlMlItem) {
             throw $this->createItemTableException();
@@ -83,7 +83,7 @@ readonly class RenameProductTablesMigration implements MigrationInterface
             throw $this->createArchiveTableException();
         }
 
-        if ($tlCfgTagMlProduct && $tlCtgTagMlItem) {
+        if ($tlCfgTagMlProduct && $tlCfgTagMlItem) {
             throw $this->createTagTableException();
         }
 
@@ -98,7 +98,7 @@ readonly class RenameProductTablesMigration implements MigrationInterface
         }
 
         if ($tlCfgTagMlProduct) {
-            $migrate['tl_cfg_tag_ml_product'] = 'tl_ctg_tag_ml_item';
+            $migrate['tl_cfg_tag_ml_product'] = 'tl_cfg_tag_ml_item';
         }
 
         return $migrate;
