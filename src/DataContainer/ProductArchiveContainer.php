@@ -12,10 +12,8 @@ use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\Database;
-use Contao\DataContainer;
 use Contao\Image;
 use Contao\Input;
-use Contao\MemberGroupModel;
 use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
@@ -41,26 +39,6 @@ class ProductArchiveContainer
         $this->fileUtil = $fileUtil;
         $this->modelUtil = $modelUtil;
         $this->security = $security;
-    }
-
-    public function getImageSizes(): array
-    {
-        $user = BackendUser::getInstance();
-        $imageSizes = System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser($user);
-
-        $options = [];
-
-        foreach ($imageSizes as $key => $size) {
-            if (\in_array($key, ['image_sizes', 'relative', 'exact'])) {
-                continue;
-            }
-
-            foreach ($size as $id => $label) {
-                $options[$id] = "$label [ID $id]";
-            }
-        }
-
-        return $options;
     }
 
     /**
