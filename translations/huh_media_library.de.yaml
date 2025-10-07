@@ -1,0 +1,4 @@
+archive_type:
+    file: 'Dateien'
+    image: 'Bilder'
+    video: 'Videos'
