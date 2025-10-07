@@ -54,7 +54,9 @@ readonly class ImageSizesOptionsListener
                     continue;
                 }
 
-                $options[$id] = "[{$theme->name}] $label";
+                $themeName = $theme->name ?: ('Theme ID ' . $theme->id);
+
+                $options[$id] = "[{$themeName}] $label";
             }
         }
 
