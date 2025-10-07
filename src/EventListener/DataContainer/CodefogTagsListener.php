@@ -11,7 +11,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 
-class CfgTagsListener
+class CodefogTagsListener
 {
     public const TABLE = ItemContainer::TABLE;
 

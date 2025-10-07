@@ -4,8 +4,10 @@ namespace HeimrichHannot\MediaLibraryBundle\Flare\ListType;
 
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListCallback;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
+use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
 use HeimrichHannot\FlareBundle\Exception\FlareException;
 use HeimrichHannot\FlareBundle\FilterElement\PublishedElement;
+use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
 use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
 use HeimrichHannot\FlareBundle\List\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
@@ -38,6 +40,13 @@ class MediaLibraryArchiveListType extends AbstractListType
     #[AsListCallback(self::TYPE, 'preset_filters')]
     public function getPresetFilters(PresetFiltersConfig $config): void
     {
+        $listModel = $config->getListModel();
+
+        if ($archiveId = $listModel->ml_archive)
+        {
+            $config->add(SimpleEquationElement::define('pid', SqlEquationOperator::EQUALS, $archiveId));
+        }
+
         $config->add(PublishedElement::define(), true);
     }
 }

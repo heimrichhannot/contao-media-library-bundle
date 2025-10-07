@@ -13,8 +13,8 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
     '__selector__' => ['type', 'protected', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
-    '__prefix__' => '{general_legend},title,type,jumpTo;{advanced_legend},additionalFields,keepProductTitleForDownloadItems;',
-    '__suffix__' => '{edit_legend},enableCreate,enableEdit,enableDelete;',
+    '__prefix__' => '{general_legend},title,type,jumpTo;',
+    '__suffix__' => '{advanced_legend},additionalFields,keepProductTitleForDownloadItems;{edit_legend},enableCreate,enableEdit,enableDelete;',
 ];
 
 $dca['palettes']['default'] = Str::mergePalettes($dca['palettes']['__prefix__'], $dca['palettes']['__suffix__']);
@@ -119,6 +119,7 @@ $dca['fields'] = [
             'mandatory' => true,
             'includeBlankOption' => true,
             'submitOnChange' => true,
+            'chosen' => true,
         ],
         'sql' => "varchar(128) NOT NULL default ''",
     ],
