@@ -20,4 +20,9 @@ abstract class AbstractArchiveType
     {
         return '';
     }
+
+    public function supportsImageSizeDownloads(ArchiveModel $archive): bool
+    {
+        return false;
+    }
 }

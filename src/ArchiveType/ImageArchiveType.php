@@ -15,4 +15,9 @@ class ImageArchiveType extends AbstractArchiveType
     {
         return '{image_legend},imageSizes';
     }
+
+    public function supportsImageSizeDownloads(ArchiveModel $archive): bool
+    {
+        return \count($archive->getImageSizes());
+    }
 }
