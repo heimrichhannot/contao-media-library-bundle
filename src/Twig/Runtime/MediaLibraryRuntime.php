@@ -70,6 +70,9 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
                 ->build();
 
             $dimensions = $figure->getImage()->getOriginalDimensions();
+            $imgPath = $figure->getImage()->getFilePath(true);
+            $fileSize = ($imgPath && \file_exists($imgPath)) ? \filesize($imgPath) : 0;
+            $fileSize = $fileSize ?: null;
 
             $original = ImageSizeDownloadDto::create()
                 ->setLabel('Original')
@@ -77,6 +80,7 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
                 ->setWidth($dimensions->getSize()->getWidth())
                 ->setHeight($dimensions->getSize()->getHeight())
                 ->setFilesModel($filesModel)
+                ->setFilesize($fileSize)
             ;
 
             $downloads[] = $original;
@@ -88,20 +92,25 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
 
         foreach ($imageSizes as $imageSize)
         {
+            if (!$imageSizeModel = ImageSizeModel::findByPk($imageSize)) {
+                continue;
+            }
+
             $figure = $figureBuilder
                 ->fromUuid($filesModel->uuid)
                 ->setSize($imageSize)
                 ->build();
 
-            if (!$imageSizeModel = ImageSizeModel::findByPk($imageSize)) {
-                continue;
-            }
+            $filePath = $figure->getImage()->getImageSrc(true);
+            $fileSize = ($filePath && \file_exists($filePath)) ? \filesize($filePath) : 0;
+            $fileSize = $fileSize ?: null;
 
             $download = ImageSizeDownloadDto::create()
                 ->setLabel($imageSizeModel->name ?: \sprintf('[ID %d]', $imageSizeModel->id))
                 ->setUrl($figure->getImage()->getImageSrc())
                 ->setFilesModel($filesModel)
                 ->setImageSizeModel($imageSizeModel)
+                ->setFilesize($fileSize)
             ;
 
             $downloads[] = $download;
@@ -149,5 +158,42 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
         }
 
         return $return;
+    }
+
+    public function getFilesizeHumanReadable(
+        string|int|null $filesize,
+        ?int            $decimals = null,
+        ?string         $decimalSeparator = null,
+        ?string         $thousandsSeparator = null,
+    ): string {
+        if ($filesize === null || $filesize === '' || $filesize === 0) {
+            return '-';
+        }
+
+        if (!\is_numeric($filesize)) {
+            return '-';
+        }
+
+        $decimals ??= 2;
+        $decimalSeparator ??= ',';
+        $thousandsSeparator ??= '.';
+
+        $decimals = \max(0, $decimals);
+
+        $intFilesize = (int) $filesize;
+
+        if ($intFilesize < 1024) {
+            return \sprintf("%d B", $intFilesize);
+        }
+
+        if ($filesize < 1048576) {
+            return \sprintf("%s kB", \number_format((float) ($intFilesize / 1024), $decimals, $decimalSeparator, $thousandsSeparator));
+        }
+
+        if ($filesize < 1073741824) {
+            return \sprintf("%s MB", \number_format((float) ($filesize / 1048576), $decimals, $decimalSeparator, $thousandsSeparator));
+        }
+
+        return \sprintf("%s GB", \number_format((float) ($filesize / 1073741824), $decimals, $decimalSeparator, $thousandsSeparator));
     }
 }

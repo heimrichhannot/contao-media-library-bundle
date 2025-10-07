@@ -22,6 +22,7 @@ class MediaLibraryExtension extends AbstractExtension
     {
         return [
             new TwigFilter('ml_image_size_info', [MediaLibraryRuntime::class, 'getImageSizeInfo']),
+            new TwigFilter('ml_filesize_human_readable', [MediaLibraryRuntime::class, 'getFilesizeHumanReadable']),
         ];
     }
 }
