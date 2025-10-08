@@ -17,7 +17,8 @@
         "symfony/translation-contracts": "^1.0 || ^2.0 || ^3.0"
     },
     "conflict": {
-        "heimrichhannot/contao-filecredits-bundle": "<2.1.0"
+        "heimrichhannot/contao-filecredits-bundle": "<2.1.0",
+        "heimrichhannot/contao-flare-bundle": "<0.0.13"
     },
     "autoload": {
         "psr-4": {
