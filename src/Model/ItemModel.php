@@ -10,14 +10,26 @@ use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use HeimrichHannot\UtilsBundle\Model\CfgTagModel;
 
+/**
+ * @property int               $id
+ * @property int               $pid
+ * @property string            $type
+ * @property string            $title
+ * @property string            $alias
+ * @property string            $file
+ * @property string|bool       $addAdditionalFiles
+ * @property array|string|null $additionalFiles
+ * @property string|null       $additionalFilesOrder
+ * @property string|null       $videoPosterImage
+ * @property string|null       $text
+ * @property string|bool       $published
+ */
 class ItemModel extends Model
 {
-    public const ITEM_LICENCE_TYPE_FREE = 'free';
-    public const ITEM_LICENCE_TYPE_LOCKED = 'locked';
-
     protected static $strTable = ItemContainer::TABLE;
 
     private array $_tags;
+    private array $_variants;
 
     /**
      * @param MemberModel $member
@@ -77,6 +89,50 @@ class ItemModel extends Model
         }
 
         return $file;
+    }
+
+    /**
+     * @return FilesModel[]
+     */
+    public function getVariants(): array
+    {
+        if (!$this->addAdditionalFiles) {
+            return [];
+        }
+
+        if (isset($this->_variants)) {
+            return $this->_variants;
+        }
+
+        $this->_variants = [];
+
+        if (!$additionalFiles = $this->additionalFiles) {
+            return [];
+        }
+
+        if (!\is_array($additionalFiles)) {
+            $additionalFiles = StringUtil::deserialize($additionalFiles, true);
+        }
+
+        if (!$additionalFiles = \array_filter($additionalFiles, static fn ($v) => \is_string($v) && $v !== '')) {
+            return [];
+        }
+
+        $sqlUnhex = implode(',', array_fill(0, count($additionalFiles), 'UNHEX(?)'));
+        $sqlParams = \array_map('bin2hex', $additionalFiles);
+
+        $db = Database::getInstance();
+        $result = $db
+            ->prepare("SELECT * FROM `tl_files` WHERE `tl_files`.`uuid` IN ({$sqlUnhex}) AND `tl_files`.`type` = 'file'")
+            ->execute($sqlParams);
+
+        if (!$files = Model::createCollectionFromDbResult($result, FilesModel::getTable())) {
+            return [];
+        }
+
+        $this->_variants = $files->getModels() ?? [];
+
+        return $this->_variants;
     }
 
     public function getCodefogTags(): array

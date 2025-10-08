@@ -2,11 +2,11 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Twig\Runtime;
 
-use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\Image\ResizeConfiguration;
 use Contao\ImageSizeModel;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
-use HeimrichHannot\MediaLibraryBundle\Dto\ImageSizeDownloadDto;
+use HeimrichHannot\MediaLibraryBundle\Manager\DownloadsManager;
+use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use Twig\Extension\RuntimeExtensionInterface;
 
@@ -14,109 +14,60 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private ArchiveTypeCollection $archiveTypes,
-        private Studio                $studio,
+        private DownloadsManager      $downloads,
     ) {}
 
-    /**
-     * @param ItemModel $itemModel
-     * @param array{
-     *     withOriginal?: bool
-     * } $options
-     * @return ImageSizeDownloadDto[]
-     */
-    public function getImageSizeDownloads(ItemModel $itemModel, array $options = []): array
+    protected function getImageSizeSupportingArchive(ItemModel $itemModel): ?ArchiveModel
     {
         if (!$archive = $itemModel->getArchive()) {
-            return [];
+            return null;
         }
 
         if (!$archiveType = $this->archiveTypes->get($archive->type)) {
-            return [];
+            return null;
         }
 
         if (!$archiveType->supportsImageSizeDownloads($archive)) {
+            return null;
+        }
+
+        return $archive;
+    }
+
+    public function getImageSizeDownloads(ItemModel $itemModel, array $options = []): array
+    {
+        if (!$archive = $this->getImageSizeSupportingArchive($itemModel)) {
             return [];
         }
 
-        if (!$filesModel = $itemModel->getFile()) {
+        return $this->downloads->createImageSizeDownloads($itemModel->file, $archive->getImageSizes(), $options);
+    }
+
+    public function getVariantImageSizeDownloads(ItemModel $itemModel, array $options = []): array
+    {
+        if (!$archive = $this->getImageSizeSupportingArchive($itemModel)) {
             return [];
-        }
-
-        [
-            'with_original' => $withOriginal,
-        ] = $options + [
-            'with_original' => true,
-        ];
-
-        /** @var ImageSizeDownloadDto[] $downloads */
-        $downloads = [];
-
-        $figureBuilder = $this->studio->createFigureBuilder();
-
-        try {
-            $figureBuilder
-                ->fromUuid($filesModel->uuid)
-                ->build();
-        }
-        catch (\Exception)
-        {
-            return [];
-        }
-
-        if ($withOriginal)
-        {
-            $figure = $figureBuilder
-                ->fromUuid($filesModel->uuid)
-                ->build();
-
-            $dimensions = $figure->getImage()->getOriginalDimensions();
-            $imgPath = $figure->getImage()->getFilePath(true);
-            $fileSize = ($imgPath && \file_exists($imgPath)) ? \filesize($imgPath) : 0;
-            $fileSize = $fileSize ?: null;
-
-            $original = ImageSizeDownloadDto::create()
-                ->setLabel('Original')
-                ->setUrl($figure->getImage()->getImageSrc())
-                ->setWidth($dimensions->getSize()->getWidth())
-                ->setHeight($dimensions->getSize()->getHeight())
-                ->setFilesModel($filesModel)
-                ->setFilesize($fileSize)
-            ;
-
-            $downloads[] = $original;
         }
 
         if (!$imageSizes = $archive->getImageSizes()) {
-            return $downloads;
+            return [];
         }
 
-        foreach ($imageSizes as $imageSize)
+        if (!$variants = $itemModel->getVariants()) {
+            return [];
+        }
+
+        $variantDownloads = [];
+
+        foreach ($variants as $variant)
         {
-            if (!$imageSizeModel = ImageSizeModel::findByPk($imageSize)) {
-                continue;
+            if ($downloads = $this->downloads->createImageSizeDownloads($variant, $imageSizes, $options))
+            {
+                $variantDownloads[] = $downloads;
             }
-
-            $figure = $figureBuilder
-                ->fromUuid($filesModel->uuid)
-                ->setSize($imageSize)
-                ->build();
-
-            $filePath = $figure->getImage()->getImageSrc(true);
-            $fileSize = ($filePath && \file_exists($filePath)) ? \filesize($filePath) : 0;
-            $fileSize = $fileSize ?: null;
-
-            $download = ImageSizeDownloadDto::create()
-                ->setLabel($imageSizeModel->name ?: \sprintf('[ID %d]', $imageSizeModel->id))
-                ->setUrl($figure->getImage()->getImageSrc())
-                ->setFilesModel($filesModel)
-                ->setImageSizeModel($imageSizeModel)
-                ->setFilesize($fileSize)
-            ;
-
-            $downloads[] = $download;
         }
 
-        return $downloads;
+        return $variantDownloads;
     }
 
     public function getImageSizeInfo(?ImageSizeModel $model): string
@@ -133,11 +84,11 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
             : 'proportional';
 
         // calculate aspect ratio
-        $a = $w;
-        $b = $h;
+        $a = null;
+        $b = null;
         if ($w && $h)
         {
-            $gcd = function ($a, $b) use (&$gcd) {
+            $gcd = static function ($a, $b) use (&$gcd) {
                 return $b ? $gcd($b, $a % $b) : $a;
             };
             $divisor = $gcd($w, $h);
@@ -148,7 +99,8 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
         $return = match ($model->resizeMode)
         {
             ResizeConfiguration::MODE_BOX => 'Passend',
-            ResizeConfiguration::MODE_CROP => \sprintf('Zuschnitt, Seitenverhältnis %d⁠:⁠%d', $a, $b),
+            ResizeConfiguration::MODE_CROP => 'Zuschnitt'
+                . (($a && $b) ? \sprintf(', Seitenverhältnis %d⁠:⁠%d', $a, $b) : ''),
             $proportional => 'Proportional',
             default => $model->resizeMode,
         };
@@ -186,14 +138,16 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
             return \sprintf("%d B", $intFilesize);
         }
 
+        $format = static fn (float $n) => \number_format($n, $decimals, $decimalSeparator, $thousandsSeparator);
+
         if ($filesize < 1048576) {
-            return \sprintf("%s kB", \number_format((float) ($intFilesize / 1024), $decimals, $decimalSeparator, $thousandsSeparator));
+            return \sprintf("%s kB", $format($intFilesize / 1024));
         }
 
         if ($filesize < 1073741824) {
-            return \sprintf("%s MB", \number_format((float) ($filesize / 1048576), $decimals, $decimalSeparator, $thousandsSeparator));
+            return \sprintf("%s MB", $format($filesize / 1048576));
         }
 
-        return \sprintf("%s GB", \number_format((float) ($filesize / 1073741824), $decimals, $decimalSeparator, $thousandsSeparator));
+        return \sprintf("%s GB", $format($filesize / 1073741824));
     }
 }
