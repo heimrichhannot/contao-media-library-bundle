@@ -2,12 +2,14 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Twig\Runtime;
 
+use Contao\FilesModel;
 use Contao\Image\ResizeConfiguration;
 use Contao\ImageSizeModel;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
 use HeimrichHannot\MediaLibraryBundle\Manager\DownloadsManager;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
@@ -15,6 +17,7 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
     public function __construct(
         private ArchiveTypeCollection $archiveTypes,
         private DownloadsManager      $downloads,
+        private ParameterBagInterface $parameters,
     ) {}
 
     protected function getImageSizeSupportingArchive(ItemModel $itemModel): ?ArchiveModel
@@ -112,13 +115,36 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
         return $return;
     }
 
+    public function getFilesize(FilesModel|null $file): ?int
+    {
+        if (!$file instanceof FilesModel || $file->type !== 'file' || !$file->path)
+        {
+            return null;
+        }
+
+        $projectDir = \rtrim($this->parameters->get('kernel.project_dir'), '/') . '/';
+        $filepath = \str_starts_with($file->path, $projectDir)
+            ? $file->path
+            : ($projectDir . \ltrim($file->path, '/'));
+
+        if (!\file_exists($filepath)) {
+            return null;
+        }
+
+        if (false === ($filesize = \filesize($filepath))) {
+            return null;
+        }
+
+        return $filesize;
+    }
+
     public function getFilesizeHumanReadable(
         string|int|null $filesize,
         ?int            $decimals = null,
         ?string         $decimalSeparator = null,
         ?string         $thousandsSeparator = null,
     ): string {
-        if ($filesize === null || $filesize === '' || $filesize === 0) {
+        if ($filesize === null || $filesize === '') {
             return '-';
         }
 
@@ -126,28 +152,30 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
             return '-';
         }
 
-        $decimals ??= 2;
-        $decimalSeparator ??= ',';
-        $thousandsSeparator ??= '.';
-
-        $decimals = \max(0, $decimals);
-
         $intFilesize = (int) $filesize;
+
+        if ($intFilesize <= 0) {
+            return '0 B';
+        }
 
         if ($intFilesize < 1024) {
             return \sprintf("%d B", $intFilesize);
         }
 
+        $decimals = \max(0, $decimals ?? 2);
+        $decimalSeparator ??= ',';
+        $thousandsSeparator ??= '.';
+
         $format = static fn (float $n) => \number_format($n, $decimals, $decimalSeparator, $thousandsSeparator);
 
-        if ($filesize < 1048576) {
+        if ($intFilesize < 1048576) {
             return \sprintf("%s kB", $format($intFilesize / 1024));
         }
 
-        if ($filesize < 1073741824) {
-            return \sprintf("%s MB", $format($filesize / 1048576));
+        if ($intFilesize < 1073741824) {
+            return \sprintf("%s MB", $format($intFilesize / 1048576));
         }
 
-        return \sprintf("%s GB", $format($filesize / 1073741824));
+        return \sprintf("%s GB", $format($intFilesize / 1073741824));
     }
 }
