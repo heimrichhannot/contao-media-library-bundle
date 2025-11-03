@@ -112,7 +112,7 @@ $dca['fields'] = [
             'includeBlankOption' => true,
             'submitOnChange' => true,
         ],
-        'sql' => "varchar(64) NOT NULL default ''",
+        // no SQL! this is loaded onload from the parent archive
     ],
     'title' => [
         'exclude' => true,

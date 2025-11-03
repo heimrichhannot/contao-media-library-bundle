@@ -2,7 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\FormGenerator;
 
-use Ausi\SlugGenerator\SlugGeneratorInterface;
+use Ausi\SlugGenerator\SlugGenerator;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Exception\AccessDeniedException;
@@ -45,7 +45,6 @@ class MediaLibraryType extends AbstractFormType
         private readonly FileUploadPathCallback $uploadPath,
         private readonly RequestStack           $requestStack,
         private readonly Security               $security,
-        private readonly SlugGeneratorInterface $slug,
         private readonly TokenChecker           $tokenChecker,
         private readonly TranslatorInterface    $translator,
     ) {}
@@ -170,7 +169,8 @@ class MediaLibraryType extends AbstractFormType
             default => \uniqid('anon_', true),
         };
 
-        $slug = $this->slug->generate($title ?: \uniqid('auto_', true));
+        $slugGenerator = new SlugGenerator();
+        $slug = $slugGenerator->generate($title ?: \uniqid('auto_', true));
 
         $uploadPath = $this->uploadPath->fileUploadPath(
             $this->uploadPath->collectPathTokens(author: $author, title: $slug)
@@ -217,12 +217,14 @@ class MediaLibraryType extends AbstractFormType
     {
         if ($archiveModel = ArchiveModel::findByPk($event->form->ml_archive))
         {
+            $slugGenerator = new SlugGenerator();
+
             $event->form->storeValues = '1';
             $event->form->targetTable = ItemModel::getTable();
 
             $event->data['pid'] = $archiveModel->id;
             $event->data['dateAdded'] = \time();
-            $event->data['alias'] = $this->slug->generate($event->data['title']);
+            $event->data['alias'] = $slugGenerator->generate($event->data['title']);
             $event->data['type'] = $archiveModel->type;
             $event->data['published'] = ($event->form->ml_publish ?? false) ? '1' : '';
         }
