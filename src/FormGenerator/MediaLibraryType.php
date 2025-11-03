@@ -2,14 +2,12 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\FormGenerator;
 
-use App\EventListener\DataContainer\MediaLibrary\FileUploadPathCallback;
 use Ausi\SlugGenerator\SlugGenerator;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
-use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
@@ -27,6 +25,7 @@ use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\FormTypeBundle\FormType\FormContext;
+use HeimrichHannot\MediaLibraryBundle\EventListener\DataContainer\FileUploadPathCallback;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Security\Voter;
@@ -40,11 +39,12 @@ class MediaLibraryType extends AbstractFormType
     public const PARAMETER_EDIT = 'edit';
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
+    protected array $uploadPathCache = [];
+
     public function __construct(
         private readonly FileUploadPathCallback $uploadPath,
         private readonly RequestStack           $requestStack,
         private readonly Security               $security,
-        private readonly Slug                   $slug,
         private readonly TokenChecker           $tokenChecker,
         private readonly TranslatorInterface    $translator,
     ) {}
@@ -71,7 +71,11 @@ class MediaLibraryType extends AbstractFormType
             return [];
         }
 
-        $folder = new Folder('files/media/mediathek');
+        $defaultUploadPath = $this->uploadPath->fileUploadPath(
+            $this->uploadPath->collectPathTokens('default', 'default')
+        );
+
+        $folder = new Folder($defaultUploadPath);
         $uuid = $folder->getModel()->uuid;
 
         $table = ItemModel::getTable();
@@ -126,8 +130,10 @@ class MediaLibraryType extends AbstractFormType
 
     public function onLoadFormField(LoadFormFieldEvent $event): void
     {
-        match ($event->getWidget()->name) {
-            'additionalFiles' => $this->onLoadFormField_additionalFields($event->getWidget()),
+        $widget = $event->getWidget();
+
+        match ($widget->name) {
+            'file', 'additionalFiles' => $this->updateWidgetUploadPath($widget),
             default => null,
         };
 
@@ -137,25 +143,53 @@ class MediaLibraryType extends AbstractFormType
         }
     }
 
-    public function onLoadFormField_additionalFields(Widget $widget): void
+    public function getCurrentMemberUploadPath(): ?string
     {
         if (!$request = $this->requestStack->getCurrentRequest()) {
-            return;
+            return null;
         }
 
-        $folderName = match (true) {
-            $this->tokenChecker->hasFrontendUser() => MemberModel::findByUsername($this->tokenChecker->getFrontendUsername())?->id
-                ?: $this->tokenChecker->getFrontendUsername(),
+        $title = $request->request->get('title');
+        $feUsername = $this->tokenChecker->hasFrontendUser() ? $this->tokenChecker->getFrontendUsername() : null;
+
+        if ($title && $feUsername)
+        {
+            $cacheKey = $feUsername . ':' . $title;
+
+            if (isset($this->uploadPathCache[$cacheKey])) {
+                return $this->uploadPathCache[$cacheKey];
+            }
+        }
+
+        $member = MemberModel::findByUsername($feUsername) ?: null;
+
+        $author = match (true) {
+            $member instanceof MemberModel => (string) $member->id,
             $this->tokenChecker->hasBackendUser() => 'be_' . $this->tokenChecker->getBackendUsername(),
             default => \uniqid('anon_', true),
         };
 
-        $slug = (new SlugGenerator())->generate(
-            $request->request->get('title')
-                ?: \uniqid('auto_', true)
+        $slugGenerator = new SlugGenerator();
+        $slug = $slugGenerator->generate($title ?: \uniqid('auto_', true));
+
+        $uploadPath = $this->uploadPath->fileUploadPath(
+            $this->uploadPath->collectPathTokens(author: $author, title: $slug)
         );
 
-        $folder = new Folder($this->uploadPath->fileUploadPath($folderName, $slug));
+        if (isset($cacheKey)) {
+            $this->uploadPathCache[$cacheKey] = $uploadPath;
+        }
+
+        return $uploadPath;
+    }
+
+    public function updateWidgetUploadPath(Widget $widget): void
+    {
+        if (!$uploadPath = $this->getCurrentMemberUploadPath()) {
+            return;
+        }
+
+        $folder = new Folder($uploadPath);
 
         $widget->uploadFolder = $folder->getModel()->uuid;
     }
@@ -172,7 +206,8 @@ class MediaLibraryType extends AbstractFormType
 
         if ($name === 'copyright'
             && \class_exists(HeimrichHannotFileCreditsBundle::class)
-            && ($fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file'])))
+            && ($fileUuid = $event->getFormContext()->getData()['file'] ?? null)
+            && ($fileModel = FilesModel::findByUuid($fileUuid)))
         {
             $widget->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
         }
@@ -182,12 +217,14 @@ class MediaLibraryType extends AbstractFormType
     {
         if ($archiveModel = ArchiveModel::findByPk($event->form->ml_archive))
         {
+            $slugGenerator = new SlugGenerator();
+
             $event->form->storeValues = '1';
             $event->form->targetTable = ItemModel::getTable();
 
             $event->data['pid'] = $archiveModel->id;
             $event->data['dateAdded'] = \time();
-            $event->data['alias'] = $this->slug->generate($event->data['title']);
+            $event->data['alias'] = $slugGenerator->generate($event->data['title']);
             $event->data['type'] = $archiveModel->type;
             $event->data['published'] = ($event->form->ml_publish ?? false) ? '1' : '';
         }

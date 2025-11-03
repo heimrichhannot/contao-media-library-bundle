@@ -11,18 +11,22 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use HeimrichHannot\UtilsBundle\Model\CfgTagModel;
 
 /**
- * @property int               $id
- * @property int               $pid
- * @property string            $type
- * @property string            $title
- * @property string            $alias
- * @property string            $file
- * @property string|bool       $addAdditionalFiles
+ * Reads and writes media library items.
+ *
+ * @property int $id
+ * @property int $pid
+ * @property string $type
+ * @property string $title
+ * @property string $alias
+ * @property int $author
+ * @property int $dateAdded
+ * @property string $file
+ * @property string|bool $addAdditionalFiles
  * @property array|string|null $additionalFiles
- * @property string|null       $additionalFilesOrder
- * @property string|null       $videoPosterImage
- * @property string|null       $text
- * @property string|bool       $published
+ * @property string|null $additionalFilesOrder
+ * @property string|null $videoPosterImage
+ * @property string|null $text
+ * @property string|bool $published
  */
 class ItemModel extends Model
 {

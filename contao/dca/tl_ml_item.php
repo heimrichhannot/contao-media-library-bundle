@@ -54,7 +54,7 @@ $dca['list'] = [
     'sorting' => [
         'mode' => 4,
         'fields' => ['title'],
-        'headerFields' => ['title', 'tstamp'],
+        'headerFields' => ['title', 'type', 'tstamp'],
         'panelLayout' => 'filter;sort,search,limit',
     ],
     'global_operations' => [
