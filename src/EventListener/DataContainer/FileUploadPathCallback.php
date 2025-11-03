@@ -41,7 +41,7 @@ readonly class FileUploadPathCallback
         return $this->mainFileUploadPath($activeRecord) . \ltrim($file->basename, '/');
     }
 
-    public function collectPathContext(
+    public function collectPathTokens(
         string                 $author,
         string                 $title,
         ItemModel|null         $item = null,
@@ -82,7 +82,7 @@ readonly class FileUploadPathCallback
         $author = $item->author ? MemberModel::findByPk($item->author) : null;
         $author = $author instanceof MemberModel ? $author : null;
 
-        $context = $this->collectPathContext(
+        $context = $this->collectPathTokens(
             author: $author->id,
             title: $item->title,
             item: $item,
@@ -91,12 +91,12 @@ readonly class FileUploadPathCallback
         return $this->fileUploadPath($context);
     }
 
-    public function fileUploadPath(array $context): string
+    public function fileUploadPath(array $tokens): string
     {
         if (!$uploadPath = $this->bundleConfig['file_upload_path'] ?? null) {
             throw new \RuntimeException('The file_upload_path config option is not set.');
         }
 
-        return $this->parser->parse($uploadPath, $context, allowHtml: false);
+        return $this->parser->parse($uploadPath, $tokens, allowHtml: false);
     }
 }

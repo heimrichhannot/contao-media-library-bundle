@@ -39,6 +39,8 @@ class MediaLibraryType extends AbstractFormType
     public const PARAMETER_EDIT = 'edit';
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
+    protected array $uploadPathCache = [];
+
     public function __construct(
         private readonly FileUploadPathCallback $uploadPath,
         private readonly RequestStack           $requestStack,
@@ -70,7 +72,11 @@ class MediaLibraryType extends AbstractFormType
             return [];
         }
 
-        $folder = new Folder('files/media/mediathek');
+        $defaultUploadPath = $this->uploadPath->fileUploadPath(
+            $this->uploadPath->collectPathTokens('default', 'default')
+        );
+
+        $folder = new Folder($defaultUploadPath);
         $uuid = $folder->getModel()->uuid;
 
         $table = ItemModel::getTable();
@@ -125,42 +131,65 @@ class MediaLibraryType extends AbstractFormType
 
     public function onLoadFormField(LoadFormFieldEvent $event): void
     {
-        match ($event->getWidget()->name) {
-            'additionalFiles' => $this->onLoadFormField_additionalFields($event->getWidget()),
+        $widget = $event->getWidget();
+
+        match ($widget->name) {
+            'file', 'additionalFiles' => $this->updateWidgetUploadPath($widget),
             default => null,
         };
 
-        // if ($event->getFormContext()->isUpdate())
-        // {
-        //     $this->contextUpdate_onLoadFormField($event);
-        // }
+        if ($event->getFormContext()->isUpdate())
+        {
+            $this->contextUpdate_onLoadFormField($event);
+        }
     }
 
-    public function onLoadFormField_additionalFields(Widget $widget): void
+    public function getCurrentMemberUploadPath(): ?string
     {
         if (!$request = $this->requestStack->getCurrentRequest()) {
-            return;
+            return null;
         }
 
-        $member = MemberModel::findByUsername($this->tokenChecker->getFrontendUsername()) ?: null;
+        $title = $request->request->get('title');
+        $feUsername = $this->tokenChecker->hasFrontendUser() ? $this->tokenChecker->getFrontendUsername() : null;
+
+        if ($title && $feUsername)
+        {
+            $cacheKey = $feUsername . ':' . $title;
+
+            if (isset($this->uploadPathCache[$cacheKey])) {
+                return $this->uploadPathCache[$cacheKey];
+            }
+        }
+
+        $member = MemberModel::findByUsername($feUsername) ?: null;
 
         $author = match (true) {
-            $member instanceof MemberModel => $member->id,
+            $member instanceof MemberModel => (string) $member->id,
             $this->tokenChecker->hasBackendUser() => 'be_' . $this->tokenChecker->getBackendUsername(),
             default => \uniqid('anon_', true),
         };
 
-        $slug = $this->slug->generate(
-            $request->request->get('title')
-                ?: \uniqid('auto_', true)
+        $slug = $this->slug->generate($title ?: \uniqid('auto_', true));
+
+        $uploadPath = $this->uploadPath->fileUploadPath(
+            $this->uploadPath->collectPathTokens(author: $author, title: $slug)
         );
 
-        $context = $this->uploadPath->collectPathContext(
-            author: $author,
-            title: $slug,
-        );
+        if (isset($cacheKey)) {
+            $this->uploadPathCache[$cacheKey] = $uploadPath;
+        }
 
-        $folder = new Folder($this->uploadPath->fileUploadPath($context));
+        return $uploadPath;
+    }
+
+    public function updateWidgetUploadPath(Widget $widget): void
+    {
+        if (!$uploadPath = $this->getCurrentMemberUploadPath()) {
+            return;
+        }
+
+        $folder = new Folder($uploadPath);
 
         $widget->uploadFolder = $folder->getModel()->uuid;
     }
@@ -177,7 +206,8 @@ class MediaLibraryType extends AbstractFormType
 
         if ($name === 'copyright'
             && \class_exists(HeimrichHannotFileCreditsBundle::class)
-            && ($fileModel = FilesModel::findByUuid($event->getFormContext()->getData()['file'])))
+            && ($fileUuid = $event->getFormContext()->getData()['file'] ?? null)
+            && ($fileModel = FilesModel::findByUuid($fileUuid)))
         {
             $widget->value = implode("\n", StringUtil::deserialize($fileModel->copyright, true));
         }
