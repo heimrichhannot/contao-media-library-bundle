@@ -23,22 +23,6 @@ class ItemContainer
         private readonly ArchiveTypeCollection $archiveTypes,
     ) {}
 
-    ###[AsCallback(self::TABLE, 'config.oncreate')]
-    public function onCreateConfig(string $table, int $insertId, array $record, DataContainer $dc): void
-    {
-        if (!$insertId || !$pid = $record['pid'] ?? null) {
-            return;
-        }
-
-        if (!$archive = ArchiveModel::findByPk($pid)) {
-            return;
-        }
-
-        Database::getInstance()
-            ->prepare("UPDATE `{$table}` SET `type` = ? WHERE `id` = ?")
-            ->execute($archive->type, $insertId);
-    }
-
     #[AsCallback(self::TABLE, 'list.sorting.child_record')]
     public function childRecordCallback(array $row): string
     {

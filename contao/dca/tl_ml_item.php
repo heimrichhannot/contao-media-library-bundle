@@ -54,7 +54,7 @@ $dca['list'] = [
     'sorting' => [
         'mode' => 4,
         'fields' => ['title'],
-        'headerFields' => ['title', 'tstamp'],
+        'headerFields' => ['title', 'type', 'tstamp'],
         'panelLayout' => 'filter;sort,search,limit',
     ],
     'global_operations' => [
@@ -112,7 +112,7 @@ $dca['fields'] = [
             'includeBlankOption' => true,
             'submitOnChange' => true,
         ],
-        // no SQL! this is loaded onload from the parent archive
+        'sql' => "varchar(64) NOT NULL default ''",
     ],
     'title' => [
         'exclude' => true,

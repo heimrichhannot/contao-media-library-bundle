@@ -41,7 +41,7 @@ class MediaLibraryType extends AbstractFormType
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
     public function __construct(
-        private readonly FileUploadPathCallback $uploadPath,
+//        private readonly FileUploadPathCallback $uploadPath,
         private readonly RequestStack           $requestStack,
         private readonly Security               $security,
         private readonly Slug                   $slug,
@@ -131,10 +131,10 @@ class MediaLibraryType extends AbstractFormType
             default => null,
         };
 
-        if ($event->getFormContext()->isUpdate())
-        {
-            $this->contextUpdate_onLoadFormField($event);
-        }
+//        if ($event->getFormContext()->isUpdate())
+//        {
+//            $this->contextUpdate_onLoadFormField($event);
+//        }
     }
 
     public function onLoadFormField_additionalFields(Widget $widget): void

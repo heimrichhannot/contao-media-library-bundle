@@ -1,0 +1,42 @@
+{% extends '@Contao/content_element/flare_listview.html.twig' %}
+
+{# @var \HeimrichHannot\FlareBundle\Paginator\Paginator paginator #}
+{% set paginator = flare.paginator %}
+
+{% block pagination %}
+{% endblock %}
+
+{% block list %}
+
+    {{ include('@Contao/flare/paginator/bs5.html.twig') }}
+
+    <section class="ml-list my-4">
+
+        {% for entry in flare.entries %}
+            {% set href = flare.to(entry.id) %}
+            <article class="ml-entry">
+                {% if entry.file|default %}
+                    {# metadata: { alt: 'Contao Logo' }, #}
+                    {{ contao_figure(entry.file, [360, 240, 'crop'], {
+                        enableLightbox: false,
+                        options: {
+                            attr: { class: 'ml-entry__image' },
+                            img_attr: { loading: 'lazy' },
+                        }
+                    }) }}
+                {% endif %}
+                <h5 class="ml-entry__title">
+                    <a href="{{ href }}" target="_self">
+                        {{ entry.title }}
+                    </a>
+                </h5>
+            </article>
+        {% else %}
+            <p class="text-muted">Keine Medien gefunden.</p>
+        {% endfor %}
+
+    </section>
+
+    {{ include('@Contao/flare/paginator/bs5.html.twig') }}
+{% endblock %}
+
