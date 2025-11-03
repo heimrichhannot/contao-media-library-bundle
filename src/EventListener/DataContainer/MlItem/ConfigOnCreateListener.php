@@ -8,13 +8,11 @@ use Doctrine\DBAL\Connection;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 
 #[AsCallback(table: 'tl_ml_item', target: 'config.oncreate')]
-class ConfigOnCreateListener
+readonly class ConfigOnCreateListener
 {
     public function __construct(
-        private readonly Connection $connection,
-    )
-    {
-    }
+        private Connection $connection,
+    ) {}
 
     public function __invoke(string $table, int $insertId, array $record, DataContainer $dc): void
     {

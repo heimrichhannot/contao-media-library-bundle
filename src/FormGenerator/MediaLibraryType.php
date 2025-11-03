@@ -2,14 +2,12 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\FormGenerator;
 
-use App\EventListener\DataContainer\MediaLibrary\FileUploadPathCallback;
-use Ausi\SlugGenerator\SlugGenerator;
+use Ausi\SlugGenerator\SlugGeneratorInterface;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
-use Contao\CoreBundle\Slug\Slug;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Folder;
@@ -27,6 +25,7 @@ use HeimrichHannot\FormTypeBundle\Event\ProcessFormDataEvent;
 use HeimrichHannot\FormTypeBundle\Event\StoreFormDataEvent;
 use HeimrichHannot\FormTypeBundle\FormType\AbstractFormType;
 use HeimrichHannot\FormTypeBundle\FormType\FormContext;
+use HeimrichHannot\MediaLibraryBundle\EventListener\DataContainer\FileUploadPathCallback;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Security\Voter;
@@ -41,10 +40,10 @@ class MediaLibraryType extends AbstractFormType
     protected const DEFAULT_FORM_CONTEXT_TABLE = 'tl_ml_item';
 
     public function __construct(
-//        private readonly FileUploadPathCallback $uploadPath,
+        private readonly FileUploadPathCallback $uploadPath,
         private readonly RequestStack           $requestStack,
         private readonly Security               $security,
-        private readonly Slug                   $slug,
+        private readonly SlugGeneratorInterface $slug,
         private readonly TokenChecker           $tokenChecker,
         private readonly TranslatorInterface    $translator,
     ) {}
@@ -131,10 +130,10 @@ class MediaLibraryType extends AbstractFormType
             default => null,
         };
 
-//        if ($event->getFormContext()->isUpdate())
-//        {
-//            $this->contextUpdate_onLoadFormField($event);
-//        }
+        // if ($event->getFormContext()->isUpdate())
+        // {
+        //     $this->contextUpdate_onLoadFormField($event);
+        // }
     }
 
     public function onLoadFormField_additionalFields(Widget $widget): void
@@ -143,19 +142,25 @@ class MediaLibraryType extends AbstractFormType
             return;
         }
 
-        $folderName = match (true) {
-            $this->tokenChecker->hasFrontendUser() => MemberModel::findByUsername($this->tokenChecker->getFrontendUsername())?->id
-                ?: $this->tokenChecker->getFrontendUsername(),
+        $member = MemberModel::findByUsername($this->tokenChecker->getFrontendUsername()) ?: null;
+
+        $author = match (true) {
+            $member instanceof MemberModel => $member->id,
             $this->tokenChecker->hasBackendUser() => 'be_' . $this->tokenChecker->getBackendUsername(),
             default => \uniqid('anon_', true),
         };
 
-        $slug = (new SlugGenerator())->generate(
+        $slug = $this->slug->generate(
             $request->request->get('title')
                 ?: \uniqid('auto_', true)
         );
 
-        $folder = new Folder($this->uploadPath->fileUploadPath($folderName, $slug));
+        $context = $this->uploadPath->collectPathContext(
+            author: $author,
+            title: $slug,
+        );
+
+        $folder = new Folder($this->uploadPath->fileUploadPath($context));
 
         $widget->uploadFolder = $folder->getModel()->uuid;
     }

@@ -24,6 +24,10 @@ class Configuration implements ConfigurationInterface
                     ->info('If true, the filenames of the generated product downloads will be sanitized.')
                     ->defaultFalse()
                 ->end()
+                ?->scalarNode('file_upload_path')
+                    ->info('The path where the uploaded files will be stored.')
+                    ->defaultValue('%kernel.project_dir%/files/media-library/##author:id##/##title##')
+                ->end()
             ?->end();
 
         return $treeBuilder;
