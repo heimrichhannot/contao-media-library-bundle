@@ -104,14 +104,9 @@ $dca['fields'] = [
     ],
     'type' => [
         'exclude' => true,
-        'filter' => true,
-        'inputType' => 'select',
-        'eval' => [
-            'tl_class' => 'w50',
-            'mandatory' => true,
-            'includeBlankOption' => true,
-            'submitOnChange' => true,
-        ],
+        'filter' => false,
+        'search' => false,
+        'sorting' => false,
         // no SQL! this is loaded onload from the parent archive
     ],
     'title' => [
@@ -232,12 +227,12 @@ $dca['fields'] = [
 ];
 
 Category::addMultipleCategoriesFieldToDca(
-    $table,
-    'categories',
-    [
+    table: $table,
+    name: 'categories',
+    evalOverride: [
         'addPrimaryCategory' => false,
         'mandatory' => false,
         'parentsUnselectable' => true,
         'isAdditionalField' => true,
-    ]
+    ],
 );

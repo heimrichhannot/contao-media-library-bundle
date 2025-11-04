@@ -60,8 +60,11 @@ class ItemContainer
             throw new \Exception('Unable to load DCA for ' . self::TABLE);
         }
 
-        if (!($palettes[$archive->type] ?? null)) {
-            $dca['palettes'][$archive->type] = $this->createPalette($archive, $item);
+        if (!($palettes[$archive->type] ?? null))
+        {
+            $palette = $this->createPalette($archive, $item);
+            $dca['palettes'][$archive->type] = $palette;
+            $dca['palettes']['default'] = $palette;
         }
 
         $this->appendAdditionalFieldsToPalette($archive);
