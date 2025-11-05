@@ -102,13 +102,13 @@ $dca['fields'] = [
     'tstamp' => [
         'sql' => "int(10) unsigned NOT NULL default '0'",
     ],
-    'type' => [
-        'exclude' => true,
-        'filter' => false,
-        'search' => false,
-        'sorting' => false,
-        // no SQL! this is loaded onload from the parent archive
-    ],
+    // 'type' => [
+    //     'exclude' => true,
+    //     'filter' => false,
+    //     'search' => false,
+    //     'sorting' => false,
+    //     // no SQL! this is loaded onload from the parent archive
+    // ],
     'title' => [
         'exclude' => true,
         'search' => true,

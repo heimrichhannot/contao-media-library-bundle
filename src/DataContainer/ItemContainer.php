@@ -52,7 +52,7 @@ class ItemContainer
             return;
         }
 
-        $item->type = $archive->type;
+        // $item->type = $archive->type;
 
         $dca = &$GLOBALS['TL_DCA'][self::TABLE];
 
