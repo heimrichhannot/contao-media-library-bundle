@@ -2,11 +2,11 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Migration;
 
-use Contao\CoreBundle\Migration\AbstractMigration;
+use Contao\CoreBundle\Migration\MigrationInterface;
 use Contao\CoreBundle\Migration\MigrationResult;
 use Doctrine\DBAL\Connection;
 
-class RenameCfgSourceMigration extends AbstractMigration
+readonly class RenameCfgSourceMigration implements MigrationInterface
 {
     public const CFG_TAG_TABLE = 'tl_cfg_tag';
     public const SOURCE_COLUMN = 'source';
@@ -14,7 +14,7 @@ class RenameCfgSourceMigration extends AbstractMigration
     public const SOURCE_VALUE_NEW = 'huh_media_library_item';
 
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {}
 
     public function getName(): string
