@@ -21,7 +21,7 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
     '__selector__' => ['type', 'addAdditionalFiles', 'protected'],
-    '__prefix__' => '{general_legend},title,alias,file;{details_legend},tags,copyright,text;',
+    '__prefix__' => '{general_legend},title,alias,file,_filecredits_copyright;{details_legend},tags,copyright,text;',
     '__suffix__' => '{additional_fields_legend};{variants_legend},addAdditionalFiles;{protect_legend},protected;{publish_legend},published,start,stop;',
 ];
 
@@ -128,6 +128,7 @@ $dca['fields'] = [
             'mandatory' => true,
             'doNotCopy' => true,
             'unique' => true,
+            'submitOnChange' => true,
         ],
         'sql' => 'binary(16) NULL',
     ],
