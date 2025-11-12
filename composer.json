@@ -7,7 +7,6 @@
         "php": "^8.2",
         "contao/core-bundle": "^4.13 || ^5.3",
         "codefog/tags-bundle": "^3.2",
-        "heimrichhannot/contao-categories-bundle": "^1.1",
         "heimrichhannot/contao-encore-contracts": "^1.0",
         "heimrichhannot/contao-flare-bundle": "^0.0",
         "heimrichhannot/contao-form-type-bundle": "^0.2.0",
@@ -20,6 +19,9 @@
     "conflict": {
         "heimrichhannot/contao-filecredits-bundle": "<2.1.0",
         "heimrichhannot/contao-flare-bundle": "<0.0.13"
+    },
+    "suggest": {
+        "heimrichhannot/contao-categories-bundle": "^1.1"
     },
     "autoload": {
         "psr-4": {

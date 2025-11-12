@@ -227,13 +227,16 @@ $dca['fields'] = [
     ],
 ];
 
-Category::addMultipleCategoriesFieldToDca(
-    table: $table,
-    name: 'categories',
-    evalOverride: [
-        'addPrimaryCategory' => false,
-        'mandatory' => false,
-        'parentsUnselectable' => true,
-        'isAdditionalField' => true,
-    ],
-);
+if (\class_exists(Category::class))
+{
+    Category::addMultipleCategoriesFieldToDca(
+        table: $table,
+        name: 'categories',
+        evalOverride: [
+            'addPrimaryCategory' => false,
+            'mandatory' => false,
+            'parentsUnselectable' => true,
+            'isAdditionalField' => true,
+        ],
+    );
+}
