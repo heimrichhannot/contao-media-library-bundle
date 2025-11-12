@@ -1,6 +1,7 @@
 <?php
 
 use Contao\DC_Table;
+use Contao\Config;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
