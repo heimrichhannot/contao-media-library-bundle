@@ -1,7 +1,6 @@
 <?php
 
 use Contao\DC_Table;
-use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductArchiveContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
@@ -58,30 +57,26 @@ $dca['list'] = [
         ],
     ],
     'operations' => [
-        $contao5 ? 'children' : 'edit' => [
+        ($contao5 ? 'children' : 'edit') => [
             'href' => "table=$itemTable",
             'icon' => $contao5 ? 'children.svg' : 'edit.svg',
         ],
-        $contao5 ? 'edit' : 'editheader' => [
+        ($contao5 ? 'edit' : 'editheader') => [
             'href' => 'act=edit',
             'icon' => $contao5 ? 'edit.svg' : 'header.svg',
-            'button_callback' => [ProductArchiveContainer::class, 'editHeader'],
         ],
         'copy' => [
             'href' => 'act=copy',
             'icon' => 'copy.svg',
-            'button_callback' => [ProductArchiveContainer::class, 'copyArchive'],
         ],
         'delete' => [
             'href' => 'act=delete',
             'icon' => 'delete.svg',
-            'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
-                .'\'))return false;Backend.getScrollOffset()"',
-            'button_callback' => [ProductArchiveContainer::class, 'deleteArchive'],
+            'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? 'Confirm delete').'\'))return false;Backend.getScrollOffset()"',
         ],
         'show' => [
             'href' => 'act=show',
-            'icon' => 'show.gif',
+            'icon' => 'show.svg',
         ],
     ],
 ];
