@@ -2,7 +2,6 @@
 
 use Contao\DC_Table;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
-use HeimrichHannot\MediaLibraryBundle\DataContainer\ProductContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
@@ -66,20 +65,18 @@ $dca['list'] = [
         ],
     ],
     'operations' => [
-        $contao5 ? 'edit' : 'editheader' => [
+        ($contao5 ? 'edit' : 'editheader') => [
             'href' => 'act=edit',
             'icon' => $contao5 ? 'edit.svg' : 'header.svg',
         ],
         'delete' => [
             'href' => 'act=delete',
             'icon' => 'delete.svg',
-            'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '')
-                .'\'))return false;Backend.getScrollOffset()"',
+            'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '').'\'))return false;Backend.getScrollOffset()"',
         ],
         'toggle' => [
             'icon' => 'visible.svg',
             'attributes' => 'onclick="Backend.getScrollOffset();"',
-            'button_callback' => [ProductContainer::class, 'toggleIcon'],
         ],
         'show' => [
             'href' => 'act=show',
