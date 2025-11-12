@@ -78,7 +78,7 @@ $dca['list'] = [
         ],
         'toggle' => [
             'icon' => 'visible.svg',
-            'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+            'attributes' => 'onclick="Backend.getScrollOffset();"',
             'button_callback' => [ProductContainer::class, 'toggleIcon'],
         ],
         'show' => [

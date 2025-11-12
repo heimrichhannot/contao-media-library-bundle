@@ -25,13 +25,3 @@ services:
     HeimrichHannot\MediaLibraryBundle\DataContainer\:
         resource: '../src/DataContainer'
         public: true
-
-    # todo(@ericges): remove this when the ajax manager has been removed from the bundle
-    huh.media_library.ajax_manager:
-        public: true
-        class: HeimrichHannot\MediaLibraryBundle\Manager\AjaxManager
-        arguments:
-            - "@contao.framework"
-            - "@translator"
-            - "@huh.utils.file"
-            - "@huh.ajax"
