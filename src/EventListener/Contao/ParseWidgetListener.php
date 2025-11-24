@@ -38,12 +38,11 @@ readonly class ParseWidgetListener
             return $buffer;
         }
 
-        $product = ItemModel::findByPk((int) $widget->currentRecord);
-        if (!$product) {
+        if (!$item = ItemModel::findByPk((int) $widget->currentRecord)) {
             return $buffer;
         }
 
-        $uuid = $product->file;
+        $uuid = $item->file;
 
         if (\is_array(StringUtil::deserialize($uuid))) {
             $uuid = \array_values(StringUtil::deserialize($uuid, true))[0] ?? null;

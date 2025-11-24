@@ -11,7 +11,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 
-class CodefogTagsListener
+readonly class CodefogTagsListener
 {
     public const TABLE = ItemContainer::TABLE;
 
@@ -20,7 +20,7 @@ class CodefogTagsListener
     public const CFG_TAG_ASSOCIATION_ITEM_FIELD = 'ml_item_id';
 
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {}
 
     /** @noinspection PhpUnused */

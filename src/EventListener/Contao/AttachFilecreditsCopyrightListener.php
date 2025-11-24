@@ -13,7 +13,7 @@ use HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
 #[AsHook("loadDataContainer")]
-readonly class LoadDataContainerListener
+readonly class AttachFilecreditsCopyrightListener
 {
     public function __invoke(string $table): void
     {
