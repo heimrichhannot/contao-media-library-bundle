@@ -27,8 +27,6 @@ $lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier zusätzlic
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start'] = ['Anzeigen ab', 'Mediathekobjekt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop'] = ['Anzeigen bis', 'Mediathekobjekt nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['protected'] = ['Zugriff auf Gruppen beschränken', 'Mediathekobjekt nur bestimmten Mitgliedergruppen zugänglich machen.'];
-$lang['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Mitgliedergruppen können auf das Mediathekobjekt zugreifen.'];
 
 /*
  * Legends

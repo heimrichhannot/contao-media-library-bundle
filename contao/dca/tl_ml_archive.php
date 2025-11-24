@@ -11,7 +11,7 @@ $itemTable = ItemModel::getTable();
 $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
-    '__selector__' => ['type', 'protected', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
+    '__selector__' => ['type', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
     '__prefix__' => '{general_legend},title,type,jumpTo;',
     '__suffix__' => '{advanced_legend},additionalFields;{edit_legend},enableCreate,enableEdit,enableDelete;',
 ];
@@ -140,12 +140,6 @@ $dca['fields'] = [
         'inputType' => 'checkboxWizard',
         'eval' => ['includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'clr w50 autoheight'],
         'sql' => 'blob NULL',
-    ],
-    'protected' => [
-        'exclude' => true,
-        'inputType' => 'checkbox',
-        'eval' => ['submitOnChange' => true],
-        'sql' => "char(1) NOT NULL default ''",
     ],
     'enableCreate' => [
         'exclude' => true,

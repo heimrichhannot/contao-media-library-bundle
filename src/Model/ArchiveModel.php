@@ -22,7 +22,6 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ArchiveContainer;
  * @property bool          $deleteJumpTo
  * @property string        $groupsCanDeleteAll
  * @property string        $groupsCanDeleteOwn
- * @property bool          $protected
  * @property array|string  $imageSizes
  */
 class ArchiveModel extends Model

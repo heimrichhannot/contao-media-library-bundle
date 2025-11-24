@@ -21,16 +21,15 @@ AliasField::register($table);
 $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
-    '__selector__' => ['type', 'addAdditionalFiles', 'protected'],
+    '__selector__' => ['type', 'addAdditionalFiles'],
     '__prefix__' => '{general_legend},title,alias,file,_filecredits_copyright;{details_legend},tags,text;',
-    '__suffix__' => '{additional_fields_legend};{variants_legend},addAdditionalFiles;{protect_legend},protected;{publish_legend},published,start,stop;',
+    '__suffix__' => '{additional_fields_legend};{variants_legend},addAdditionalFiles;{publish_legend},published,start,stop;',
 ];
 
 $dca['palettes']['default'] = Str::mergePalettes($dca['palettes']['__prefix__'], $dca['palettes']['__suffix__']);
 
 $dca['subpalettes'] = [
     'addAdditionalFiles' => 'additionalFiles',
-    'protected' => 'groups',
 ];
 
 $contao5 = !\defined('VERSION');
@@ -199,21 +198,6 @@ $dca['fields'] = [
         'inputType' => 'text',
         'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
         'sql' => "varchar(10) NOT NULL default ''",
-    ],
-    'protected' => [
-        'label' => &$GLOBALS['TL_LANG'][$archiveTable]['protected'],
-        'exclude' => true,
-        'inputType' => 'checkbox',
-        'eval' => ['submitOnChange' => true],
-        'sql' => "char(1) NOT NULL default ''",
-    ],
-    'groups' => [
-        'label' => &$GLOBALS['TL_LANG'][$archiveTable]['groups'],
-        'exclude' => true,
-        'inputType' => 'checkbox',
-        'foreignKey' => 'tl_member_group.name',
-        'eval' => ['mandatory' => true, 'multiple' => true],
-        'sql' => 'blob NULL',
     ],
 ];
 
