@@ -3,54 +3,48 @@
 [![](https://img.shields.io/packagist/v/heimrichhannot/contao-media-library-bundle.svg)](https://packagist.org/packages/heimrichhannot/contao-media-library-bundle)
 [![](https://img.shields.io/packagist/dt/heimrichhannot/contao-media-library-bundle.svg)](https://packagist.org/packages/heimrichhannot/contao-media-library-bundle)
 
-This bundle offers the archive based handling of media library products of different type and their download items. 
-The download items can be generated automatically.
+The Contao Media Library Bundle provides archive‑based management of media library items (such as images, videos, and files) and their downloadable files.
 
 ## Features
 
-- organize your media (images, videos, ...) as products in archives if a fully fledged shop system would be too much
-- predefined media library content types `image`, `video`, `file`
-- in case of image products, images sizes for the creation of downloads according to the downloads can be specified
-- manually add download items for products
-- configurable dca field palettes for products
-- add additional fields differently for each product archive
-- [Form Type](https://github.com/heimrichhannot/contao-form-type-bundle) integration 
-- [Encore Bundle](https://github.com/heimrichhannot/contao-encore-bundle) integration
-- optional: `codefog/tags-bundle` integration for tagging products (activate in product archive)
-- optional: `heimrichhannot/contao-categories-bundle` integration for categorizing products (activate in product archive)
+- Organize your media as objects in archives
+- Predefined media library product types: `image`, `video`, `file`
+- For image archives, define image sizes that are used to automatically create downloads
+- Individually add additional DCA fields to the archives and their items
+- Automatically generate downloads for images in desired formats and dimensions
+- Upload and edit media library items directly from the frontend with a form generator preset form-type
+- Integration with [Form Type Bundle](https://github.com/heimrichhannot/contao-form-type-bundle)
+- Integration with [Encore Bundle](https://github.com/heimrichhannot/contao-encore-bundle)
+- Optional: Integration with [Codefog Tags Bundle]() to tag items
+- Optional: Integration with [H & H Categories Bundle]() to categorize products
+- Optional: Integration with [H & H Filecredits Bundle (private)](https://github.com/heimrichhannot/contao-filecredits-bundle) to assign file credits to products
 
-## Usage
+## Installation
 
-### Install
+Install the bundle via Composer and update the database afterwards.
 
-Install via composer
- 
-```
+```bash
 composer require heimrichhannot/contao-media-library-bundle
 ```
 
-Update database
+## Setup
 
-### Setup
+1. Create a media library archive and configure its settings.
+2. Create an entry in this archive.
+3. Optional: Manually add additional files or file variants.
 
-1. Create a media library archive and set configurations for its content.
-2. Create a product in the archive. Download items will be automatically generated on submit if not permitted manually.
-3. Optional: manually add download items
-
-### Configuration
+## Configuration
 
 ```yaml
 huh_media_library:
-
-  # If true, the filenames of the generated product downloads will be sanitized.
-  sanitize_download_filenames: false
+    # Default upload path for media library items when using the frontend form
+    file_upload_path: 'files/media-library/##author##/##title##'
 ```
 
-### Edit and Delete product
+## Editing and deleting products
 
-You can add edit and delete support for your media library products by setting the corresponding option in the archive settings.
-You also need to adjust the member (group) settings accordingly.
+You can enable edit and delete support for media library products by activating the corresponding options in the archive settings.  
+Make sure to configure the member (and/or member group) permissions accordingly.
 
-Edit and delete links will automatically be added to the template data of reader bundle templates, if the member has the corresponding permissions.
-The variable names are `editLink` and `deleteLink`.
-
+If a front end member has the required permissions, edit and delete links are automatically added to the template data of reader bundle templates.  
+The variables are available as `editLink` and `deleteLink`.
