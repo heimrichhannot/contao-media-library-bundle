@@ -4,7 +4,6 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
@@ -60,14 +59,14 @@ class ItemContainer
             throw new \Exception('Unable to load DCA for ' . self::TABLE);
         }
 
-        if (!($palettes[$archive->type] ?? null))
-        {
+        if (!$palette = $palettes[$archive->type] ?? null) {
             $palette = $this->createPalette($archive, $item);
-            $dca['palettes'][$archive->type] = $palette;
-            $dca['palettes']['default'] = $palette;
         }
 
-        $this->appendAdditionalFieldsToPalette($archive);
+        $palette = $this->appendAdditionalFieldsToPalette($palette, $archive);
+
+        $dca['palettes'][$archive->type] = $palette;
+        $dca['palettes']['default'] = $palette;
     }
 
     public function createPalette(ArchiveModel $archive, ItemModel $item): string
@@ -89,16 +88,14 @@ class ItemContainer
         return Str::mergePalettes($prefix, $itemPalette, $suffix);
     }
 
-    public function appendAdditionalFieldsToPalette(ArchiveModel $archive): void
+    public function appendAdditionalFieldsToPalette($palette, ArchiveModel $archive): string
     {
-        $palette = $GLOBALS['TL_DCA'][self::TABLE]['palettes'][$archive->type] ?? '';
-
         if (!\str_contains($palette, '{additional_fields_legend}')) {
-            return;
+            return $palette;
         }
 
         if (!$additionalFields = StringUtil::deserialize($archive->additionalFields, true)) {
-            return;
+            return $palette;
         }
 
         $pm = PaletteManipulator::create();
@@ -107,6 +104,6 @@ class ItemContainer
             $pm->addField($field, 'additional_fields_legend', PaletteManipulator::POSITION_APPEND);
         }
 
-        $pm->applyToPalette($archive->type, self::TABLE);
+        return $pm->applyToString($palette);
     }
 }
