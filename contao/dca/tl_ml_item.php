@@ -14,7 +14,11 @@ use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 $table = ItemModel::getTable();
 $archiveTable = ArchiveModel::getTable();
 
-AuthorField::register($table)->setType(AuthorField::TYPE_MEMBER);
+AuthorField::register($table)
+    ->setType(AuthorField::TYPE_MEMBER)
+    ->setEvalValue('mandatory', false)
+    ->setEvalValue('isAdditionalField', true)
+;
 DateAddedField::register($table);
 AliasField::register($table);
 
