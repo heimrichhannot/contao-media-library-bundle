@@ -23,6 +23,11 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('sanitize_download_filenames')
                     ->info('If true, the filenames of the generated product downloads will be sanitized.')
                     ->defaultFalse()
+                    ->setDeprecated(
+                        'huh/media-library-bundle',
+                        '2.0',
+                        'The option "sanitize_download_filenames" is deprecated and will be removed in version 3.0.'
+                    )
                 ->end()
                 ?->scalarNode('file_upload_path')
                     ->info('The path where the uploaded files will be stored.')
