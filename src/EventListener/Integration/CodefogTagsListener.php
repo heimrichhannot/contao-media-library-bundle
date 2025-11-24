@@ -1,6 +1,6 @@
 <?php
 
-namespace HeimrichHannot\MediaLibraryBundle\EventListener\DataContainer;
+namespace HeimrichHannot\MediaLibraryBundle\EventListener\Integration;
 
 use Codefog\TagsBundle\Model\TagModel;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
@@ -9,8 +9,16 @@ use Contao\DataContainer;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListCallback;
+use HeimrichHannot\FlareBundle\Exception\FlareException;
+use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
+use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryArchiveListType;
 
+/**
+ * Integrates the media library with the Codefog Tags Bundle.
+ * @see https://github.com/codefog/tags-bundle
+ */
 readonly class CodefogTagsListener
 {
     public const TABLE = ItemContainer::TABLE;
@@ -18,6 +26,9 @@ readonly class CodefogTagsListener
     public const CFG_TAG_ASSOCIATION_TABLE = 'tl_cfg_tag_ml_item';
     public const CFG_TAG_ASSOCIATION_TAG_FIELD = 'cfg_tag_id';
     public const CFG_TAG_ASSOCIATION_ITEM_FIELD = 'ml_item_id';
+
+    public const ALIAS_TAG_TABLE = 'cfg_tag';
+    public const ALIAS_JOIN_TABLE = 'cfg_tag_ml_item';
 
     public function __construct(
         private Connection $connection,
@@ -134,5 +145,33 @@ readonly class CodefogTagsListener
         }
 
         return \array_unique(\array_map('\intval', \array_filter($records->fetchEach($tagIdAlias))));
+    }
+
+    /**
+     * @throws FlareException
+     */
+    #[AsListCallback(MediaLibraryArchiveListType::TYPE, 'query.configure')]
+    public function prepareQuery(ListQueryBuilder $builder): void
+    {
+        $builder
+            ->leftJoin(
+                table: 'tl_cfg_tag_ml_item',
+                as: self::ALIAS_JOIN_TABLE,
+                on: $builder->makeJoinOn(self::ALIAS_JOIN_TABLE, 'ml_item_id', 'id')
+            )
+            ->leftJoin(
+                table: 'tl_cfg_tag',
+                as: self::ALIAS_TAG_TABLE,
+                on: $builder->makeJoinOn(
+                    joinAlias: self::ALIAS_TAG_TABLE,
+                    joinColumn: 'id',
+                    relatedColumn: 'cfg_tag_id',
+                    relatedAlias: self::ALIAS_JOIN_TABLE
+                )
+            )
+            ->setTableAliasMandatory(self::ALIAS_JOIN_TABLE)
+            ->setTableAliasMandatory(self::ALIAS_TAG_TABLE)
+            ->setTableAliasHidden(self::ALIAS_JOIN_TABLE)
+        ;
     }
 }

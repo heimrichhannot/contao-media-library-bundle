@@ -3,14 +3,19 @@
 namespace HeimrichHannot\MediaLibraryBundle\EventListener\Integration;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\DataContainer;
 use Contao\FilesModel;
-use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
+use HeimrichHannot\FileCreditsBundle\DataContainer\FileCreditContainer;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class FilecreditsListener
+/**
+ * Integrates the media library with the Heimrich & Hannot File Credits Bundle.
+ * @see https://github.com/heimrichhannot/contao-filecredits-bundle
+ */
+class HuhFilecreditsListener
 {
     public const COPYRIGHT_FIELD_NAME = '_filecredits_copyright';
 
@@ -18,13 +23,27 @@ class FilecreditsListener
         private readonly RequestStack $requestStack,
     ) {}
 
-    #[AsCallback(table: ItemContainer::TABLE, target: 'config.onload')]
-    public function onLoadItemContainer(?DataContainer $dc = null): void
+    #[AsHook("loadDataContainer")]
+    public function addFilecreditsCopyrightField(string $table): void
     {
-        if (!\class_exists(HeimrichHannotFileCreditsBundle::class)) {
+        if ($table !== ItemModel::getTable()) {
             return;
         }
 
+        if (!\class_exists(FileCreditContainer::class)) {
+            return;
+        }
+
+        $field = 'filecredits_copyright';
+
+        FileCreditContainer::addCopyrightFieldToDca($table, $field, 'file');
+
+        $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval']['tl_class'] = 'clr';
+    }
+
+    #[AsCallback(table: ItemContainer::TABLE, target: 'config.onload')]
+    public function onLoadItemContainer(?DataContainer $dc = null): void
+    {
         $filesTable = FilesModel::getTable();
         DataContainer::loadDataContainer($filesTable);
         DataContainer::loadLanguageFile($filesTable);

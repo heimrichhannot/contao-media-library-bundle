@@ -1,5 +1,6 @@
-<?php
+<?php /** @noinspection PhpUndefinedNamespaceInspection, PhpUndefinedClassInspection */
 
+use Codefog\TagsBundle\CodefogTagsBundle;
 use Contao\DC_Table;
 use Contao\Config;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
@@ -21,7 +22,7 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
     '__selector__' => ['type', 'addAdditionalFiles', 'protected'],
-    '__prefix__' => '{general_legend},title,alias,file,_filecredits_copyright;{details_legend},tags,copyright,text;',
+    '__prefix__' => '{general_legend},title,alias,file,_filecredits_copyright;{details_legend},tags,text;',
     '__suffix__' => '{additional_fields_legend};{variants_legend},addAdditionalFiles;{protect_legend},protected;{publish_legend},published,start,stop;',
 ];
 
@@ -180,15 +181,6 @@ $dca['fields'] = [
         'eval' => ['tl_class' => 'clr', 'rte' => 'tinyMCE'],
         'sql' => 'text NULL',
     ],
-    'tags' => [
-        'exclude' => true,
-        'inputType' => 'cfgTags',
-        'eval' => [
-            'tagsManager' => 'huh_media_library_item',
-            'tl_class' => 'clr',
-            'isAdditionalField' => true,
-        ],
-    ],
     'published' => [
         'exclude' => true,
         'filter' => true,
@@ -224,6 +216,19 @@ $dca['fields'] = [
         'sql' => 'blob NULL',
     ],
 ];
+
+if (\class_exists(CodefogTagsBundle::class))
+{
+    $dca['fields']['tags'] = [
+        'exclude' => true,
+        'inputType' => 'cfgTags',
+        'eval' => [
+            'tagsManager' => 'huh_media_library_item',
+            'tl_class' => 'clr',
+            'isAdditionalField' => false,
+        ],
+    ];
+}
 
 if (\class_exists(Category::class))
 {
