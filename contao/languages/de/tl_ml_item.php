@@ -44,7 +44,7 @@ $lang['video_legend'] = 'Video-Einstellungen';
 /*
  * Buttons
  */
-$lang['new'] = ['Neues Mediathekobjekt', 'Mediathekobjekt erstellen'];
+$lang['new'] = ['Neues Mediathek-Objekt', 'Mediathekobjekt erstellen'];
 $lang['edit'] = ['Mediathekobjekt bearbeiten', 'Mediathekobjekt ID %s bearbeiten'];
 $lang['copy'] = ['Mediathekobjekt duplizieren', 'Mediathekobjekt ID %s duplizieren'];
 $lang['delete'] = ['Mediathekobjekt löschen', 'Mediathekobjekt ID %s löschen'];
