@@ -15,7 +15,6 @@ $lang['additionalFields'] = ['Zusätzliche Felder der Einträge', 'Wählen Sie h
 $lang['imageSizes'] = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
 $lang['protected'] = ['Downloadelemente schützen', 'Wählen Sie diese Option, wenn der Zugriff auf die Downloadelemente beschränkt werden soll.'];
 $lang['groups'] = ['Mitgliedergruppen', 'Wählen Sie hier die gewünschten Mitgliedergruppen für den geschützten Zugriff aus.'];
-$lang['keepProductTitleForDownloadItems'] = ['Produktnamen im Downloadtitel behalten', 'Wählen Sie diese Option, wenn der Titel des Produktes in den Titeln der Downloadelementen bestehen bleiben soll.'];
 
 $lang['enableDelete'] = ['Einträge können gelöscht werden', 'Wählen Sie diese Option, wenn dem Nutzer die Möglichkeit gegeben werden soll, das Produkt zu löschen.'];
 $lang['deleteJumpTo'] = ['Weiterleitungsseite nach dem Löschen', 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Löschen des Produktes weitergeleitet werden soll.'];

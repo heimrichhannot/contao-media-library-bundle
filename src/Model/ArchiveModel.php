@@ -15,7 +15,6 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ArchiveContainer;
  * @property string        $title
  * @property string        $type
  * @property string        $additionalFields
- * @property bool          $keepProductTitleForDownloadItems
  * @property bool          $enableCreate
  * @property bool          $enableEdit
  * @property int           $editJumpTo
