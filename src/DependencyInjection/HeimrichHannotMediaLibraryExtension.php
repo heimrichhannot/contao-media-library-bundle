@@ -28,6 +28,7 @@ class HeimrichHannotMediaLibraryExtension extends Extension implements PrependEx
     {
         return 'huh_media_library';
     }
+
     public function prepend(ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__) . '/../config'));

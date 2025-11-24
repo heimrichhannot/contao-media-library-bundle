@@ -32,7 +32,7 @@ class HeimrichHannotMediaLibraryBundle extends Bundle
      */
     public function getContainerExtensionClass(): string
     {
-        return DependencyInjection\HeimrichHannotMediaLibraryExtension::class;
+        return HeimrichHannotMediaLibraryExtension::class;
     }
 
     public function getContainerExtension(): ?ExtensionInterface
