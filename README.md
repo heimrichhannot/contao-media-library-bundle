@@ -15,9 +15,9 @@ The Contao Media Library Bundle provides archive‑based management of media lib
 - Upload and edit media library items directly from the frontend with a form generator preset form-type
 - Integration with [Form Type Bundle](https://github.com/heimrichhannot/contao-form-type-bundle)
 - Integration with [Encore Bundle](https://github.com/heimrichhannot/contao-encore-bundle)
-- Optional: Integration with [Codefog Tags Bundle]() to tag items
-- Optional: Integration with [H & H Categories Bundle]() to categorize products
-- Optional: Integration with [H & H Filecredits Bundle (private)](https://github.com/heimrichhannot/contao-filecredits-bundle) to assign file credits to products
+- Optional: Integration with [Codefog Tags Bundle](https://github.com/codefog/tags-bundle) to tag items
+- Optional: Integration with [H & H Categories Bundle](https://github.com/heimrichhannot/contao-categories-bundle) to categorize items
+- Optional: Integration with [H & H Filecredits Bundle (private)](https://github.com/heimrichhannot/contao-filecredits-bundle) to ease assignment of file credits to the files of items
 
 ## Installation
 
