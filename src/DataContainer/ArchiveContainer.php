@@ -9,8 +9,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\ParameterType;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
+use HeimrichHannot\MediaLibraryBundle\Event\ArchivePaletteEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArchiveContainer
@@ -21,9 +23,10 @@ class ArchiveContainer
     public const TABLE = 'tl_ml_archive';
 
     public function __construct(
-        private readonly ArchiveTypeCollection $archiveTypes,
-        private readonly Connection            $connection,
-        private readonly RequestStack          $requestStack,
+        private readonly ArchiveTypeCollection    $archiveTypes,
+        private readonly Connection               $connection,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly RequestStack             $requestStack,
     ) {}
 
     /**
@@ -94,6 +97,15 @@ class ArchiveContainer
 
         $prefix = $dca['palettes']['__prefix__'] ?? '';
         $suffix = $dca['palettes']['__suffix__'] ?? '';
+
+        $event = new ArchivePaletteEvent(
+            archiveModel: $archive,
+            palette: $archivePalette,
+            prefix: $prefix,
+            suffix: $suffix,
+        );
+        $eventName = ArchivePaletteEvent::getEventName($archive->type);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         $dca['palettes'][$type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
     }

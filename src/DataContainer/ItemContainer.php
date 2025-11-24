@@ -7,9 +7,11 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
+use HeimrichHannot\MediaLibraryBundle\Event\ItemPaletteEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class ItemContainer
 {
@@ -19,7 +21,8 @@ class ItemContainer
     public const TABLE = 'tl_ml_item';
 
     public function __construct(
-        private readonly ArchiveTypeCollection $archiveTypes,
+        private readonly ArchiveTypeCollection    $archiveTypes,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {}
 
     #[AsCallback(self::TABLE, 'list.sorting.child_record')]
@@ -85,7 +88,17 @@ class ItemContainer
         $prefix = $GLOBALS['TL_DCA'][self::TABLE]['palettes']['__prefix__'] ?? '';
         $suffix = $GLOBALS['TL_DCA'][self::TABLE]['palettes']['__suffix__'] ?? '';
 
-        return Str::mergePalettes($prefix, $itemPalette, $suffix);
+        $event = new ItemPaletteEvent(
+            archiveModel: $archive,
+            itemModel: $item,
+            palette: $itemPalette,
+            prefix: $prefix,
+            suffix: $suffix,
+        );
+        $eventName = ItemPaletteEvent::getEventName($archive->type);
+        $this->eventDispatcher->dispatch($event, $eventName);
+
+        return Str::mergePalettes($event->prefix, $event->palette, $event->suffix);
     }
 
     public function appendAdditionalFieldsToPalette($palette, ArchiveModel $archive): string
