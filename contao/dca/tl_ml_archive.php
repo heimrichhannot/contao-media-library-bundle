@@ -168,7 +168,6 @@ $dca['fields'] = [
     'enableDelete' => [
         'exclude' => true,
         'inputType' => 'checkbox',
-        'default' => true,
         'eval' => [
             'tl_class' => 'clr',
             'submitOnChange' => true,
