@@ -27,6 +27,7 @@ $lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier zusätzlic
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
 $lang['start'] = ['Anzeigen ab', 'Mediathekobjekt erst ab diesem Tag auf der Webseite anzeigen.'];
 $lang['stop'] = ['Anzeigen bis', 'Mediathekobjekt nur bis zu diesem Tag auf der Webseite anzeigen.'];
+$lang['author'] = ['Autor', 'Geben Sie hier den Autor des Mediathekobjekts ein.'];
 
 /*
  * Legends
