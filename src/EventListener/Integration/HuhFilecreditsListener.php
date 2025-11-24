@@ -73,7 +73,7 @@ class HuhFilecreditsListener
         }
 
         if ($request->getMethod() === 'POST') {
-            $fc = (array) $request->request->get('_filecredits_copyright', []);
+            $fc = (array) ($request->request->get('_filecredits_copyright') ?? []);
             return \serialize(\array_filter(\array_unique($fc)));
         }
 
