@@ -8,7 +8,6 @@ use Contao\MemberModel;
 use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
-use HeimrichHannot\UtilsBundle\Model\CfgTagModel;
 
 /**
  * Reads and writes media library items.
@@ -32,7 +31,6 @@ class ItemModel extends Model
 {
     protected static $strTable = ItemContainer::TABLE;
 
-    private array $_tags;
     private array $_variants;
 
     /**
@@ -137,29 +135,5 @@ class ItemModel extends Model
         $this->_variants = $files->getModels() ?? [];
 
         return $this->_variants;
-    }
-
-    public function getCodefogTags(): array
-    {
-        if (isset($this->_tags)) {
-            return $this->_tags;
-        }
-
-        $db = Database::getInstance();
-        $tagRows = $db->prepare('SELECT t.* FROM tl_cfg_tag_ml_item i LEFT JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id WHERE i.ml_item_id = ?')
-            ->execute($this->id);
-
-        if (!$tagRows->numRows) {
-            return $this->_tags = [];
-        }
-
-        $this->_tags = Model::createCollectionFromDbResult($tagRows, CfgTagModel::getTable())->getModels() ?? [];
-
-        return $this->_tags;
-    }
-
-    public function getCodefogTagNames(): array
-    {
-        return array_map(static fn (CfgTagModel $tag) => $tag->name, $this->getCodefogTags());
     }
 }
