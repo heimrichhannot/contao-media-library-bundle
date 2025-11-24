@@ -16,19 +16,19 @@ $lang = &$GLOBALS['TL_LANG'][ItemModel::getTable()];
 $lang['tstamp'] = ['Änderungsdatum', ''];
 $lang['title'] = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['pid'] = ['Kategorie', 'Wählen Sie hier die Kategorie aus.'];
-$lang['file'] = ['Datei', 'Laden Sie hier die zum Produkt gehörige Datei hoch.'];
+$lang['file'] = ['Datei', 'Laden Sie hier die zum Mediathekobjekt gehörige Datei hoch.'];
 $lang['videoPosterImage'] = ['Video-Vorschaubild', 'Laden Sie hier en Vorschaubild für das Video hoch.'];
 $lang['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $lang['copyright'] = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
-$lang['text'] = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Produkt ein.'];
-$lang['tags'] = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Produkt ein.'];
+$lang['text'] = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Mediathekobjekt ein.'];
+$lang['tags'] = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Mediathekobjekt ein.'];
 $lang['addAdditionalFiles'] = ['Datei-Varianten hinzufügen', 'Wählen Sie diese Option, um weitere Dateien hinzuzufügen, die das originale Motiv aufgreifen, als Varianten der Originaldatei sind.'];
 $lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier zusätzliche Varianten zum Originaldateiinhalt aus.'];
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
-$lang['start'] = ['Anzeigen ab', 'Produkt erst ab diesem Tag auf der Webseite anzeigen.'];
-$lang['stop'] = ['Anzeigen bis', 'Produkt nur bis zu diesem Tag auf der Webseite anzeigen.'];
-$lang['protected'] = ['Zugriff auf Gruppen beschränken', 'Produkt nur bestimmten Mitgliedergruppen zugänglich machen.'];
-$lang['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Mitgliedergruppen können auf das Produkt zugreifen.'];
+$lang['start'] = ['Anzeigen ab', 'Mediathekobjekt erst ab diesem Tag auf der Webseite anzeigen.'];
+$lang['stop'] = ['Anzeigen bis', 'Mediathekobjekt nur bis zu diesem Tag auf der Webseite anzeigen.'];
+$lang['protected'] = ['Zugriff auf Gruppen beschränken', 'Mediathekobjekt nur bestimmten Mitgliedergruppen zugänglich machen.'];
+$lang['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Mitgliedergruppen können auf das Mediathekobjekt zugreifen.'];
 
 /*
  * Legends
@@ -44,13 +44,13 @@ $lang['video_legend'] = 'Video-Einstellungen';
 /*
  * Buttons
  */
-$lang['new'] = ['Neues Produkt', 'Produkt erstellen'];
-$lang['edit'] = ['Produkt bearbeiten', 'Produkt ID %s bearbeiten'];
-$lang['copy'] = ['Produkt duplizieren', 'Produkt ID %s duplizieren'];
-$lang['delete'] = ['Produkt löschen', 'Produkt ID %s löschen'];
-$lang['toggle'] = ['Produkt veröffentlichen', 'Produkt ID %s veröffentlichen/verstecken'];
-$lang['show'] = ['Produkt Details', 'Produkt-Details ID %s anzeigen'];
-$lang['downloads'] = ['Downloads anzeigen', 'Downloads von Produkt ID %s anzeigen'];
+$lang['new'] = ['Neues Mediathekobjekt', 'Mediathekobjekt erstellen'];
+$lang['edit'] = ['Mediathekobjekt bearbeiten', 'Mediathekobjekt ID %s bearbeiten'];
+$lang['copy'] = ['Mediathekobjekt duplizieren', 'Mediathekobjekt ID %s duplizieren'];
+$lang['delete'] = ['Mediathekobjekt löschen', 'Mediathekobjekt ID %s löschen'];
+$lang['toggle'] = ['Mediathekobjekt veröffentlichen', 'Mediathekobjekt ID %s veröffentlichen/verstecken'];
+$lang['show'] = ['Mediathekobjekt Details', 'Mediathekobjekt-Details ID %s anzeigen'];
+$lang['downloads'] = ['Downloads anzeigen', 'Downloads von Mediathekobjekt ID %s anzeigen'];
 
 $lang['downloadLink'] = 'herunterladen';
 $lang['downloadTitle'] = '% herunterladen';
