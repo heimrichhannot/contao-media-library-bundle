@@ -120,13 +120,11 @@ class ItemModel extends Model
             return [];
         }
 
-        $sqlUnhex = implode(',', array_fill(0, count($additionalFiles), 'UNHEX(?)'));
-        $sqlParams = \array_map('bin2hex', $additionalFiles);
+        $sqlIn = \array_map(static fn ($v): string => \sprintf('UNHEX("%s")', \bin2hex($v)), $additionalFiles);
+        $sqlInStr = \implode(',', $sqlIn);
 
         $db = Database::getInstance();
-        $result = $db
-            ->prepare("SELECT * FROM `tl_files` WHERE `tl_files`.`uuid` IN ({$sqlUnhex}) AND `tl_files`.`type` = 'file'")
-            ->execute($sqlParams);
+        $result = $db->query("SELECT * FROM `tl_files` WHERE `tl_files`.`uuid` IN ({$sqlInStr}) AND `tl_files`.`type` = \"file\"");
 
         if (!$files = Model::createCollectionFromDbResult($result, FilesModel::getTable())) {
             return [];
