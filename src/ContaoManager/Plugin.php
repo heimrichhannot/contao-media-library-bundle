@@ -21,8 +21,11 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     {
         $loadAfter = [
             ContaoCoreBundle::class,
-            CodefogTagsBundle::class,
         ];
+
+        if (\class_exists(CodefogTagsBundle::class)) {
+            $loadAfter[] = CodefogTagsBundle::class;
+        }
 
         if (\class_exists(HeimrichHannotFileCreditsBundle::class)) {
             $loadAfter[] = HeimrichHannotFileCreditsBundle::class;
