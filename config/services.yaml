@@ -11,8 +11,8 @@ services:
     HeimrichHannot\MediaLibraryBundle\:
         resource: ../src
         exclude:
-            - ../src/{Contao,ContaoManager,DependencyInjection,Model}
-            - ../src/Product/Product.php
+            - ../src/{Contao,ContaoManager,DependencyInjection,Model,Product}
+            - ../src/DataContainer/Product*
 
     HeimrichHannot\MediaLibraryBundle\Migration\RenameProductTablesMigration:
         tags:

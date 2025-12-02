@@ -1,0 +1,2 @@
+services:
+    HeimrichHannot\MediaLibraryBundle\EventListener\Integration\CodefogTagsListener: ~

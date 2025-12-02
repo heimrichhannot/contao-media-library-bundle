@@ -8,10 +8,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle;
 
-use HeimrichHannot\MediaLibraryBundle\DependencyInjection\Compiler\CodefogTagsPass;
-use HeimrichHannot\MediaLibraryBundle\DependencyInjection\Compiler\HuhFilecreditsPass;
 use HeimrichHannot\MediaLibraryBundle\DependencyInjection\HeimrichHannotMediaLibraryExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -38,13 +35,5 @@ class HeimrichHannotMediaLibraryBundle extends Bundle
     public function getContainerExtension(): ?ExtensionInterface
     {
         return $this->extension ??= $this->createContainerExtension();
-    }
-
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new CodefogTagsPass());
-        $container->addCompilerPass(new HuhFilecreditsPass());
     }
 }

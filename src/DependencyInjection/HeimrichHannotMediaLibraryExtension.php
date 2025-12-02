@@ -2,6 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -18,6 +19,16 @@ class HeimrichHannotMediaLibraryExtension extends Extension implements PrependEx
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__) . '/../config'));
         $loader->load('services.yaml');
 
+        if ($this->isCodefogTagsBundleInstalled())
+        {
+            $loader->load('integrations/codefog_tags.services.yaml');
+        }
+
+        if ($this->isHuhFilecreditsBundleInstalled())
+        {
+            $loader->load('integrations/huh_filecredits.services.yaml');
+        }
+
         $configuration = new Configuration();
         $mlConfig = $this->processConfiguration($configuration, $configs);
 
@@ -31,7 +42,20 @@ class HeimrichHannotMediaLibraryExtension extends Extension implements PrependEx
 
     public function prepend(ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__) . '/../config'));
-        $loader->load('config.yaml');
+        if ($this->isCodefogTagsBundleInstalled())
+        {
+            $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__) . '/../config'));
+            $loader->load('integrations/codefog_tags.config.yaml');
+        }
+    }
+
+    private function isCodefogTagsBundleInstalled(): bool
+    {
+        return InstalledVersions::isInstalled('codefog/tags-bundle');
+    }
+
+    private function isHuhFilecreditsBundleInstalled(): bool
+    {
+        return InstalledVersions::isInstalled('heimrichhannot/contao-filecredits-bundle');
     }
 }

@@ -11,7 +11,7 @@ use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
 use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
 use HeimrichHannot\FlareBundle\List\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
-use HeimrichHannot\MediaLibraryBundle\EventListener\Flare\JoinCodefogTagsCallback;
+use HeimrichHannot\MediaLibraryBundle\EventListener\Integration\CodefogTagsListener;
 
 #[AsListType(alias: self::TYPE, dataContainer: 'tl_ml_item', palette: '{archive_legend},ml_archive')]
 class MediaLibraryArchiveListType extends AbstractListType
@@ -24,7 +24,7 @@ class MediaLibraryArchiveListType extends AbstractListType
      *
      * @param ListQueryBuilder $builder The query builder instance used for constructing the query.
      * @throws FlareException if there is an error during query preparation.
-     * @see JoinCodefogTagsCallback for joining tags.
+     * @see CodefogTagsListener for joining tags.
      * @internal This method is intended for internal use only and should not be called directly.
      */
     #[AsListCallback(self::TYPE, 'query.configure')]
