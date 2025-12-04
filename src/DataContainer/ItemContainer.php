@@ -88,15 +88,14 @@ class ItemContainer
         $prefix = $GLOBALS['TL_DCA'][self::TABLE]['palettes']['__prefix__'] ?? '';
         $suffix = $GLOBALS['TL_DCA'][self::TABLE]['palettes']['__suffix__'] ?? '';
 
-        $event = new ItemPaletteEvent(
+        $event = $this->eventDispatcher->dispatch(new ItemPaletteEvent(
+            archiveType: $archive->type,
             archiveModel: $archive,
             itemModel: $item,
             palette: $itemPalette,
             prefix: $prefix,
             suffix: $suffix,
-        );
-        $eventName = ItemPaletteEvent::getEventName($archive->type);
-        $this->eventDispatcher->dispatch($event, $eventName);
+        ));
 
         return Str::mergePalettes($event->prefix, $event->palette, $event->suffix);
     }

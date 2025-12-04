@@ -8,14 +8,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ItemPaletteEvent extends Event
 {
-    public const NAME_TEMPLATE = 'huh.media_library.archive_type.%s.item_palette';
-
-    public static function getEventName(string $archiveType): string
-    {
-        return \sprintf(self::NAME_TEMPLATE, $archiveType);
-    }
-
     public function __construct(
+        public readonly string       $archiveType,
         public readonly ArchiveModel $archiveModel,
         public readonly ItemModel    $itemModel,
         public string                $palette,

@@ -98,14 +98,13 @@ class ArchiveContainer
         $prefix = $dca['palettes']['__prefix__'] ?? '';
         $suffix = $dca['palettes']['__suffix__'] ?? '';
 
-        $event = new ArchivePaletteEvent(
+        $this->eventDispatcher->dispatch(new ArchivePaletteEvent(
+            archiveType: $type,
             archiveModel: $archive,
             palette: $archivePalette,
             prefix: $prefix,
             suffix: $suffix,
-        );
-        $eventName = ArchivePaletteEvent::getEventName($archive->type);
-        $this->eventDispatcher->dispatch($event, $eventName);
+        ));
 
         $dca['palettes'][$type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
     }

@@ -20,6 +20,8 @@ The Contao Media Library Bundle provides archive‑based management of media lib
 - Optional: Integration with [H & H Categories Bundle](https://github.com/heimrichhannot/contao-categories-bundle) to categorize items
 - Optional: Integration with [H & H Filecredits Bundle (private)](https://github.com/heimrichhannot/contao-filecredits-bundle) to ease assignment of file credits to the files of items
 
+---
+
 ## Installation
 
 Install the bundle via Composer and update the database afterwards.
@@ -42,6 +44,8 @@ huh_media_library:
     file_upload_path: 'files/media-library/##author##/##title##'
 ```
 
+---
+
 ## Editing and deleting products
 
 You can enable edit and delete support for media library products by activating the corresponding options in the archive settings.  
@@ -49,3 +53,67 @@ Make sure to configure the member (and/or member group) permissions accordingly.
 
 If a front end member has the required permissions, edit and delete links are automatically added to the template data of reader bundle templates.  
 The variables are available as `editLink` and `deleteLink`.
+
+---
+
+## Developers
+
+### Events
+
+#### Modify Palette
+
+`HeimrichHannot\MediaLibraryBundle\Event\`**`ArchivePaletteEvent`**
+<br>`HeimrichHannot\MediaLibraryBundle\Event\`**`ItemPaletteEvent`**
+
+Fired when the palette of an archive or item is generated. Can be used to add additional fields.
+
+#### Backend Editing
+
+`HeimrichHannot\MediaLibraryBundle\Event\`**`ArchiveEditEvent`**
+<br>`HeimrichHannot\MediaLibraryBundle\Event\`**`ItemEditEvent`**
+
+Fired when an archive or item is edited, respectively. Can be used modify the DCA or translations.
+
+### Custom Media Library Archive Types
+
+Any class that extends `HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType` will be automatically
+registered as a media library archive type and be available in the archive settings.
+
+```php
+<?php # src/MediaLibrary/MyMediaLibraryArchive.php
+
+namespace App\MediaLibrary;
+
+use HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType;
+
+class MyMediaLibraryArchive extends AbstractArchiveType
+{
+    public const TYPE = 'app_myMlArchiveType';
+    
+    public static function getAlias(): string
+    {
+        return self::TYPE;
+    }
+    
+    /* ================ IMPLEMENT CONFIG METHODS ================ *\
+     *  The following methods have default implementations in     *
+     *  AbstractArchiveType, but can be overridden if necessary.  *
+    \* ========================================================== */
+    
+    public function getItemPalette(ArchiveModel $archive, ItemModel $item): string
+    {
+        return parent::getItemPalette($archive, $item);
+    }
+
+    public function getArchivePalette(ArchiveModel $archive): string
+    {
+        return parent::getArchivePalette($archive);
+    }
+
+    public function supportsImageSizeDownloads(ArchiveModel $archive): bool
+    {
+        return parent::supportsImageSizeDownloads($archive);
+    }
+}
+
+```

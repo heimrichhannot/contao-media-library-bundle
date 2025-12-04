@@ -4,22 +4,13 @@ namespace HeimrichHannot\MediaLibraryBundle\Event;
 
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
+use Symfony\Contracts\EventDispatcher\Event;
 
-readonly class ItemEditEvent
+class ItemEditEvent extends Event
 {
     public function __construct(
-        public string        $archiveType,
-        private ArchiveModel $archiveModel,
-        private ItemModel    $itemModel,
+        public readonly string       $archiveType,
+        public readonly ArchiveModel $archiveModel,
+        public readonly ItemModel    $itemModel,
     ) {}
-
-    public function getArchiveModel(): ArchiveModel
-    {
-        return $this->archiveModel;
-    }
-
-    public function getItemModel(): ItemModel
-    {
-        return $this->itemModel;
-    }
 }
