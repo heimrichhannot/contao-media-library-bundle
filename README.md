@@ -79,6 +79,30 @@ Fired when an archive or item is edited, respectively. Can be used modify the DC
 Any class that extends `HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType` will be automatically
 registered as a media library archive type and be available in the archive settings.
 
+
+#### Minimal working Boilerplate
+
+```php
+<?php # src/MediaLibrary/MyMediaLibraryArchive.php
+
+namespace App\MediaLibrary;
+
+use HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+class MyMediaLibraryArchive extends AbstractArchiveType
+{
+    public const TYPE = 'app_myMlArchiveType';
+
+    public static function getAlias(): string
+    {
+        return self::TYPE;
+    }
+}
+```
+
+#### Extended Example
+
 ```php
 <?php # src/MediaLibrary/MyMediaLibraryArchive.php
 
