@@ -12,7 +12,7 @@ $dca = &$GLOBALS['TL_DCA'][$table];
 
 $dca['palettes'] = [
     '__selector__' => ['type', 'useExifDataForTags', 'enableCreate', 'enableEdit', 'enableDelete'],
-    '__prefix__' => '{general_legend},title,type,jumpTo;',
+    '__prefix__' => '{general_legend},title,type;',
     '__suffix__' => '{advanced_legend},additionalFields;{edit_legend},enableCreate,enableEdit,enableDelete;',
 ];
 
@@ -118,14 +118,14 @@ $dca['fields'] = [
         ],
         'sql' => "varchar(128) NOT NULL default ''",
     ],
-    'jumpTo' => [
-        'exclude' => true,
-        'inputType' => 'pageTree',
-        'foreignKey' => 'tl_page.title',
-        'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
-        'sql' => "int(10) unsigned NOT NULL default 0",
-        'relation' => ['type' => 'hasOne', 'load' => 'lazy']
-    ],
+    // 'jumpTo' => [
+    //     'exclude' => true,
+    //     'inputType' => 'pageTree',
+    //     'foreignKey' => 'tl_page.title',
+    //     'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    //     'sql' => "int(10) unsigned NOT NULL default 0",
+    //     'relation' => ['type' => 'hasOne', 'load' => 'lazy']
+    // ],
     'additionalFields' => [
         'exclude' => true,
         'filter' => true,
