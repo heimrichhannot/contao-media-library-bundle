@@ -85,21 +85,22 @@ registered as a media library archive type and be available in the archive setti
 namespace App\MediaLibrary;
 
 use HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 class MyMediaLibraryArchive extends AbstractArchiveType
 {
     public const TYPE = 'app_myMlArchiveType';
-    
+
     public static function getAlias(): string
     {
         return self::TYPE;
     }
-    
+
     /* ================ IMPLEMENT CONFIG METHODS ================ *\
      *  The following methods have default implementations in     *
      *  AbstractArchiveType, but can be overridden if necessary.  *
     \* ========================================================== */
-    
+
     public function getItemPalette(ArchiveModel $archive, ItemModel $item): string
     {
         return parent::getItemPalette($archive, $item);
@@ -114,6 +115,39 @@ class MyMediaLibraryArchive extends AbstractArchiveType
     {
         return parent::supportsImageSizeDownloads($archive);
     }
-}
 
+    /* ================ EXAMPLE EVENT LISTENERS  ================ *\
+     *  The following methods are examples of event listeners     *
+     *  that you can implement to customize the behavior of your  *
+     *  media library archive types or even existing ones.        *
+    \* ========================================================== */
+
+    #[AsEventListener]
+    public function alterTranslations(ItemEditEvent $event): void
+    {
+        if ($event->archiveType !== self::TYPE) {
+            return;
+        }
+
+        $trans = &$GLOBALS['TL_LANG'][ItemModel::getTable()];
+        $trans['file'] = ['Vorschaubild', 'Wählen Sie ein Thumbnail für das Archiv aus.'];
+        $trans['addAdditionalFiles'] = ['Dateien zum Herunterladen anbieten', 'Bieten Sie Dateien zum Download an.'];
+        $trans['additionalFiles'] = ['Herunterladbare Dateien auswählen', 'Hier können Sie die Dateien auswählen, die zum Download angeboten werden sollen.'];
+    }
+
+    #[AsEventListener]
+    public function onItemPalette(ItemPaletteEvent $event): void
+    {
+        if ($event->archiveType !== self::TYPE) {
+            return;
+        }
+
+        $event->prefix = PaletteManipulator::create()
+            ->removeField('tags')
+            ->removeField('text')
+            ->applyToString($event->prefix);
+
+        $event->suffix = '{details_legend},tags,text;' . $event->suffix;
+    }
+}
 ```
