@@ -35,7 +35,7 @@ readonly class DownloadsManager
             $image = $figureBuilder->build()->getImage();
 
             // validate image can be created
-            $this->imageFactory->create($image->getFilePath());
+            $this->imageFactory->create($image->getFilePath(absolute: true));
 
             return $image;
         }
