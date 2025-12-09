@@ -2,7 +2,8 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Manager;
 
-use Contao\CoreBundle\Image\Studio\Figure;
+use Contao\CoreBundle\Image\ImageFactoryInterface;
+use Contao\CoreBundle\Image\Studio\ImageResult;
 use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\FilesModel;
 use Contao\Image\PictureConfiguration;
@@ -12,13 +13,14 @@ use HeimrichHannot\MediaLibraryBundle\Dto\ImageSizeDownloadDto;
 readonly class DownloadsManager
 {
     public function __construct(
+        private ImageFactoryInterface $imageFactory,
         private Studio $studio,
     ) {}
 
-    protected function tryCreateFigure(
+    protected function tryCreateFigureImage(
         string                                     $fileUuid,
         PictureConfiguration|array|int|string|null $imageSize = null
-    ): ?Figure {
+    ): ?ImageResult {
         try
         {
             $figureBuilder = $this->studio
@@ -30,7 +32,12 @@ readonly class DownloadsManager
                 $figureBuilder->setSize($imageSize);
             }
 
-            return $figureBuilder->build();
+            $image = $figureBuilder->build()->getImage();
+
+            // validate image can be created
+            $this->imageFactory->create($image->getFilePath());
+
+            return $image;
         }
         catch (\Throwable) {}
 
@@ -53,18 +60,18 @@ readonly class DownloadsManager
 
     public function createImageDownload(FilesModel $file): ?ImageSizeDownloadDto
     {
-        if (!$figure = $this->tryCreateFigure($file->uuid)) {
+        if (!$image = $this->tryCreateFigureImage($file->uuid)) {
             return null;
         }
 
-        $dimensions = $figure->getImage()->getOriginalDimensions();
-        $imgPath = $figure->getImage()->getFilePath(true);
+        $dimensions = $image->getOriginalDimensions();
+        $imgPath = $image->getFilePath(true);
         $fileSize = ($imgPath && \file_exists($imgPath)) ? \filesize($imgPath) : 0;
         $fileSize = $fileSize ?: null;
 
         return ImageSizeDownloadDto::create()
             ->setLabel('Original')
-            ->setUrl($figure->getImage()->getImageSrc())
+            ->setUrl($image->getImageSrc())
             ->setWidth($dimensions->getSize()->getWidth())
             ->setHeight($dimensions->getSize()->getHeight())
             ->setFilesModel($file)
@@ -79,17 +86,17 @@ readonly class DownloadsManager
             return null;
         }
 
-        if (!$figure = $this->tryCreateFigure($file->uuid, $imageSize)) {
+        if (!$image = $this->tryCreateFigureImage($file->uuid, $imageSize)) {
             return null;
         }
 
-        $filePath = $figure->getImage()->getImageSrc(true);
+        $filePath = $image->getImageSrc(true);
         $fileSize = ($filePath && \file_exists($filePath)) ? \filesize($filePath) : 0;
         $fileSize = $fileSize ?: null;
 
         return ImageSizeDownloadDto::create()
             ->setLabel($imageSizeModel->name ?: \sprintf('[ID %d]', $imageSizeModel->id))
-            ->setUrl($figure->getImage()->getImageSrc())
+            ->setUrl($image->getImageSrc())
             ->setFilesModel($file)
             ->setImageSizeModel($imageSizeModel)
             ->setFilesize($fileSize)
