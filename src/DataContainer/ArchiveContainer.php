@@ -98,7 +98,8 @@ class ArchiveContainer
         $prefix = $dca['palettes']['__prefix__'] ?? '';
         $suffix = $dca['palettes']['__suffix__'] ?? '';
 
-        $this->eventDispatcher->dispatch(new ArchivePaletteEvent(
+        /** @var ArchivePaletteEvent $event */
+        $event = $this->eventDispatcher->dispatch(new ArchivePaletteEvent(
             archiveType: $type,
             archiveModel: $archive,
             palette: $archivePalette,
@@ -106,7 +107,7 @@ class ArchiveContainer
             suffix: $suffix,
         ));
 
-        $dca['palettes'][$type] = Str::mergePalettes($prefix, $archivePalette, $suffix);
+        $dca['palettes'][$type] = Str::mergePalettes($event->prefix, $event->palette, $event->suffix);
     }
 
     #[AsCallback(self::TABLE,  'fields.additionalFields.options')]
