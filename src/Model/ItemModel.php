@@ -143,8 +143,13 @@ class ItemModel extends Model
             return $this->_tags;
         }
 
+        if (!\class_exists(CfgTagModel::class)) {
+            return [];
+        }
+
         $db = Database::getInstance();
-        $tagRows = $db->prepare('SELECT t.* FROM tl_cfg_tag_ml_item i LEFT JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id WHERE i.ml_item_id = ?')
+        $tagRows = $db
+            ->prepare('SELECT t.* FROM tl_cfg_tag_ml_item i LEFT JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id WHERE i.ml_item_id = ?')
             ->execute($this->id);
 
         if (!$tagRows->numRows) {
@@ -156,8 +161,15 @@ class ItemModel extends Model
         return $this->_tags;
     }
 
+    /**
+     * @api Used in templates.
+     */
     public function getCodefogTagNames(): array
     {
-        return array_map(static fn (CfgTagModel $tag) => $tag->name, $this->getCodefogTags());
+        if (!\class_exists(CfgTagModel::class)) {
+            return [];
+        }
+
+        return \array_map(static fn (CfgTagModel $tag) => $tag->name, $this->getCodefogTags());
     }
 }
