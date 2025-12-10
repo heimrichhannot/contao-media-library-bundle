@@ -11,10 +11,15 @@ use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
 use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
 use HeimrichHannot\FlareBundle\List\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
+use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use HeimrichHannot\MediaLibraryBundle\EventListener\Integration\CodefogTagsListener;
 
-#[AsListType(alias: self::TYPE, dataContainer: 'tl_ml_item', palette: '{archive_legend},ml_archive')]
-class MediaLibraryArchiveListType extends AbstractListType
+#[AsListType(
+    alias: self::TYPE,
+    dataContainer: ItemContainer::TABLE,
+    palette: '{archive_legend},ml_archive'
+)]
+class MediaLibraryArchiveListType extends AbstractListType implements MediaLibraryFilesListTypeInterface
 {
     public const TYPE = 'ml_archive';
     public const ALIAS_ARCHIVE = 'ml_archive';
