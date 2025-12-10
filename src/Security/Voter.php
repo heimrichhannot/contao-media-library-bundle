@@ -2,7 +2,7 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Security;
 
-use Contao\BackendUser;
+use BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\FrontendUser;
