@@ -2,13 +2,13 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Model;
 
+use Codefog\TagsBundle\Model\TagModel;
+use Composer\InstalledVersions;
 use Contao\Database;
 use Contao\FilesModel;
-use Contao\MemberModel;
 use Contao\Model;
 use Contao\StringUtil;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
-use HeimrichHannot\UtilsBundle\Model\CfgTagModel;
 
 /**
  * Reads and writes media library items.
@@ -34,36 +34,37 @@ class ItemModel extends Model
 
     private array $_tags;
     private array $_variants;
+    private bool $_isCodefogTagsAvailable;
 
-    /**
-     * @param MemberModel $member
-     * @return bool
-     *
-     * @deprecated Use Voter instead
-     */
-    public function memberCanDelete(MemberModel $member): bool
-    {
-        $productArchive = ArchiveModel::findByPk($this->pid);
-
-        if ($productArchive === null) {
-            return false;
-        }
-
-        if (!$productArchive->enableDelete) {
-            return false;
-        }
-
-        $memberGroups = StringUtil::deserialize($member->groups, true);
-        $groupsCanDeleteAll = StringUtil::deserialize($productArchive->groupsCanDeleteAll, true);
-
-        if (!empty(array_intersect($memberGroups, $groupsCanDeleteAll))) {
-            return true;
-        }
-
-        $groupsCanDeleteOwn = StringUtil::deserialize($productArchive->groupsCanDeleteOwn, true);
-
-        return !empty(array_intersect($memberGroups, $groupsCanDeleteOwn)) && (int) $this->author === (int) $member->id;
-    }
+    // /**
+    //  * @param MemberModel $member
+    //  * @return bool
+    //  *
+    //  * @deprecated Use Voter instead
+    //  */
+    // public function memberCanDelete(MemberModel $member): bool
+    // {
+    //     $productArchive = ArchiveModel::findByPk($this->pid);
+    //
+    //     if ($productArchive === null) {
+    //         return false;
+    //     }
+    //
+    //     if (!$productArchive->enableDelete) {
+    //         return false;
+    //     }
+    //
+    //     $memberGroups = StringUtil::deserialize($member->groups, true);
+    //     $groupsCanDeleteAll = StringUtil::deserialize($productArchive->groupsCanDeleteAll, true);
+    //
+    //     if (!empty(array_intersect($memberGroups, $groupsCanDeleteAll))) {
+    //         return true;
+    //     }
+    //
+    //     $groupsCanDeleteOwn = StringUtil::deserialize($productArchive->groupsCanDeleteOwn, true);
+    //
+    //     return !empty(array_intersect($memberGroups, $groupsCanDeleteOwn)) && (int) $this->author === (int) $member->id;
+    // }
 
     public function getArchive(): ?ArchiveModel
     {
@@ -143,8 +144,8 @@ class ItemModel extends Model
             return $this->_tags;
         }
 
-        if (!\class_exists(CfgTagModel::class)) {
-            return [];
+        if (!$this->isCodefogTagsAvailable()) {
+            return $this->_tags = [];
         }
 
         $db = Database::getInstance();
@@ -156,7 +157,7 @@ class ItemModel extends Model
             return $this->_tags = [];
         }
 
-        $this->_tags = Model::createCollectionFromDbResult($tagRows, CfgTagModel::getTable())->getModels() ?? [];
+        $this->_tags = Model::createCollectionFromDbResult($tagRows, TagModel::getTable())->getModels() ?? [];
 
         return $this->_tags;
     }
@@ -166,10 +167,23 @@ class ItemModel extends Model
      */
     public function getCodefogTagNames(): array
     {
-        if (!\class_exists(CfgTagModel::class)) {
+        if (!$this->isCodefogTagsAvailable()) {
             return [];
         }
 
-        return \array_map(static fn (CfgTagModel $tag) => $tag->name, $this->getCodefogTags());
+        return \array_map(static fn (TagModel $tag) => $tag->name, $this->getCodefogTags());
+    }
+
+    protected function isCodefogTagsAvailable(): bool
+    {
+        if (!isset($this->_isCodefogTagsAvailable))
+        {
+            $this->_isCodefogTagsAvailable = (
+                InstalledVersions::isInstalled('codefog/tags-bundle')
+                && \class_exists(TagModel::class)
+            );
+        }
+
+        return $this->_isCodefogTagsAvailable;
     }
 }
