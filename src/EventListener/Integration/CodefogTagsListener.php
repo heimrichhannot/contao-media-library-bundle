@@ -3,6 +3,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\EventListener\Integration;
 
 use Codefog\TagsBundle\Model\TagModel;
+use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Database;
 use Contao\DataContainer;
@@ -90,6 +91,8 @@ readonly class CodefogTagsListener
     #[AsCallback(self::TABLE, 'config.onsubmit')]
     public function updateTagAssociations(DataContainer $dc): void
     {
+        Controller::loadDataContainer(TagModel::getTable());
+
         $source = $GLOBALS['TL_DCA'][self::TABLE]['fields']['tags']['eval']['tagsManager'];
 
         if (!$tags = TagModel::findBy(['source=?'], [$source])) {
