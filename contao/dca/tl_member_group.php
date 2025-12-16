@@ -2,4 +2,4 @@
 
 use HeimrichHannot\MediaLibraryBundle\Security\Voter;
 
-Voter::createAccessRightFields('tl_member_group', 'title_legend');
+Voter::createAccessRightFields(table: 'tl_member_group', paletteParent: 'title_legend');

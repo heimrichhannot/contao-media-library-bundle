@@ -27,7 +27,7 @@ class Voter extends SymfonyVoter
         self::PERMISSION_CREATE,
         self::PERMISSION_EDIT,
         self::PERMISSION_DELETE,
-        self::PERMISSION_DELETE_OWN
+        self::PERMISSION_DELETE_OWN,
     ];
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -40,11 +40,7 @@ class Voter extends SymfonyVoter
             return $subject instanceof ArchiveModel;
         }
 
-        if (!$subject instanceof ItemModel) {
-            return false;
-        }
-
-        return true;
+        return $subject instanceof ItemModel;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -81,6 +77,7 @@ class Voter extends SymfonyVoter
         {
             self::PERMISSION_CREATE => $this->voteOnCreate($user, $archiveModel),
             self::PERMISSION_EDIT => $this->voteOnEdit($user, $subject, $archiveModel),
+            self::PERMISSION_DELETE_OWN,
             self::PERMISSION_DELETE => $this->voteOnDelete($archiveModel, $user, $subject),
             default => false,
         };
@@ -126,9 +123,13 @@ class Voter extends SymfonyVoter
             return true;
         }
 
-        foreach ($user->groups as $group) {
-            $groupModel = MemberGroupModel::findByPk($group);
-            if ($groupModel && $this->isAllowed(static::PERMISSION_EDIT, $groupModel, $archiveModel)) {
+        foreach ($user->groups as $group)
+        {
+            if (!$groupModel = MemberGroupModel::findByPk($group)) {
+                continue;
+            }
+
+            if ($this->isAllowed(static::PERMISSION_EDIT, $groupModel, $archiveModel)) {
                 return true;
             }
         }
@@ -149,6 +150,10 @@ class Voter extends SymfonyVoter
         $authorId = (int) $productModel->author;
         $userId = (int) $user->id;
         $userIsAuthor = $authorId && $userId && $authorId === $userId;
+
+        if ($userIsAuthor && $this->isAllowed(self::PERMISSION_DELETE_OWN, $user, $archiveModel)) {
+            return true;
+        }
 
         foreach ($user->groups as $group)
         {

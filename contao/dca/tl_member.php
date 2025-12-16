@@ -2,4 +2,4 @@
 
 use HeimrichHannot\MediaLibraryBundle\Security\Voter;
 
-Voter::createAccessRightFields('tl_member', 'homedir_legend');
+Voter::createAccessRightFields(table: 'tl_member', paletteParent: 'homedir_legend');
