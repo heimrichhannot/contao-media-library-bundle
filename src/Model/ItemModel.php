@@ -159,8 +159,7 @@ class ItemModel extends Model
                   FROM tl_cfg_tag_ml_item i
             INNER JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id
                  WHERE i.ml_item_id = ?
-                   AND t.id IS NOT NULL
-                   AND t.id != ""
+                   AND t.id > 0
             SQL)
             ->execute($this->id);
 
