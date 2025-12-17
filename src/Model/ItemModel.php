@@ -153,23 +153,18 @@ class ItemModel extends Model
         }
 
         $db = Database::getInstance();
-        $tagRows = $db
-            ->prepare(<<<'SQL'
-                SELECT t.*
-                  FROM tl_cfg_tag_ml_item i
-            INNER JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id
-                 WHERE i.ml_item_id = ?
-                   AND t.id > 0
-            SQL)
-            ->execute($this->id);
 
-        if (!$tagRows->numRows) {
+        $tagIds = $db->prepare('SELECT `cfg_tag_id` FROM `tl_cfg_tag_ml_item` WHERE `ml_item_id` = ?')
+            ->execute($this->id)
+            ->fetchEach('cfg_tag_id');
+
+        if (!$tagIds = \array_unique(\array_filter($tagIds))) {
             return $this->_tags = [];
         }
 
-        $this->_tags = Model::createCollectionFromDbResult($tagRows, TagModel::getTable())->getModels() ?? [];
+        $collection = TagModel::findMultipleByIds($tagIds);
 
-        return $this->_tags;
+        return $this->_tags = $collection?->getModels() ?? [];
     }
 
     /**
