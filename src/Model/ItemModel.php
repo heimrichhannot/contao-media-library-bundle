@@ -148,9 +148,20 @@ class ItemModel extends Model
             return $this->_tags = [];
         }
 
+        if (!$this->id) {
+            return [];
+        }
+
         $db = Database::getInstance();
         $tagRows = $db
-            ->prepare('SELECT t.* FROM tl_cfg_tag_ml_item i LEFT JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id WHERE i.ml_item_id = ?')
+            ->prepare(<<<'SQL'
+                SELECT t.*
+                  FROM tl_cfg_tag_ml_item i
+            INNER JOIN tl_cfg_tag t ON t.id = i.cfg_tag_id
+                 WHERE i.ml_item_id = ?
+                   AND t.id IS NOT NULL
+                   AND t.id != ""
+            SQL)
             ->execute($this->id);
 
         if (!$tagRows->numRows) {
