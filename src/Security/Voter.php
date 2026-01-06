@@ -32,7 +32,7 @@ class Voter extends SymfonyVoter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (!\in_array($attribute, self::PERMISSIONS)) {
+        if (!\in_array($attribute, self::PERMISSIONS, strict: true)) {
             return false;
         }
 
