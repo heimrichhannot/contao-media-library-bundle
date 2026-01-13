@@ -133,7 +133,7 @@ class MediaLibraryType extends AbstractFormType
         $widget = $event->getWidget();
 
         match ($widget->name) {
-            'file', 'additionalFiles' => $this->updateWidgetUploadPath($widget),
+            'file', 'additionalFiles' => $this->updateWidgetUploadPath($widget, $event->getFormContext()),
             default => null,
         };
 
@@ -143,13 +143,13 @@ class MediaLibraryType extends AbstractFormType
         }
     }
 
-    public function getCurrentMemberUploadPath(): ?string
+    public function getCurrentMemberUploadPath(FormContext $context): ?string
     {
         if (!$request = $this->requestStack->getCurrentRequest()) {
             return null;
         }
 
-        $title = $request->request->get('title');
+        $title = $request->request->get('title', $context->getData()['title'] ?? null);
         $feUsername = $this->tokenChecker->hasFrontendUser() ? $this->tokenChecker->getFrontendUsername() : null;
 
         if ($title && $feUsername)
@@ -183,9 +183,9 @@ class MediaLibraryType extends AbstractFormType
         return $uploadPath;
     }
 
-    public function updateWidgetUploadPath(Widget $widget): void
+    public function updateWidgetUploadPath(Widget $widget, FormContext $context): void
     {
-        if (!$uploadPath = $this->getCurrentMemberUploadPath()) {
+        if (!$uploadPath = $this->getCurrentMemberUploadPath($context)) {
             return;
         }
 
