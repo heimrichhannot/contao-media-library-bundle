@@ -48,8 +48,8 @@ readonly class FileUploadPathCallback
         MemberModel|Model|null $member = null,
     ): array {
         $context = [
-            '##author##' => $author,
-            '##title##' => $title,
+            'author' => $author,
+            'title' => $title,
         ];
 
         if ($item) {
@@ -71,7 +71,7 @@ readonly class FileUploadPathCallback
                 continue;
             }
 
-            $context["##{$prefix}_{$key}##"] = $value;
+            $context["{$prefix}_{$key}"] = $value;
         }
 
         return $context;
