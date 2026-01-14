@@ -8,13 +8,12 @@ The Contao Media Library Bundle provides archive‑based management of media lib
 ## Features
 
 - Organize your media as objects in archives
-- Predefined media library product types: `image`, `video`, `file`
-- For image archives, define image sizes that are used to automatically create downloads
-- Individually add additional DCA fields to the archives and their items
-- Automatically generate downloads for images in desired formats and dimensions
+- Predefined media library item types: `image`, `video`, `file`
+- For image archives, define image sizes to automatically create downloads in desired formats and dimensions
 - Upload and edit media library items directly from the frontend with a form generator preset form-type
+- Add custom DCA fields to individual archives and their items
 - Integration with [FLARE Bundle](https://github.com/heimrichhannot/conta-flare-bundle) to list media libraries, e.g., in gallery views
-- Integration with [Form Type Bundle](https://github.com/heimrichhannot/contao-form-type-bundle) to handle form submissions with media library items
+- Integration with [Form Type Bundle](https://github.com/heimrichhannot/contao-form-type-bundle) to handle frontend form submissions with media library items
 - Optional: Integration with [Codefog Tags Bundle](https://github.com/codefog/tags-bundle) to tag items
 - Optional: Integration with [H & H Categories Bundle](https://github.com/heimrichhannot/contao-categories-bundle) to categorize items
 - Optional: Integration with [H & H Filecredits Bundle (private)](https://github.com/heimrichhannot/contao-filecredits-bundle) to ease assignment of file credits to the files of items
