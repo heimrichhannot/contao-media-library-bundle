@@ -47,11 +47,29 @@ huh_media_library:
 
 ## Editing and deleting products
 
-You can enable edit and delete support for media library products by activating the corresponding options in the archive settings.  
-Make sure to configure the member (and/or member group) permissions accordingly.
+Enable edit and delete functionality for media library items by turning on the corresponding options in the archive settings.
+Also verify that member (and/or member group) permissions are configured appropriately.
 
-If a front end member has the required permissions, edit and delete links are automatically added to the template data of reader bundle templates.  
-The variables are available as `editLink` and `deleteLink`.
+### Editing items directly from the frontend
+
+1. Set up your custom upload and/or edit form in the form-generator using the supplied `MediaLibraryType` form-type.
+   - You may use the identical form for both actions, uploading and editing, given that you want the same fields to be present.
+   - Otherwise, create separate forms for each action or refer to the
+     [contao-form-type-bundle's documentation](https://github.com/heimrichhannot/contao-form-type-bundle)
+     for information on how to modify a form programatically.
+2. Create an upload and/or edit page with a form content element configured to use the previously set up form.
+   The page will then automatically assure that any accessing frontend member is authorized to upload or edit the individual media library item.
+3. In a flare reader template, you may use the below snippet to display an edit link for a media library item.
+   - An endpoint for deleting items is road-mapped; full functionality is not available yet.
+
+```twig
+{% if is_granted('ml_item_edit', model) %}
+    {% set pageEdit = archive.related('editJumpTo') %}
+    {% if pageEdit %}
+        <a href="{{ pageEdit.absoluteUrl }}?edit={{ model.id }}">edit</a>
+    {% endif %}
+{% endif %}
+```
 
 ---
 
@@ -71,13 +89,12 @@ Fired when the palette of an archive or item is generated. Can be used to add ad
 `HeimrichHannot\MediaLibraryBundle\Event\`**`ArchiveEditEvent`**
 <br>`HeimrichHannot\MediaLibraryBundle\Event\`**`ItemEditEvent`**
 
-Fired when an archive or item is edited, respectively. Can be used modify the DCA or translations.
+Fired when an archive or item is edited, respectively. Can be used to modify the DCA or translations.
 
 ### Custom Media Library Archive Types
 
 Any class that extends `HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType` will be automatically
 registered as a media library archive type and be available in the archive settings.
-
 
 #### Minimal working Boilerplate
 
@@ -87,7 +104,6 @@ registered as a media library archive type and be available in the archive setti
 namespace App\MediaLibrary;
 
 use HeimrichHannot\MediaLibraryBundle\ArchiveType\AbstractArchiveType;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 class MyMediaLibraryArchive extends AbstractArchiveType
 {
