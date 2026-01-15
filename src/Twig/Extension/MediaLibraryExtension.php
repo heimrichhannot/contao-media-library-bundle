@@ -14,6 +14,7 @@ class MediaLibraryExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('ml_file_download', [MediaLibraryRuntime::class, 'getFileDownload']),
             new TwigFunction('ml_image_size_downloads', [MediaLibraryRuntime::class, 'getImageSizeDownloads']),
             new TwigFunction('ml_image_size_variant_downloads', [MediaLibraryRuntime::class, 'getVariantImageSizeDownloads']),
             new TwigFunction('ml_filesize', [MediaLibraryRuntime::class, 'getFilesize']),

@@ -2,42 +2,13 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Dto;
 
-use Contao\FilesModel;
 use Contao\ImageSizeModel;
 
-class ImageSizeDownloadDto
+class ImageSizeDownloadDto extends FileDownloadDto
 {
-    private string $label;
-    private string $url;
-    private int $width;
-    private int $height;
-    private ?int $filesize = null;
-    private FilesModel $filesModel;
-    private ?ImageSizeModel $imageSizeModel = null;
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function setLabel(string $label): self
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(string $url): self
-    {
-        $this->url = $url;
-
-        return $this;
-    }
+    protected int $width;
+    protected int $height;
+    protected ?ImageSizeModel $imageSizeModel = null;
 
     public function getWidth(): int
     {
@@ -63,30 +34,6 @@ class ImageSizeDownloadDto
         return $this;
     }
 
-    public function getFilesize(): ?int
-    {
-        return $this->filesize;
-    }
-
-    public function setFilesize(?int $filesize): self
-    {
-        $this->filesize = $filesize;
-
-        return $this;
-    }
-
-    public function getFilesModel(): FilesModel
-    {
-        return $this->filesModel;
-    }
-
-    public function setFilesModel(FilesModel $filesModel): self
-    {
-        $this->filesModel = $filesModel;
-
-        return $this;
-    }
-
     public function getImageSizeModel(): ?ImageSizeModel
     {
         return $this->imageSizeModel;
@@ -97,10 +44,5 @@ class ImageSizeDownloadDto
         $this->imageSizeModel = $imageSizeModel;
 
         return $this;
-    }
-
-    public static function create(): self
-    {
-        return new self();
     }
 }

@@ -8,6 +8,7 @@ use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\FilesModel;
 use Contao\Image\PictureConfiguration;
 use Contao\ImageSizeModel;
+use HeimrichHannot\MediaLibraryBundle\Dto\FileDownloadDto;
 use HeimrichHannot\MediaLibraryBundle\Dto\ImageSizeDownloadDto;
 
 readonly class DownloadsManager
@@ -56,6 +57,28 @@ readonly class DownloadsManager
         }
 
         return FilesModel::findByUuid($file) ?: null;
+    }
+
+    public function createDownload(FilesModel $file): ?FileDownloadDto
+    {
+        if (!$file->id || $file->type !== 'file') {
+            return null;
+        }
+
+        $absPath = $file->getAbsolutePath();
+
+        if (!\file_exists($absPath)) {
+            return null;
+        }
+
+        $filesize = \filesize($absPath) ?: null;
+
+        return FileDownloadDto::create()
+            ->setLabel($file->name)
+            ->setUrl($file->path)
+            ->setFilesModel($file)
+            ->setFilesize($filesize)
+        ;
     }
 
     public function createImageDownload(FilesModel $file): ?ImageSizeDownloadDto

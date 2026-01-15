@@ -6,6 +6,7 @@ use Contao\FilesModel;
 use Contao\Image\ResizeConfiguration;
 use Contao\ImageSizeModel;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
+use HeimrichHannot\MediaLibraryBundle\Dto\FileDownloadDto;
 use HeimrichHannot\MediaLibraryBundle\Manager\DownloadsManager;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
@@ -19,6 +20,19 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
         private DownloadsManager      $downloads,
         private ParameterBagInterface $parameters,
     ) {}
+
+    public function getFileDownload(FilesModel|string|null $file, array $options = []): ?FileDownloadDto
+    {
+        if (!$file instanceof FilesModel) {
+            $file = FilesModel::findByUuid($file);
+        }
+
+        if (!$file instanceof FilesModel) {
+            return null;
+        }
+
+        return $this->downloads->createDownload($file);
+    }
 
     protected function getImageSizeSupportingArchive(ItemModel $itemModel): ?ArchiveModel
     {
