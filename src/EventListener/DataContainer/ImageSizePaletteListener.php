@@ -7,7 +7,7 @@ use HeimrichHannot\MediaLibraryBundle\Event\ArchivePaletteEvent;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsEventListener(priority: 160)]
+#[AsEventListener(priority: -125)]
 readonly class ImageSizePaletteListener
 {
     public function __construct(
@@ -20,7 +20,9 @@ readonly class ImageSizePaletteListener
             return;
         }
 
-        if ($type->supportsImageSizeDownloads($event->archiveModel)) {
+        if ($type->supportsImageSizeDownloads($event->archiveModel)
+            && !\str_contains($event->assemblePalette(), 'imageSizes'))
+        {
             $event->suffix = Str::mergePalettes('{image_legend},imageSizes', $event->suffix);
         }
     }

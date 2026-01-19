@@ -107,7 +107,7 @@ class ArchiveContainer
             suffix: $suffix,
         ));
 
-        $dca['palettes'][$type] = Str::mergePalettes($event->prefix, $event->palette, $event->suffix);
+        $dca['palettes'][$type] = $event->assemblePalette();
     }
 
     #[AsCallback(self::TABLE,  'fields.additionalFields.options')]
