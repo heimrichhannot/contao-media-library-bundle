@@ -97,6 +97,7 @@ class ItemModel extends Model
     }
 
     /**
+     * Returns the additional files as FilesModel objects.
      * @return FilesModel[]
      */
     public function getVariants(): array
