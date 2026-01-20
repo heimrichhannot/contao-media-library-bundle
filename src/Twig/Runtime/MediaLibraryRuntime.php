@@ -66,13 +66,11 @@ readonly class MediaLibraryRuntime implements RuntimeExtensionInterface
             return [];
         }
 
-        if (!$imageSizes = $archive->getImageSizes()) {
-            return [];
-        }
-
         if (!$variants = $itemModel->getVariants()) {
             return [];
         }
+
+        $imageSizes = $archive->getImageSizes();
 
         $variantDownloads = [];
 
