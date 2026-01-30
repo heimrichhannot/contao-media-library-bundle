@@ -2,39 +2,26 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Flare\ListType;
 
-use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListCallback;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
 use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
-use HeimrichHannot\FlareBundle\Exception\FlareException;
+use HeimrichHannot\FlareBundle\Event\ListQueryPrepareEvent;
+use HeimrichHannot\FlareBundle\Event\ListSpecificationCreatedEvent;
 use HeimrichHannot\FlareBundle\FilterElement\PublishedElement;
 use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
-use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
-use HeimrichHannot\FlareBundle\List\PresetFiltersConfig;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
-use HeimrichHannot\MediaLibraryBundle\EventListener\Integration\CodefogTagsListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsListType(
-    alias: self::TYPE,
-    dataContainer: ItemContainer::TABLE,
-    palette: '{archive_legend},ml_archive'
-)]
+#[AsListType(self::TYPE, dataContainer: ItemContainer::TABLE, palette: '{archive_legend},ml_archive')]
 class MediaLibraryArchiveListType extends AbstractListType implements MediaLibraryFilesListTypeInterface
 {
     public const TYPE = 'ml_archive';
     public const ALIAS_ARCHIVE = 'ml_archive';
 
-    /**
-     * Configures the query by preparing an inner join on the specified table.
-     *
-     * @param ListQueryBuilder $builder The query builder instance used for constructing the query.
-     * @throws FlareException if there is an error during query preparation.
-     * @see CodefogTagsListener for joining tags.
-     * @internal This method is intended for internal use only and should not be called directly.
-     */
-    #[AsListCallback(self::TYPE, 'query.configure')]
-    public function prepareQuery(ListQueryBuilder $builder): void
+    public function onListQueryPrepareEvent(ListQueryPrepareEvent $event): void
     {
+        $builder = $event->getListQueryBuilder();
+
         $builder->innerJoin(
             table: 'tl_ml_archive',
             as: self::ALIAS_ARCHIVE,
@@ -42,16 +29,24 @@ class MediaLibraryArchiveListType extends AbstractListType implements MediaLibra
         );
     }
 
-    #[AsListCallback(self::TYPE, 'preset_filters')]
-    public function getPresetFilters(PresetFiltersConfig $config): void
+    #[AsEventListener(priority: 200)]
+    public function onListSpecificationCreated(ListSpecificationCreatedEvent $config): void
     {
-        $listModel = $config->getListModel();
-
-        if ($archiveId = $listModel->ml_archive)
-        {
-            $config->add(SimpleEquationElement::define('pid', SqlEquationOperator::EQUALS, $archiveId));
+        if ($config->listSpecification->type !== self::TYPE) {
+            return;
         }
 
-        $config->add(PublishedElement::define(), true);
+        $filters = $config->listSpecification->getFilters();
+
+        if ($archiveId = $config->listSpecification->ml_archive) {
+            $filters->set(
+                '_ml_archive_id',
+                SimpleEquationElement::define('pid', SqlEquationOperator::EQUALS, $archiveId)
+            );
+        }
+
+        if (!$filters->hasType(PublishedElement::TYPE)) {
+            $filters->add(PublishedElement::define());
+        }
     }
 }

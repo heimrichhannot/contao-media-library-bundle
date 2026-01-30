@@ -10,11 +10,11 @@ use Contao\DataContainer;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
-use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListCallback;
+use HeimrichHannot\FlareBundle\Event\ListQueryPrepareEvent;
 use HeimrichHannot\FlareBundle\Exception\FlareException;
-use HeimrichHannot\FlareBundle\List\ListQueryBuilder;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryArchiveListType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Integrates the media library with the Codefog Tags Bundle.
@@ -151,11 +151,17 @@ readonly class CodefogTagsListener
     }
 
     /**
-     * @throws FlareException
+     * @throws FlareException If a join to the cfg_tag_ml_item table fails.
      */
-    #[AsListCallback(MediaLibraryArchiveListType::TYPE, 'query.configure')]
-    public function prepareQuery(ListQueryBuilder $builder): void
+    #[AsEventListener]
+    public function prepareQuery(ListQueryPrepareEvent $event): void
     {
+        if ($event->listSpecification->type !== MediaLibraryArchiveListType::TYPE) {
+            return;
+        }
+
+        $builder = $event->getListQueryBuilder();
+
         $builder
             ->leftJoin(
                 table: 'tl_cfg_tag_ml_item',
