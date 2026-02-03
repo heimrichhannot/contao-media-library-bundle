@@ -157,18 +157,12 @@ $dca['fields'] = [
             'tl_class' => 'autoheight clr',
             'multiple' => true,
             'fieldType' => 'checkbox',
-            'orderField' => 'additionalFilesOrder',
             'filesOnly' => true,
             'mandatory' => true,
             'doNotCopy' => false,
+            'sortable' => true,
         ],
         'sql' => 'blob NULL',
-    ],
-    'additionalFilesOrder' => [
-        'sql' => 'blob NULL',
-        'eval' => [
-            'doNotCopy' => true,
-        ],
     ],
     'videoPosterImage' => [
         'exclude' => true,
