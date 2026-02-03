@@ -21,7 +21,7 @@ readonly class FlareReaderListener
 
     public function __invoke(ReaderRenderEvent $event): void
     {
-        if (!$listType = $this->listTypes->get($event->getListModel()->type)) {
+        if (!$listType = $this->listTypes->get($event->getListSpecification()->type)) {
             return;
         }
 
