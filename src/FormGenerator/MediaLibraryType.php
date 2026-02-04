@@ -7,6 +7,7 @@ use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
 use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
 use Contao\Database;
 use Contao\DataContainer;
@@ -16,6 +17,7 @@ use Contao\FormModel;
 use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
+use Contao\Validator;
 use Contao\Widget;
 use HeimrichHannot\FileCreditsBundle\HeimrichHannotFileCreditsBundle;
 use HeimrichHannot\FileCreditsBundle\Model\FilesModel;
@@ -42,11 +44,12 @@ class MediaLibraryType extends AbstractFormType
     protected array $uploadPathCache = [];
 
     public function __construct(
-        private readonly FileUploadPathCallback $uploadPath,
-        private readonly RequestStack           $requestStack,
-        private readonly Security               $security,
-        private readonly TokenChecker           $tokenChecker,
-        private readonly TranslatorInterface    $translator,
+        private readonly FileUploadPathCallback     $uploadPath,
+        private readonly RequestStack               $requestStack,
+        private readonly Security                   $security,
+        private readonly TokenChecker               $tokenChecker,
+        private readonly TranslatorInterface        $translator,
+        private readonly VirtualFilesystemInterface $filesStorage,
     ) {}
 
     public function getType(): string
@@ -241,13 +244,13 @@ class MediaLibraryType extends AbstractFormType
     {
         $form = $event->getForm();
 
-        $pid = $form->ml_archive ?? null;
-        if (!$pid) {
+        if (!$pid = $form->ml_archive ?? null) {
             return;
         }
 
-        $archiveModel = ArchiveModel::findByPk($pid);
-        if (!$archiveModel) {
+        if (!ArchiveModel::findByPk($pid))
+            // Validate parent archive exists to prevent downstream errors
+        {
             return;
         }
 
@@ -256,33 +259,114 @@ class MediaLibraryType extends AbstractFormType
         $fieldNames = Database::getInstance()->getFieldNames($table);
         $data = \array_intersect_key($event->getData(), \array_flip($fieldNames));
 
-        if (empty($_SESSION['FILES']))
-        {
-            $event->setData($data);
-            return;
-        }
+        $data = empty($_SESSION['FILES'])
+            ? $this->transformRegularFileData($table, $data)
+            : $this->transformSessionFileData($table, $data);
 
+        $event->setData($data);
+    }
+
+    public function transformSessionFileData(string $table, array $data): array
+    {
         Controller::loadDataContainer($table);
 
-        foreach ($_SESSION['FILES'] as $fieldName => $fieldData)
-        {
-            $field = $GLOBALS['TL_DCA'][$table]['fields'][$fieldName] ?? null;
+        $fields = &$GLOBALS['TL_DCA'][$table]['fields'];
 
-            if (!isset($data[$fieldName]) || empty($field)) {
+        foreach ($_SESSION['FILES'] as $fieldName => $fileData)
+        {
+            $field = $fields[$fieldName] ?? null;
+
+            if (!isset($data[$fieldName]) || !$field || !\is_array($field)) {
                 continue;
             }
 
-            $data[$fieldName] = StringUtil::uuidToBin($fieldData['uuid']);
+            $fieldData = &$data[$fieldName];
+
+            if (!$uuid = $fileData['uuid'] ?? null) {
+                continue;
+            }
+
+            $fieldData = StringUtil::uuidToBin($uuid);
 
             $fieldType = $field['eval']['fieldType'] ?? null;
-            $fieldMultiple = $field['eval']['multiple'] ?? null;
+            $fieldMultiple = \filter_var(
+                $field['eval']['multiple'] ?? false,
+                \FILTER_VALIDATE_BOOLEAN,
+                \FILTER_NULL_ON_FAILURE
+            );
 
-            if ($fieldType === 'checkbox' || $fieldMultiple === true) {
-                $data[$fieldName] = \serialize([$fieldData['uuid']]);
+            if ($fieldType === 'checkbox' || $fieldMultiple) {
+                $fieldData = \serialize([$uuid]);
             }
         }
 
-        $event->setData($data);
+        return $data;
+    }
+
+    public function transformRegularFileData(string $table, array $data): array
+    {
+        Controller::loadDataContainer($table);
+
+        $fields = &$GLOBALS['TL_DCA'][$table]['fields'];
+
+        foreach ($data as $fieldName => &$value)
+        {
+            if (!$field = $fields[$fieldName] ?? null) {
+                continue;
+            }
+
+            if ($field['inputType'] !== 'fileTree') {
+                continue;
+            }
+
+            $multiple = \filter_var(
+                $field['eval']['multiple'] ?? false,
+                \FILTER_VALIDATE_BOOLEAN,
+                \FILTER_NULL_ON_FAILURE
+            );
+
+            if (!$multiple) {
+                $value = $this->normalizeFileValue($value);
+                continue;
+            }
+
+            $values = match (true) {
+                \is_string($value) => StringUtil::deserialize($value, true),
+                \is_array($value) => $value,
+                default => [],
+            };
+
+            $values = \array_map(fn (mixed $v) => $this->normalizeFileValue($v), $values);
+
+            $value = \serialize($values);
+        }
+        unset($value);
+
+        return $data;
+    }
+
+    public function normalizeFileValue(mixed $value): ?string
+    {
+        if (!$value || !\is_string($value)) {
+            return null;
+        }
+
+        if (Validator::isUuid($value))
+        {
+            return match (true) {
+                Validator::isBinaryUuid($value) => $value,
+                Validator::isStringUuid($value) => StringUtil::uuidToBin($value),
+                default => null,
+            };
+        }
+
+        if ($file = $this->filesStorage->get($value)
+            ?? $this->filesStorage->get(\preg_replace('/^\/?files\//i', '', $value)))
+        {
+            return $file->getUuid()?->toBinary();
+        }
+
+        return null;
     }
 
     public function onProcessFormData(ProcessFormDataEvent $event): void
