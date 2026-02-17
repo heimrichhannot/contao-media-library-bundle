@@ -160,7 +160,7 @@ $dca['fields'] = [
             'filesOnly' => true,
             'mandatory' => true,
             'doNotCopy' => false,
-            'sortable' => true,
+            'isSortable' => true,
         ],
         'sql' => 'blob NULL',
     ],
