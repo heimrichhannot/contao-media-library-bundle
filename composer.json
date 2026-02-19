@@ -16,7 +16,7 @@
     },
     "conflict": {
         "heimrichhannot/contao-filecredits-bundle": "<2.1.0",
-        "heimrichhannot/contao-flare-bundle": "<0.0.29"
+        "heimrichhannot/contao-flare-bundle": "<0.1.0@alpha"
     },
     "suggest": {
         "codefog/tags-bundle": "^3.2",
