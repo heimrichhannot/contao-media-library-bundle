@@ -8,13 +8,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\ParameterType;
 
-class DateAddedFieldsListener
+readonly class DateAddedFieldsListener
 {
     public const TABLE_ML_ARCHIVE = 'tl_ml_archive';
     public const TABLE_ML_ITEM = 'tl_ml_item';
 
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {}
 
     /**
