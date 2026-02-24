@@ -1,11 +1,5 @@
 <?php
 
-/*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
- *
- * @license LGPL-3.0-or-later
- */
-
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 
 $lang = &$GLOBALS['TL_LANG'][ItemModel::getTable()];
@@ -21,7 +15,7 @@ $lang['videoPosterImage'] = ['Video-Vorschaubild', 'Laden Sie hier en Vorschaubi
 $lang['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $lang['copyright'] = ['Copyright', 'Geben Sie hier ein Copyright ein.'];
 $lang['text'] = ['Beschreibung', 'Tragen Sie hier die Beschreibung für das Mediathekobjekt ein.'];
-$lang['tags'] = ['Schlagworte', 'Tragen Sie hier Schlagworte für das Mediathekobjekt ein.'];
+$lang['tags'] = ['Schlagwörter', 'Tragen Sie hier Schlagwörter für das Mediathekobjekt ein.'];
 $lang['addAdditionalFiles'] = ['Datei-Varianten hinzufügen', 'Wählen Sie diese Option, um weitere Dateien hinzuzufügen, die das originale Motiv aufgreifen, als Varianten der Originaldatei sind.'];
 $lang['additionalFiles'] = ['Zusätzliche Dateien', 'Wählen Sie hier zusätzliche Varianten zum Originaldateiinhalt aus.'];
 $lang['published'] = ['Veröffentlichen', 'Wählen Sie diese Option zum Veröffentlichen.'];
