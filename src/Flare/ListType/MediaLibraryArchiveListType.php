@@ -4,11 +4,13 @@ namespace HeimrichHannot\MediaLibraryBundle\Flare\ListType;
 
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
 use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
-use HeimrichHannot\FlareBundle\Event\ListQueryPrepareEvent;
 use HeimrichHannot\FlareBundle\Event\ListSpecificationCreatedEvent;
 use HeimrichHannot\FlareBundle\FilterElement\PublishedElement;
 use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
+use HeimrichHannot\FlareBundle\Query\JoinTypeEnum;
+use HeimrichHannot\FlareBundle\Query\SqlJoinStruct;
+use HeimrichHannot\FlareBundle\Query\TableAliasRegistry;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -18,15 +20,17 @@ class MediaLibraryArchiveListType extends AbstractListType implements MediaLibra
     public const TYPE = 'ml_archive';
     public const ALIAS_ARCHIVE = 'ml_archive';
 
-    public function onListQueryPrepareEvent(ListQueryPrepareEvent $event): void
+    public function configureTableRegistry(TableAliasRegistry $registry): void
     {
-        $builder = $event->getListQueryBuilder();
+        $fromAlias = TableAliasRegistry::ALIAS_MAIN;
 
-        $builder->innerJoin(
+        $registry->registerJoin(new SqlJoinStruct(
+            fromAlias: $fromAlias,
+            joinType: JoinTypeEnum::INNER,
             table: 'tl_ml_archive',
-            as: self::ALIAS_ARCHIVE,
-            on: $builder->makeJoinOn(self::ALIAS_ARCHIVE, 'id', 'pid')
-        );
+            joinAlias: self::ALIAS_ARCHIVE,
+            condition: $registry->makeJoinOn(self::ALIAS_ARCHIVE, 'id', $fromAlias, 'pid')
+        ));
     }
 
     #[AsEventListener(priority: 200)]
