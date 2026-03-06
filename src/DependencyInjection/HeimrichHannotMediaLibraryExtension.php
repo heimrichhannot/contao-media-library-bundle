@@ -3,6 +3,7 @@
 namespace HeimrichHannot\MediaLibraryBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -51,7 +52,7 @@ class HeimrichHannotMediaLibraryExtension extends Extension implements PrependEx
 
     private function isCodefogTagsBundleInstalled(): bool
     {
-        return InstalledVersions::isInstalled('codefog/tags-bundle');
+        return InstalledVersions::satisfies(new VersionParser(), 'codefog/tags-bundle', '^3.0');
     }
 
     private function isHuhFilecreditsBundleInstalled(): bool
