@@ -1,5 +1,6 @@
 <?php
 
+use Contao\DataContainer;
 use Contao\DC_Table;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
@@ -39,13 +40,12 @@ $dca['config'] = [
 
 $dca['list'] = [
     'label' => [
-        'fields' => ['title'],
-        'format' => '%s',
+        'fields' => ['title', 'type'],
+        'format' => '%s&ensp;<span class="tl_gray">[%s]</span>',
     ],
     'sorting' => [
-        'mode' => 2,
+        'mode' => DataContainer::MODE_SORTABLE,
         'fields' => ['title'],
-        'headerFields' => ['title'],
         'panelLayout' => 'filter;sort,search,limit',
     ],
     'global_operations' => [
@@ -91,7 +91,7 @@ $dca['fields'] = [
     'dateAdded' => [
         'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
         'sorting' => true,
-        'flag' => 6,
+        'flag' => DataContainer::SORT_DAY_DESC,
         'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
         'sql' => "int(10) unsigned NOT NULL default '0'",
     ],
@@ -100,7 +100,7 @@ $dca['fields'] = [
         'exclude' => true,
         'search' => true,
         'sorting' => true,
-        'flag' => 1,
+        'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
         'inputType' => 'text',
         'eval' => ['mandatory' => true, 'tl_class' => 'w50'],
         'sql' => "varchar(255) NOT NULL default ''",

@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.2",
         "contao/core-bundle": "^4.13 || ^5.3",
-        "heimrichhannot/contao-flare-bundle": "0.0.*",
+        "heimrichhannot/contao-flare-bundle": "^0.1",
         "heimrichhannot/contao-form-type-bundle": "^0.2.0",
         "heimrichhannot/contao-utils-bundle": "^2.220 || ^3.0",
         "symfony/config": "^5.4 || ^6.4",
@@ -16,7 +16,7 @@
     },
     "conflict": {
         "heimrichhannot/contao-filecredits-bundle": "<2.1.0",
-        "heimrichhannot/contao-flare-bundle": "<0.0.29"
+        "heimrichhannot/contao-flare-bundle": "<0.1.0@alpha"
     },
     "suggest": {
         "codefog/tags-bundle": "^3.2",

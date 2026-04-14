@@ -1,6 +1,7 @@
 <?php /** @noinspection PhpUndefinedNamespaceInspection, PhpUndefinedClassInspection */
 
 use Codefog\TagsBundle\CodefogTagsBundle;
+use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\Config;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
@@ -9,7 +10,6 @@ use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use HeimrichHannot\UtilsBundle\Dca\AliasField;
 use HeimrichHannot\UtilsBundle\Dca\AuthorField;
-use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
 
 $table = ItemModel::getTable();
 $archiveTable = ArchiveModel::getTable();
@@ -19,7 +19,6 @@ AuthorField::register($table)
     ->setEvalValue('mandatory', false)
     ->setEvalValue('isAdditionalField', true)
 ;
-DateAddedField::register($table);
 AliasField::register($table);
 
 $dca = &$GLOBALS['TL_DCA'][$table];
@@ -56,9 +55,9 @@ $dca['list'] = [
         'format' => '%s',
     ],
     'sorting' => [
-        'mode' => 4,
+        'mode' => DataContainer::MODE_PARENT,
         'fields' => ['title'],
-        'headerFields' => ['title', 'tstamp'],
+        'headerFields' => ['title', 'type'],
         'panelLayout' => 'filter;sort,search,limit',
     ],
     'global_operations' => [
@@ -80,6 +79,7 @@ $dca['list'] = [
             'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '').'\'))return false;Backend.getScrollOffset()"',
         ],
         'toggle' => [
+            'href' => 'act=toggle&amp;field=published',
             'icon' => 'visible.svg',
             'attributes' => 'onclick="Backend.getScrollOffset();"',
         ],
@@ -104,6 +104,13 @@ $dca['fields'] = [
     'tstamp' => [
         'sql' => "int(10) unsigned NOT NULL default '0'",
     ],
+    'dateAdded' => [
+        'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
+        'sorting' => true,
+        'flag' => DataContainer::SORT_DAY_DESC,
+        'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
+        'sql' => "int(10) unsigned NOT NULL default '0'",
+    ],
     // 'type' => [
     //     'exclude' => true,
     //     'filter' => false,
@@ -115,7 +122,7 @@ $dca['fields'] = [
         'exclude' => true,
         'search' => true,
         'sorting' => true,
-        'flag' => 1,
+        'flag' => DataContainer::SORT_INITIAL_LETTERS_ASC,
         'inputType' => 'text',
         'eval' => ['mandatory' => true, 'tl_class' => 'w50'],
         'sql' => "varchar(255) NOT NULL default ''",
@@ -157,18 +164,12 @@ $dca['fields'] = [
             'tl_class' => 'autoheight clr',
             'multiple' => true,
             'fieldType' => 'checkbox',
-            'orderField' => 'additionalFilesOrder',
             'filesOnly' => true,
             'mandatory' => true,
             'doNotCopy' => false,
+            'isSortable' => true,
         ],
         'sql' => 'blob NULL',
-    ],
-    'additionalFilesOrder' => [
-        'sql' => 'blob NULL',
-        'eval' => [
-            'doNotCopy' => true,
-        ],
     ],
     'videoPosterImage' => [
         'exclude' => true,
@@ -192,9 +193,11 @@ $dca['fields'] = [
     'published' => [
         'exclude' => true,
         'filter' => true,
+        'toggle' => true,
         'inputType' => 'checkbox',
         'eval' => ['doNotCopy' => true, 'tl_class' => 'clr'],
-        'sql' => "char(1) NOT NULL default ''",
+        'default' => false,
+        'sql' => ['type' => 'boolean', 'default' => false, 'notnull' => true],
     ],
     'start' => [
         'exclude' => true,

@@ -18,6 +18,8 @@ class ArchiveTypeCollection
     {
         if (!isset($this->archiveTypes))
         {
+            $this->archiveTypes = [];
+
             foreach ($this->archiveTypesIterable as $alias => $service)
             {
                 $this->archiveTypes[$alias] = $service;

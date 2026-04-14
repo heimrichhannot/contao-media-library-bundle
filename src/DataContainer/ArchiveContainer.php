@@ -5,13 +5,9 @@ namespace HeimrichHannot\MediaLibraryBundle\DataContainer;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\DBAL\ParameterType;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
 use HeimrichHannot\MediaLibraryBundle\Event\ArchivePaletteEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
-use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -24,38 +20,9 @@ class ArchiveContainer
 
     public function __construct(
         private readonly ArchiveTypeCollection    $archiveTypes,
-        private readonly Connection               $connection,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack             $requestStack,
     ) {}
-
-    /**
-     * @throws DBALException When the database query fails for some reason.
-     */
-    #[AsCallback(self::TABLE, 'config.onsubmit')]
-    public function onSubmit(DataContainer $dc): void
-    {
-        if (!$dc->id) {
-            return;
-        }
-
-        $table = $this->connection->quoteIdentifier(self::TABLE);
-        $stmt = $this->connection->prepare(<<<SQL
-            UPDATE {$table}
-               SET `dateAdded` = :dateAdded
-             WHERE `id` = :id
-               AND COALESCE(CAST(`dateAdded` AS UNSIGNED), 0) < 1
-            SQL);
-        $stmt->bindValue('dateAdded', \time(), ParameterType::INTEGER);
-        $stmt->bindValue('id', $dc->id, ParameterType::INTEGER);
-        $stmt->executeStatement();
-    }
-
-    #[AsCallback(self::TABLE, 'config.oncopy')]
-    public function onCopy(int $id, DataContainer $dc): void
-    {
-        $this->connection->update(self::TABLE, ['dateAdded' => \time()], ['id' => $id]);
-    }
 
     /**
      * Dynamically generate and add the palette for the current archive type if it does not exist yet.
@@ -67,7 +34,7 @@ class ArchiveContainer
     {
         $act = $this->requestStack->getCurrentRequest()?->query?->get('act');
 
-        if (!$dc?->id || $act !== 'edit') {
+        if (!$dc || !$dc->id || $act !== 'edit') {
             return;
         }
 
