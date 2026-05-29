@@ -22,7 +22,7 @@ class HeimrichHannotMediaLibraryExtension extends Extension
         $container->setParameter('huh_media_library', $config);
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'huh_media_library';
     }

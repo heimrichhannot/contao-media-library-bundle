@@ -43,7 +43,7 @@ class ProductListModuleController extends AbstractFrontendModuleController
     ){}
 
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         if ($this->productFactory->getProductHelper()->runIfDeleteAction()) {
             throw new RedirectResponseException($this->utils->url()->removeQueryStringParameterFromUrl(Product::PARAMETER_DELETE));
