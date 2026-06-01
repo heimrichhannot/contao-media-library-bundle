@@ -72,9 +72,16 @@ class HuhFilecreditsListener
             return null;
         }
 
-        if ($request->getMethod() === 'POST') {
-            $fc = (array) ($request->request->get('_filecredits_copyright') ?? []);
-            return \serialize(\array_filter(\array_unique($fc)));
+        if ($request->getMethod() === 'POST')
+        {
+            $fc = \array_filter(
+                $request->request->all('_filecredits_copyright'),
+                static fn (mixed $value): bool => \is_scalar($value) && \trim((string) $value) !== ''
+            );
+
+            return \serialize(\array_values(\array_unique(
+                \array_map(static fn (mixed $value): string => \trim((string) $value), $fc)
+            )));
         }
 
         if (!$dc->id || !$file = ItemModel::findByPk($dc->id)?->getFile()) {
