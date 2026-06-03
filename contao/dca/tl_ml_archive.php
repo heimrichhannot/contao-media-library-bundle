@@ -57,13 +57,13 @@ $dca['list'] = [
         ],
     ],
     'operations' => [
-        ($contao5 ? 'children' : 'edit') => [
-            'href' => "table=$itemTable",
-            'icon' => $contao5 ? 'children.svg' : 'edit.svg',
-        ],
         ($contao5 ? 'edit' : 'editheader') => [
             'href' => 'act=edit',
             'icon' => $contao5 ? 'edit.svg' : 'header.svg',
+        ],
+        ($contao5 ? 'children' : 'edit') => [
+            'href' => "table=$itemTable",
+            'icon' => $contao5 ? 'children.svg' : 'edit.svg',
         ],
         'copy' => [
             'href' => 'act=copy',
