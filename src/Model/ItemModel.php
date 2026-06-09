@@ -15,6 +15,7 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
  *
  * @property int $id
  * @property int $pid
+ * @property int $tstamp
  * @property string $type
  * @property string $title
  * @property string $alias
