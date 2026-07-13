@@ -2,11 +2,14 @@
 
 namespace HeimrichHannot\MediaLibraryBundle\Flare\ListType;
 
+use HeimrichHannot\FlareBundle\Contract\DcaContract;
+use HeimrichHannot\FlareBundle\DataContainer\Builder\DcaBuilder;
+use HeimrichHannot\FlareBundle\DataContainer\Builder\DcaContext;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
 use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
 use HeimrichHannot\FlareBundle\Event\ListSpecificationCreatedEvent;
-use HeimrichHannot\FlareBundle\FilterElement\PublishedElement;
-use HeimrichHannot\FlareBundle\FilterElement\SimpleEquationElement;
+use HeimrichHannot\FlareBundle\Filter\Element\PublishedFilterElement;
+use HeimrichHannot\FlareBundle\Filter\Element\SimpleEquationFilterElement;
 use HeimrichHannot\FlareBundle\ListType\AbstractListType;
 use HeimrichHannot\FlareBundle\Query\JoinTypeEnum;
 use HeimrichHannot\FlareBundle\Query\SqlJoinStruct;
@@ -14,11 +17,16 @@ use HeimrichHannot\FlareBundle\Query\TableAliasRegistry;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsListType(self::TYPE, dataContainer: ItemContainer::TABLE, palette: '{archive_legend},ml_archive')]
-class MediaLibraryArchiveListType extends AbstractListType implements MediaLibraryFilesListTypeInterface
+#[AsListType(self::TYPE, dataContainer: ItemContainer::TABLE)]
+class MediaLibraryArchiveListType extends AbstractListType implements MediaLibraryFilesListTypeInterface, DcaContract
 {
     public const TYPE = 'ml_archive';
     public const ALIAS_ARCHIVE = 'ml_archive';
+
+    public function buildDca(DcaBuilder $dca, DcaContext $context): void
+    {
+        $dca->palette('{archive_legend},ml_archive');
+    }
 
     public function configureTableRegistry(TableAliasRegistry $registry): void
     {
@@ -36,21 +44,21 @@ class MediaLibraryArchiveListType extends AbstractListType implements MediaLibra
     #[AsEventListener(priority: 200)]
     public function onListSpecificationCreated(ListSpecificationCreatedEvent $config): void
     {
-        if ($config->listSpecification->type !== self::TYPE) {
+        $spec = $config->listSpecification;
+
+        if ($spec->type !== self::TYPE) {
             return;
         }
 
-        $filters = $config->listSpecification->getFilters();
-
-        if ($archiveId = $config->listSpecification->ml_archive) {
-            $filters->set(
-                '_ml_archive_id',
-                SimpleEquationElement::define('pid', SqlEquationOperator::EQUALS, $archiveId)
+        if ($archiveId = $spec->ml_archive) {
+            $spec->addFilter(
+                SimpleEquationFilterElement::define('pid', SqlEquationOperator::EQUALS, $archiveId),
+                '_ml_archive_id'
             );
         }
 
-        if (!$filters->hasType(PublishedElement::TYPE)) {
-            $filters->add(PublishedElement::define());
+        if (!$spec->hasFilterOfType(PublishedFilterElement::TYPE)) {
+            $spec->addFilter(PublishedFilterElement::define());
         }
     }
 }
