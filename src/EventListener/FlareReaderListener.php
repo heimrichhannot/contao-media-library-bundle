@@ -21,11 +21,12 @@ readonly class FlareReaderListener
 
     public function __invoke(ReaderRenderEvent $event): void
     {
-        if (!$listType = $this->listTypes->get($event->getListSpecification()->type)) {
-            return;
-        }
+        $list = $event->getList();
 
-        if (!$listType->getService() instanceof MediaLibraryFilesListTypeInterface) {
+        $listType = $list->getTypeInstance()
+            ?? $this->listTypes->get($list->getTypeAlias())?->getService();
+
+        if (!$listType instanceof MediaLibraryFilesListTypeInterface) {
             return;
         }
 

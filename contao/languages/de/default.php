@@ -1,8 +1,0 @@
-<?php
-
-use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryArchiveListType;
-
-$lang = &$GLOBALS['TL_LANG'];
-$flare = &$lang['FLARE'];
-
-$flare['list'][MediaLibraryArchiveListType::TYPE] = ['Mediathek-Archiv [ML]', 'Listet Elemente eines Mediathek-Archives auf.'];

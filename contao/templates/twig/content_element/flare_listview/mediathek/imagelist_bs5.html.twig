@@ -1,19 +1,19 @@
 {% extends '@Contao/content_element/flare_listview.html.twig' %}
 
-{# @var \HeimrichHannot\FlareBundle\Paginator\Paginator paginator #}
-{% set paginator = flare.paginator %}
-
 {% block pagination %}
 {% endblock %}
 
 {% block list %}
 
+    {# @var \HeimrichHannot\FlareBundle\Engine\View\InteractiveView flare_list #}
+    {% set paginator = flare_list.paginator %}
+
     {{ include('@Contao/flare/paginator/bs5.html.twig') }}
 
     <section class="ml-list my-4">
 
-        {% for entry in flare.entries %}
-            {% set href = flare.to(entry.id) %}
+        {% for entry in flare_list.entries %}
+            {% set href = flare_list.to(entry.id) %}
             <article class="ml-entry">
                 {% if entry.file|default %}
                     {# metadata: { alt: 'Contao Logo' }, #}
