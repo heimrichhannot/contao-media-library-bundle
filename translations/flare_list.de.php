@@ -1,7 +1,7 @@
 <?php
 
-use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryArchiveListType;
+use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryArchiveListDriver;
 
 return [
-    MediaLibraryArchiveListType::TYPE => 'Mediathek-Archiv [ML]',
+    MediaLibraryArchiveListDriver::TYPE => 'Mediathek-Archiv [ML]',
 ];

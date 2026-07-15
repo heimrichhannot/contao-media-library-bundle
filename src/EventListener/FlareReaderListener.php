@@ -6,7 +6,7 @@ use Contao\CoreBundle\Filesystem\FilesystemItem;
 use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
 use Contao\StringUtil;
 use HeimrichHannot\FlareBundle\Event\ReaderRenderEvent;
-use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryFilesListTypeInterface;
+use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryFilesListDriverInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Uid\Uuid;
 
@@ -21,7 +21,7 @@ readonly class FlareReaderListener
     {
         $list = $event->getList();
 
-        if (!$list->driver instanceof MediaLibraryFilesListTypeInterface) {
+        if (!$list->driver instanceof MediaLibraryFilesListDriverInterface) {
             return;
         }
 

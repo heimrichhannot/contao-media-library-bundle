@@ -7,13 +7,13 @@ use HeimrichHannot\FlareBundle\Contract\DcaContract;
 use HeimrichHannot\FlareBundle\Contract\ListType\BuildListContract;
 use HeimrichHannot\FlareBundle\DataContainer\Builder\DcaBuilder;
 use HeimrichHannot\FlareBundle\DataContainer\Builder\DcaContext;
-use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListType;
+use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsListDriver;
 use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
 use HeimrichHannot\FlareBundle\Filter\Element\PublishedFilterElement;
 use HeimrichHannot\FlareBundle\Filter\Element\SimpleEquationFilterElement;
 use HeimrichHannot\FlareBundle\Filter\Filter;
+use HeimrichHannot\FlareBundle\List\Driver\AbstractListDriver;
 use HeimrichHannot\FlareBundle\List\ListSpecBuilder;
-use HeimrichHannot\FlareBundle\List\Type\AbstractListDriver;
 use HeimrichHannot\FlareBundle\Model\ListModel;
 use HeimrichHannot\FlareBundle\Query\JoinTypeEnum;
 use HeimrichHannot\FlareBundle\Query\SqlJoinStruct;
@@ -21,9 +21,9 @@ use HeimrichHannot\FlareBundle\Query\TableAliasRegistry;
 use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-#[AsListType(self::TYPE, dataContainer: ItemContainer::TABLE)]
-class MediaLibraryArchiveListType extends AbstractListDriver implements
-    MediaLibraryFilesListTypeInterface, BuildListContract, DcaContract
+#[AsListDriver(self::TYPE, dataContainer: ItemContainer::TABLE)]
+class MediaLibraryArchiveListDriver extends AbstractListDriver implements
+    MediaLibraryFilesListDriverInterface, BuildListContract, DcaContract
 {
     public const TYPE = 'ml_archive';
     public const ALIAS_ARCHIVE = 'ml_archive';
