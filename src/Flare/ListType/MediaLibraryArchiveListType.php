@@ -12,8 +12,8 @@ use HeimrichHannot\FlareBundle\Enum\SqlEquationOperator;
 use HeimrichHannot\FlareBundle\Filter\Element\PublishedFilterElement;
 use HeimrichHannot\FlareBundle\Filter\Element\SimpleEquationFilterElement;
 use HeimrichHannot\FlareBundle\Filter\Filter;
-use HeimrichHannot\FlareBundle\List\ListBuilder;
-use HeimrichHannot\FlareBundle\List\Type\AbstractListType;
+use HeimrichHannot\FlareBundle\List\ListSpecBuilder;
+use HeimrichHannot\FlareBundle\List\Type\AbstractListDriver;
 use HeimrichHannot\FlareBundle\Model\ListModel;
 use HeimrichHannot\FlareBundle\Query\JoinTypeEnum;
 use HeimrichHannot\FlareBundle\Query\SqlJoinStruct;
@@ -22,7 +22,7 @@ use HeimrichHannot\MediaLibraryBundle\DataContainer\ItemContainer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[AsListType(self::TYPE, dataContainer: ItemContainer::TABLE)]
-class MediaLibraryArchiveListType extends AbstractListType implements
+class MediaLibraryArchiveListType extends AbstractListDriver implements
     MediaLibraryFilesListTypeInterface, BuildListContract, DcaContract
 {
     public const TYPE = 'ml_archive';
@@ -56,12 +56,12 @@ class MediaLibraryArchiveListType extends AbstractListType implements
         ));
     }
 
-    public function buildList(ListBuilder $builder): void
+    public function buildList(ListSpecBuilder $builder): void
     {
         if ($archiveId = (int) $builder->getModel()?->ml_archive) {
             $builder->addFilter(
                 new Filter(
-                    element: SimpleEquationFilterElement::TYPE,
+                    type: SimpleEquationFilterElement::TYPE,
                     config: [
                         'intrinsic' => true,
                         'left' => 'pid',
@@ -75,7 +75,7 @@ class MediaLibraryArchiveListType extends AbstractListType implements
 
         if (!$builder->hasFilterOfType(PublishedFilterElement::TYPE)) {
             $builder->addFilter(new Filter(
-                element: PublishedFilterElement::TYPE,
+                type: PublishedFilterElement::TYPE,
                 config: [
                     'intrinsic' => true,
                     'published_field' => 'published',
