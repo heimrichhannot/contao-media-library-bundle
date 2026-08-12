@@ -396,8 +396,14 @@ class MediaLibraryType extends AbstractFormType
             && ($archiveModel = ArchiveModel::findByPk($form->ml_archive))
             && ($detailsJumpTo = PageModel::findByPk($archiveModel->jumpTo))
         ) {
-            $url = $detailsJumpTo->getAbsoluteUrl('/'.$event->getSubmittedData()['alias']);
-            $_SESSION['FILES'] = array();
+            // Only reader pages take the item alias as an auto item; appending it to a
+            // regular page (e.g. an overview) would produce a 404.
+            $detailsJumpTo->loadDetails();
+            $alias = $event->getSubmittedData()['alias'] ?? null;
+            $params = ($detailsJumpTo->requireItem && $alias) ? '/'.$alias : '';
+
+            $url = $detailsJumpTo->getAbsoluteUrl($params);
+            $_SESSION['FILES'] = [];
             Controller::redirect($url);
         }
     }

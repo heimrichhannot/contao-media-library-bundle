@@ -20,7 +20,7 @@ $dca['palettes'] = [
 $dca['palettes']['default'] = Str::mergePalettes($dca['palettes']['__prefix__'], $dca['palettes']['__suffix__']);
 
 $dca['subpalettes'] = [
-    'enableCreate' => 'createJumpTo',
+    'enableCreate' => 'createJumpTo,jumpTo',
     'enableEdit' => 'editJumpTo',
     'enableDelete' => 'deleteJumpTo',
 ];
@@ -118,14 +118,16 @@ $dca['fields'] = [
         ],
         'sql' => "varchar(128) NOT NULL default ''",
     ],
-    // 'jumpTo' => [
-    //     'exclude' => true,
-    //     'inputType' => 'pageTree',
-    //     'foreignKey' => 'tl_page.title',
-    //     'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
-    //     'sql' => "int(10) unsigned NOT NULL default 0",
-    //     'relation' => ['type' => 'hasOne', 'load' => 'lazy']
-    // ],
+    // Redirect target after a frontend upload. If the selected page requires an
+    // item (a reader page), the alias of the new item is appended to the URL.
+    'jumpTo' => [
+        'exclude' => true,
+        'inputType' => 'pageTree',
+        'foreignKey' => 'tl_page.title',
+        'eval' => ['fieldType' => 'radio', 'tl_class' => 'clr'],
+        'sql' => "int(10) unsigned NOT NULL default 0",
+        'relation' => ['type' => 'hasOne', 'load' => 'lazy']
+    ],
     'additionalFields' => [
         'exclude' => true,
         'filter' => true,

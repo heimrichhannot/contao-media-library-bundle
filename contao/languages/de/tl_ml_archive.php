@@ -10,7 +10,7 @@ $lang = &$GLOBALS['TL_LANG'][ArchiveModel::getTable()];
 $lang['tstamp'] = ['Änderungsdatum', ''];
 $lang['title'] = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang['type'] = ['Typ', 'Wählen Sie hier aus, von welcher Art die Einträge dieses Archives sind.'];
-$lang['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie hier die Produktleser-Seite aus, zu der Besucher nach dem Klicken auf ein Produkt weitergeleitet werden soll.'];
+$lang['jumpTo'] = ['Weiterleitungsseite nach dem Erstellen', 'Wählen Sie hier die Seite aus, zu der der Nutzer nach dem Erstellen eines Produktes weitergeleitet werden soll. Handelt es sich um eine Produktleser-Seite, wird der Alias des neuen Produktes angehängt.'];
 $lang['additionalFields'] = ['Zusätzliche Felder der Einträge', 'Wählen Sie hier die Felder aus, die der Palette von Produkten dieses Archivs hinzugefügt werden sollen.'];
 $lang['imageSizes'] = ['Bildgrößen', 'Wählen Sie hier die Bildgrößen aus, für die Downloads für das Produkt erstellt werden sollen.'];
 
