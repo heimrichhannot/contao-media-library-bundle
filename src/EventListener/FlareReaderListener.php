@@ -19,7 +19,7 @@ readonly class FlareReaderListener
 
     public function __invoke(ReaderRenderEvent $event): void
     {
-        $list = $event->getList();
+        $list = $event->list;
 
         if (!$list->driver instanceof MediaLibraryFilesListDriverInterface) {
             return;
@@ -31,7 +31,7 @@ readonly class FlareReaderListener
 
     public function getFile(ReaderRenderEvent $event): ?FilesystemItem
     {
-        if (!$uuidBin = $event->getDisplayModel()->file) {
+        if (!$uuidBin = $event->displayModel->file) {
             return null;
         }
 
@@ -50,7 +50,7 @@ readonly class FlareReaderListener
 
     public function getAdditionalFiles(ReaderRenderEvent $event): ?array
     {
-        $model = $event->getDisplayModel();
+        $model = $event->displayModel;
 
         if (!$model->addAdditionalFiles) {
             return null;
