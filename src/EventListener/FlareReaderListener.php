@@ -6,8 +6,7 @@ use Contao\CoreBundle\Filesystem\FilesystemItem;
 use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
 use Contao\StringUtil;
 use HeimrichHannot\FlareBundle\Event\ReaderRenderEvent;
-use HeimrichHannot\FlareBundle\Registry\ListTypeRegistry;
-use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryFilesListTypeInterface;
+use HeimrichHannot\MediaLibraryBundle\Flare\ListType\MediaLibraryFilesListDriverInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Uid\Uuid;
 
@@ -15,17 +14,14 @@ use Symfony\Component\Uid\Uuid;
 readonly class FlareReaderListener
 {
     public function __construct(
-        private ListTypeRegistry           $listTypes,
         private VirtualFilesystemInterface $filesStorage,
     ) {}
 
     public function __invoke(ReaderRenderEvent $event): void
     {
-        if (!$listType = $this->listTypes->get($event->getListSpecification()->type)) {
-            return;
-        }
+        $list = $event->list;
 
-        if (!$listType->getService() instanceof MediaLibraryFilesListTypeInterface) {
+        if (!$list->driver instanceof MediaLibraryFilesListDriverInterface) {
             return;
         }
 
@@ -35,7 +31,7 @@ readonly class FlareReaderListener
 
     public function getFile(ReaderRenderEvent $event): ?FilesystemItem
     {
-        if (!$uuidBin = $event->getDisplayModel()->file) {
+        if (!$uuidBin = $event->displayModel->file) {
             return null;
         }
 
@@ -54,7 +50,7 @@ readonly class FlareReaderListener
 
     public function getAdditionalFiles(ReaderRenderEvent $event): ?array
     {
-        $model = $event->getDisplayModel();
+        $model = $event->displayModel;
 
         if (!$model->addAdditionalFiles) {
             return null;
