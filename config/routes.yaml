@@ -1,3 +1,0 @@
-huh_media_library:
-    resource: "@HeimrichHannotMediaLibraryBundle/src/Controller/"
-    type:     annotation

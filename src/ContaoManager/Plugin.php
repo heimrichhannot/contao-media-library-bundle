@@ -42,6 +42,10 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
 
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel): ?RouteCollection
     {
-        return $resolver->resolve($routes = '@HeimrichHannotMediaLibraryBundle/config/routes.yaml')->load($routes);
+        // The controllers' route attributes: Symfony 6.4+ loads them as type "attribute", Symfony 5.4 as "annotation"
+        $type = class_exists(\Symfony\Component\Routing\Loader\AttributeClassLoader::class) ? 'attribute' : 'annotation';
+        $path = \dirname(__DIR__).'/Controller/';
+
+        return $resolver->resolve($path, $type)->load($path, $type);
     }
 }

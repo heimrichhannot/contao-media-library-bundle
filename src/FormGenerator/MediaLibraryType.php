@@ -32,7 +32,7 @@ use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
 use HeimrichHannot\MediaLibraryBundle\Model\ItemModel;
 use HeimrichHannot\MediaLibraryBundle\Security\Voter;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaLibraryType extends AbstractFormType
@@ -46,7 +46,7 @@ class MediaLibraryType extends AbstractFormType
     public function __construct(
         private readonly FileUploadPathCallback     $uploadPath,
         private readonly RequestStack               $requestStack,
-        private readonly Security                   $security,
+        private readonly AuthorizationCheckerInterface $security,
         private readonly TokenChecker               $tokenChecker,
         private readonly TranslatorInterface        $translator,
         private readonly VirtualFilesystemInterface $filesStorage,
