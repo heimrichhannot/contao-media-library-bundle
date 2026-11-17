@@ -53,13 +53,14 @@ readonly class CodefogTagsListener
             $tagId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_TAG_FIELD};
             $itemId = (int) $tagAssociations->{self::CFG_TAG_ASSOCIATION_ITEM_FIELD};
 
-            $tagUsedByOtherRecord = $this->connection->executeQuery(
+            $tagUsedByOtherRecord = false !== $this->connection->fetchOne(
                 \sprintf('SELECT 1 FROM %s WHERE %s = ? AND %s != ? LIMIT 1', $qTagTable, $qTagField, $qItemField),
                 [$tagId, $dc->id],
                 [ParameterType::INTEGER, ParameterType::INTEGER]
             );
 
-            if ($tagUsedByOtherRecord->rowCount() > 0)
+            // Only delete the tag itself if no other item uses it anymore
+            if (!$tagUsedByOtherRecord)
             {
                 $this->connection->executeStatement(
                     \sprintf(
