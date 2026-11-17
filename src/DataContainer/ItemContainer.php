@@ -110,12 +110,22 @@ class ItemContainer
             return $palette;
         }
 
+        // A field that is already part of the palette must not be added a second time: the form would render
+        // two inputs with the same name and the second (usually empty) one would overwrite the first on save.
+        $paletteFields = Str::getPaletteFields($palette);
         $pm = PaletteManipulator::create();
+        $added = false;
 
         foreach ($additionalFields as $field) {
+            if (!\is_string($field) || '' === $field || isset($paletteFields[$field])) {
+                continue;
+            }
+
+            $paletteFields[$field] = true;
             $pm->addField($field, 'additional_fields_legend', PaletteManipulator::POSITION_APPEND);
+            $added = true;
         }
 
-        return $pm->applyToString($palette);
+        return $added ? $pm->applyToString($palette) : $palette;
     }
 }

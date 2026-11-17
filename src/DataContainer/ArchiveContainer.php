@@ -8,6 +8,7 @@ use Contao\DataContainer;
 use HeimrichHannot\MediaLibraryBundle\Collection\ArchiveTypeCollection;
 use HeimrichHannot\MediaLibraryBundle\Event\ArchivePaletteEvent;
 use HeimrichHannot\MediaLibraryBundle\Model\ArchiveModel;
+use HeimrichHannot\MediaLibraryBundle\Util\Str;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -91,11 +92,17 @@ class ArchiveContainer
             return [];
         }
 
+        // fields of the base item palette are always shown, offering them again would only duplicate them
+        $baseFields = Str::getPaletteFields(Str::mergePalettes(
+            $dca['palettes']['__prefix__'] ?? null,
+            $dca['palettes']['__suffix__'] ?? null,
+        ));
+
         $options = [];
 
         foreach ($fields as $fieldName => $field)
         {
-            if (!($field['eval']['isAdditionalField'] ?? false)) {
+            if (!($field['eval']['isAdditionalField'] ?? false) || isset($baseFields[$fieldName])) {
                 continue;
             }
 
